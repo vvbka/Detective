@@ -1,0 +1,25 @@
+{
+  "name": "detective",
+  "version": "0.0.1",
+  "description": "a statistics-based clue solver",
+  "main": "app/dist/index.html",
+  "dependencies": {
+    "gulp": "^3.8.10",
+    "gulp-chug": "^0.4.1",
+    "node-webkit-builder": "^1.0.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "app/build/detective/linux32/detective"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/vbka/detective"
+  },
+  "keywords": [
+    "sample",
+    "webkit"
+  ],
+  "author": "VBKA",
+  "license": "MIT"
+}
