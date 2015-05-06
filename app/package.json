@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "a statistics-based clue solver",
   "main": "index.html",
+  "dependencies": {
+    "detective": "git+ssh://git@bitbucket.org/vbka/detective.git#src"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

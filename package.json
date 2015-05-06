@@ -12,7 +12,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "./exec.sh",
-    "postinstall": "gulp clean"
+    "postinstall": "gulp clean; cd app && npm i"
   },
   "repository": {
     "type": "git",
