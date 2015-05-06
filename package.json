@@ -4,13 +4,15 @@
   "description": "a statistics-based clue solver",
   "main": "app/dist/index.html",
   "dependencies": {
-    "gulp": "^3.8.10",
-    "gulp-chug": "^0.4.1",
-    "node-webkit-builder": "^1.0.6"
+    "gulp": "3.8.11",
+    "gulp-chug": "0.4.1",
+    "node-webkit-builder": "1.0.6",
+    "rimraf": "^2.3.3"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "app/build/detective/linux32/detective"
+    "start": "./exec.sh",
+    "postinstall": "gulp clean"
   },
   "repository": {
     "type": "git",
