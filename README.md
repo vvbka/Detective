@@ -1,7 +1,10 @@
-# detective
+# Detective
 
-TODO: talk about stuff.
+A statistics-based solver for Clue.
 
-## authors
+## Authors
 
-VBKA.
+***VBKA.***
+
+ - [Valen Varangu Booth](https://github.com/valenvb)
+ - [Karim Alibhai](https://github.com/karimsa)
