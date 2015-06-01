@@ -4,9 +4,9 @@
   "description": "a statistics-based clue solver",
   "main": "index.html",
   "window": {
-    "toolbar":false,
-    "width":1200,
-    "height":710
+    "toolbar": true,
+    "width": 1200,
+    "height": 710
   },
   "dependencies": {
   },
