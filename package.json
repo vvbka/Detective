@@ -2,26 +2,16 @@
   "name": "detective",
   "version": "0.0.1",
   "description": "a statistics-based clue solver",
-  "main": "app/dist/index.html",
+  "main": "app.js",
   "dependencies": {
-    "gulp": "3.8.11",
-    "gulp-chug": "0.4.1",
-    "node-webkit-builder": "1.0.6",
-    "rimraf": "^2.3.3"
+    "cutils": "git+ssh://git@bitbucket.org/vbka/cutils.git",
+    "eventemitter2": "^0.4.14",
+    "fishbone": "^1.0.1",
+    "solver": "0.0.2"
   },
-  "devDependencies": {},
   "scripts": {
-    "start": "./exec.sh",
-    "postinstall": "gulp clean; cd app && npm i"
+    "start": "./node_modules/.bin/electron ."
   },
-  "repository": {
-    "type": "git",
-    "url": "https://bitbucket.org/vbka/detective"
-  },
-  "keywords": [
-    "sample",
-    "webkit"
-  ],
   "author": "VBKA",
   "license": "MIT"
 }
