@@ -12,6 +12,10 @@ var app = require('app'),
 // report crashes for electron
 require('crash-reporter').start();
 
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the javascript object is GCed.
+var DetectiveWindow = null;
+
 // apparently everything other than OSX needs to be
 // manually quitted
 app.on('window-all-closed', function () {
@@ -23,11 +27,11 @@ app.on('window-all-closed', function () {
 // prepare for full init from electron, then do
 // our stuff
 app.on('ready', function () {
-  var win = new BrowserWindow({
+    DetectiveWindow = new BrowserWindow({
     width: 1200,
     height: 710
   });
 
-  win.loadUrl('file://' + __dirname + '/index.html');
-  win.openDevTools();
+  DetectiveWindow.loadUrl('file://' + __dirname + '/index.html');
+  DetectiveWindow.openDevTools();
 });
