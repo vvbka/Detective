@@ -1,7 +1,7 @@
 #!/bin/bash
 
 type="osx64"
-if [ "$(sysctl -b kernel.ostype)" == "Linux" ]; then
+if [ "$(sysctl -b kernel.ostype 2>&1)" == "Linux" ]; then
   type="linux32"
 fi
 
