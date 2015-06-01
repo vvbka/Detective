@@ -17,7 +17,7 @@
       <div class="container-fluid">
         <div class="navbar-header">
           
-          <a class="navbar-brand" href="http://getbootstrap.com/examples/dashboard/#">Detective</a>
+          <a class="navbar-brand" href="#">Detective</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form" style="text-align:center;">
@@ -32,16 +32,19 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
            
-            <li class="active"><a href="http://getbootstrap.com/examples/dashboard/#">Master<span class="sr-only">(current)</span></a></li>
-            <li><a href="">Reports</a></li>
-            <li><a href="">Analytics</a></li>
-            <li><a href="">Export</a></li>
+            <li class="active"><a href="" ng-click="isMaster = true;">Master</a></li>
+            
+            <li ng-repeat="plyr in players"><a href="" ng-click="load(plyr.name);">{{plyr.name}}</a></li>
+            
           </ul>
         </div>
+        
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Master</h1>
-
-          <div class="row placeholders">
+          
+          <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}}</h1>
+          
+          <!--Master Guess Dsiplay-->
+          <div class="row placeholders" ng-show="isMaster">
             <div class="col-xs-7 col-sm-4 ">
               <img src="img/person/green.png"  class="img" alt="person">
               <h4>Mr. Green</h4>
@@ -60,11 +63,25 @@
               <h4>Knife</h4>
               <span class="text-muted">4%</span>
             </div>
-            
           </div>
+          
+          <!--Player Hand Guess Dsiplay-->
+          <div class="row placeholders" ng-show="!isMaster">
+            
+            
+            <div ng-repeat="player.topHand" class="col-sm-2 ">
+              <img src="img/person/green.png"  class="img" alt="person">
+              <h4>Mr. Green</h4>
+              <span class="text-muted">94%</span>
+            </div>
+        
+          </div>
+          
 
-          <h2 class="sub-header" ng-model>Master Guess</h2>
-          <div class="table-responsive">
+          <h2 class="sub-header" >{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
+          
+          
+          <div  ng-show="isMaster" class="table-responsive">
             <table class="table table-striped">
               
                <thead>
@@ -86,13 +103,39 @@
               </tbody>
             </table>
           </div>
+          
+          <!--The Player's Display Table-->
+          <div  ng-show="!isMaster" class="table-responsive">
+            <table class="table table-striped">
+              
+               <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Room</th>
+                  <th>Weapon</th>
+                </tr>
+              </thead>
+              
+              <tbody>
+               
+                <tr ng-repeat="(row) in player.guess">
+                  <td>{{row.person || '--' }}</td>
+                  <td>{{row.room || '--' }}</td>
+                  <td>{{row.weapon || '--' }}</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+          
+          
         </div>
       </div>
     </div>
 
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.js"></script>
-    <script src="../node_modules/angular/angular.min.js"></script>
+    <script src="js/angular.js"></script>
     <script src="js/main.js"></script>
     
 
