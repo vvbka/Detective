@@ -28,6 +28,7 @@ gulp.task('default', ['build'], function (cb) {
     var nw = new NodeWebkitBuilder({
         files: ['./package.json', './**/**']
       , platforms: process.env.NODE_ENV === 'development' ? [process.env.HOST_OS] : ['linux32', 'osx64']
+      , version:'0.12.0'
     })
 
     nw.on('log', console.log.bind(console))
