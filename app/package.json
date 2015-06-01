@@ -9,6 +9,9 @@
     "height": 710
   },
   "dependencies": {
+    "cutils": "git+ssh://git@bitbucket.org/vbka/cutils.git",
+    "eventemitter2": "^0.4.14",
+    "solver": "0.0.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
