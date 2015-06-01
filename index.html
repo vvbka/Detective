@@ -20,8 +20,8 @@
           <a class="navbar-brand" href="#">Detective</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <form class="navbar-form" style="text-align:center;">
-            <input type="text" class="form-control" placeholder="Input Command..." size="70">
+          <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
+            <input type="text" class="form-control" placeholder="{{aloutput || 'Input command ...'}}" size="70" ng-model="alinput">
           </form>
         </div>
       </div>
@@ -69,7 +69,7 @@
           <div class="row placeholders" ng-show="!isMaster">
             
             
-            <div ng-repeat="player.topHand" class="col-sm-2 ">
+            <div ng-repeat="card in player.sure" class="col-sm-2 ">
               <img src="img/person/green.png"  class="img" alt="person">
               <h4>Mr. Green</h4>
               <span class="text-muted">94%</span>
@@ -94,7 +94,7 @@
               
               <tbody>
                
-                <tr ng-repeat="(row) in masterGuess">
+                <tr ng-repeat="row in masterGuess">
                   <td>{{row.person || '--' }}</td>
                   <td>{{row.room || '--' }}</td>
                   <td>{{row.weapon || '--' }}</td>
@@ -118,7 +118,7 @@
               
               <tbody>
                
-                <tr ng-repeat="(row) in player.guess">
+                <tr ng-repeat="row in player.guess">
                   <td>{{row.person || '--' }}</td>
                   <td>{{row.room || '--' }}</td>
                   <td>{{row.weapon || '--' }}</td>
