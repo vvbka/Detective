@@ -1,4 +1,0 @@
-[submodule "app/lib"]
-	path = app/lib
-	url = git@bitbucket.org:vbka/detective.git
-	branch = src
