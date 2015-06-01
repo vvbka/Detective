@@ -4,11 +4,12 @@
   "description": "a statistics-based clue solver",
   "main": "app.js",
   "dependencies": {
-    "cutils": "git+ssh://git@bitbucket.org/vbka/cutils.git",
+    "cutils": "git+https://git@bitbucket.org/vbka/cutils.git",
     "electron-prebuilt": "^0.27.2",
     "eventemitter2": "^0.4.14",
     "fishbone": "^1.0.1",
-    "solver": "0.0.2"
+    "solver": "0.0.2",
+    "alfred": "git+https://git@bitbucket.org/karimsa/alfred.git"
   },
   "scripts": {
     "start": "./node_modules/.bin/electron ."
