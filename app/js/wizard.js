@@ -1,0 +1,3 @@
+/**
+ * js/wizard.js - detective
+ **/

@@ -4,7 +4,7 @@
  * Copyright (C) 2015 VBKA.
  **/
 
-angular.module('detective', []).controller('main', ['$scope', function ($scope) {
+process.app.controller('main', ['$scope', function ($scope) {
 
   'use strict';
 
