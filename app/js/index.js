@@ -8,8 +8,8 @@ process.app.controller('main', ['$scope', function ($scope) {
 
   'use strict';
 
-  var priority = require('../lib/priority'),
-      strategies = require('../lib/strategy-controller')([
+  var priority = require('./lib/priority'),
+      strategies = require('./lib/strategy-controller')([
         'find'
       ]);
 
