@@ -7,4 +7,9 @@ fi
 
 rm -rf app/build
 NODE_ENV=development HOST_OS=${type} gulp
-app/build/detective/${type}/detective
+
+if [ "$type" == "osx64" ]; then
+  open app/build/detective/${type}/detective.app
+else
+  app/build/detective/${type}/detective
+fi
