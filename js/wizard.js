@@ -11,13 +11,39 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   $scope.masterDefinite = global.masterDefinite;
   $scope.cards = global.cardset.people.concat(global.cardset.rooms, global.cardset.weapons);
   $scope.myCards = [];
-  $scope.add='Add a card';
+  $scope.add = '';
+
+  $scope.chars = ["Ms. Scarlet", "Mr. Green", "Colonel Mustard", "Mrs. Peacock", "Professor Plum", "Mrs. White"];
+  $scope.char2det = [,,,,,,,];
+  $scope.plnames = [,,,,,,,];
   
-  $scope.addToMyCards = function(){
-    $scope.myCards.push($scope.add);
-    $scope.add = '';
-    console.log($scope.myCards);
+  $scope.addToMyCards = function () {
+    $scope.add = $scope.add.trim();
+    console.log($scope.add);
+    if ($scope.add) {
+      $scope.myCards.push($scope.add);
+      $scope.add = '';
+      console.log($scope.myCards);
+    }
   };
+
+  $scope.setupPlayers = function () {
+    $scope.plnames = $scope.plnames.filter(function (name) {
+     return name;
+    });
+
+    var detindex = 0, i;
+    for (i = 0; i < $scope.char2det.length; i += 1) {
+      if ($scope.char2det[i]) {
+        detindex = i;
+        break;
+      }
+    }
+
+    console.log($scope.plnames[detindex] + ' is detective (playing as ' + $scope.chars[detindex] + ')');
+  };
+
+  $('#wizard-init').on('finished', function () { $scope.$apply($scope.setupPlayers) });
   
   // .players.add([name])
   // adds a player to the game (in the next player position)
