@@ -30,12 +30,28 @@ process.app.controller('main', ['$scope', function ($scope) {
 
   // bind alfred's input to angular, and
   // record history of commands using a typeahead
-  $scope.typeahead = ['hello, there'];
-  $scope.exec = function (text) {
+  $scope.typeahead = ['Hello, there.'];
+  $scope.exec = function () {
+    // fix up text
+    var text = $('[ng-model="alinput"]').val();
+    text = text[0].toUpperCase() + text.substr(1).toLowerCase();
+    if (text[text.length - 1] !== '.') text += '.';
+
     // keep latest commands at the top of the list
-//    $scope.typeahead = $scope.typeahead.reverse();
     $scope.typeahead.push(text);
-//    $scope.typeahead = $scope.typeahead.reverse();
+    $scope.typeahead = $scope.typeahead.filter(function (item, index, self) {
+      item = item.toLowerCase();
+
+      var n= -1;
+      for (var i = 0; i < self.length; i += 1) {
+        if (self[i].toLowerCase() === item) {
+          n = i;
+          break;
+        }
+      }
+
+      return index === n;
+    });
 
     // continue on next tick in order to force the
     // command to be asynchronous
