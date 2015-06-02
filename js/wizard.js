@@ -13,10 +13,10 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   $scope.myCards = [];
   $scope.add = '';
 
-  $scope.chars = ["Ms. Scarlet", "Mr. Green", "Colonel Mustard", "Mrs. Peacock", "Professor Plum", "Mrs. White"];
-  $scope.char2det = [,,,,,,,];
-  $scope.plnames = [,,,,,,,];
-  
+  $scope.chars = global.cardset.people;
+  $scope.char2det = [, , , , , , , ];
+  $scope.plnames = [, , , , , , , ];
+
   $scope.addToMyCards = function () {
     $scope.add = $scope.add.trim();
     console.log($scope.add);
@@ -29,10 +29,11 @@ process.app.controller('wizard', ['$scope', function ($scope) {
 
   $scope.setupPlayers = function () {
     $scope.plnames = $scope.plnames.filter(function (name) {
-     return name;
+      return name;
     });
 
-    var detindex = 0, i;
+    var detindex = 0,
+      i;
     for (i = 0; i < $scope.char2det.length; i += 1) {
       if ($scope.char2det[i]) {
         detindex = i;
@@ -43,8 +44,11 @@ process.app.controller('wizard', ['$scope', function ($scope) {
     console.log($scope.plnames[detindex] + ' is detective (playing as ' + $scope.chars[detindex] + ')');
   };
 
-  $('#wizard-init').on('finished', function () { $scope.$apply($scope.setupPlayers) });
-  
+  $('#wizard-init').on('finished', function () {
+    $scope.$apply($scope.setupPlayers);
+    $('#init-modal').modal('hide');
+  });
+
   // .players.add([name])
   // adds a player to the game (in the next player position)
   // -> player position can be modified through the UI
@@ -71,16 +75,22 @@ process.app.controller('wizard', ['$scope', function ($scope) {
     $scope.isMaster = false;
     $scope.player = $scope.playerdata[name];
   };
+
+  $scope.repeatDone = function () {
+    
+    $(document).on('ready', function () {
+      $('#wizard-init').steps({
+        headerTag: 'h3',
+        bodyTag: 'section',
+        stepsOrientation: 'vertical'
+      });
+
+       $('.sortable').sortable({
+      items: ':not(.disabled)'
+    });
+      
+      $('#init-modal').modal('show');
+    });
+
+  };
 }])
-
-$('#wizard-init').steps({
-  headerTag: 'h3',
-  bodyTag: 'section',
-  stepsOrientation: 'vertical'
-});
-
-$('#init-modal').modal('show');
-
-$('.sortable').sortable({
-  items: ':not(.disabled)'
-});

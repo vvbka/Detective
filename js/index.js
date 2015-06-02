@@ -4,7 +4,7 @@
  * Copyright (C) 2015 VBKA.
  **/
 global.cardset = {};
-global.cardset.people = ['Colonel Mustard', 'Ms. Scarlet', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'];
+global.cardset.people = ['Ms. Scarlet', 'Colonel Mustard',  'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'];
 global.cardset.rooms = ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'];
 global.cardset.weapons = ['Axe', 'Bomb', 'Candlestick', 'Knife', 'Pipe', 'Poison', 'Revolver', 'Rope', 'Syringe', 'Wrench'];
 

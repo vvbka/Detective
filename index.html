@@ -157,7 +157,13 @@
             <section>
               <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
               <ul class="sortable sortable-list">
-                <li ng-repeat="(index,char) in chars" class="{{index == 0 ? 'disabled' : ''}}">{{char}} <input type="checkbox" ng-model="char2det[index]"> <input type="text" ng-model="plnames[index]">  </li>
+                <li ng-repeat="(index,char) in chars" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
+                
+                  {{char}} 
+                
+                  <input type="checkbox" ng-model="char2det[index]"> <input type="text" ng-model="plnames[index]">  
+                
+                </li>
               </ul>
             </section>
             
@@ -182,7 +188,7 @@
     <script src="js/angular.js"></script>
     <script>process.app = angular.module('detective', [])</script>
     <script src="js/jquery.typeahead.js"></script>
-    <script src="js/ng-enter.js"></script>
+    <script src="js/ng-custom.js"></script>
     <script src="js/steps.js"></script>
     <script src="js/sortable.js"></script>
     <script src="js/index.js"></script>
