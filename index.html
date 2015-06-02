@@ -8,6 +8,7 @@
     <title>Detective</title>
 
     <link href="css/jquery.typeahead.css" rel="stylesheet">
+    <link href="css/jquery.steps.css" rel="stylesheet">
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/template.css" rel="stylesheet">
   </head>
@@ -21,6 +22,7 @@
           <a class="navbar-brand" href="#">Detective</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
+         
           <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
             <div class="typeahead-container">
               <div class="typeahead-field">
@@ -30,6 +32,7 @@
               </div>
             </div>
           </form>
+          
         </div>
       </div>
     </nav>
@@ -140,11 +143,61 @@
       </div>
     </div>
 
+   
+   <!--The init wizzard-->
+   <div id="init-modal" class="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Welcome To Detective</h4>
+        </div>
+        <div class="modal-body">
+        
+          <div id="wizard-init" ng-controller="wizard">
+            <h3>Player Order</h3>
+            <section>
+              <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
+              <ul class="sortable sortable-list">
+                <li class="disabled ">Ms. Scarlet <input type="checkbox" > <input  type="text">  </li>
+                <li id="grn">Mr. Green <input type="checkbox" > <input  type="text">  </li>
+                <li id="colmus">Colonel Mustard <input type="checkbox" > <input  type="text">  </li>
+                <li id="peac">Mrs. Peacock <input type="checkbox" > <input  type="text">  </li>
+                <li id="plum">Professor Plum <input type="checkbox" > <input  type="text">  </li>
+                <li id="white">Mrs. White <input type="checkbox" > <input  type="text">  </li>
+              </ul>
+              
+            </section>
+            
+            <h3>Detective's Cards</h3>
+            <section><p>Please list all the cards in Detective's hand</p>
+              <div class="input-group">
+                <input ng-modal="add" type="text" class="form-control">
+                <span class="input-group-btn"><button class="btn btn-success" ng-click="addToMyCards()">Add</button></span>
+              </div>
+              
+              <ul>
+                <li ng-repeat="card in myCards">{{card}}</li>
+                
+              </ul>
+            
+            </section>
+          </div>
+        
+        </div>
+        
+      </div>
+      
+    </div>
+     
+   </div>
+   
     <script>var $ = jQuery = require('./js/jquery.js');</script>
     <script src="js/bootstrap.js"></script>
     <script src="js/angular.js"></script>
     <script>process.app = angular.module('detective', [])</script>
     <script src="js/jquery.typeahead.js"></script>
+    <script src="js/steps.js"></script>
+    <script src="js/sortable.js"></script>
     <script src="js/index.js"></script>
     <script src="js/wizard.js"></script>
     

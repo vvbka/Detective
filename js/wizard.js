@@ -9,7 +9,16 @@
 process.app.controller('wizard', ['$scope', function ($scope) {
   $scope.players = global.players;
   $scope.masterDefinite = global.masterDefinite;
-
+  $scope.cards = global.cardset.people.concat(global.cardset.rooms, global.cardset.weapons);
+  $scope.myCards = [];
+  $scope.add='Add a card';
+  
+  $scope.addToMyCards = function(){
+    $scope.myCards.push($scope.add);
+    $scope.add = '';
+    console.log($scope.myCards);
+  };
+  
   // .players.add([name])
   // adds a player to the game (in the next player position)
   // -> player position can be modified through the UI
@@ -37,3 +46,15 @@ process.app.controller('wizard', ['$scope', function ($scope) {
     $scope.player = $scope.playerdata[name];
   };
 }])
+
+$('#wizard-init').steps({
+  headerTag: 'h3',
+  bodyTag: 'section',
+  stepsOrientation: 'vertical'
+});
+
+$('#init-modal').modal('show');
+
+$('.sortable').sortable({
+  items: ':not(.disabled)'
+});

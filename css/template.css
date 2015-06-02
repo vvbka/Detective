@@ -90,7 +90,7 @@ body {
 
 
 /*
- * Placeholder dashboard ideas
+ *  Dashboard Images
  */
 
 .placeholders {
@@ -106,4 +106,27 @@ body {
 .placeholder img {
   display: inline-block;
   border-radius: 50%;
+}
+
+
+/*
+* Wizard CSS
+*/
+
+/*Draggable Area*/
+ul.sortable-list > li {
+  border: solid 1px black;
+  margin-top: 5px;
+  padding: 5px;
+}
+ul.sortable-list > li > input {
+  float: right;
+}
+
+ul.sortable-list > li > input[type='text'] {
+  margin-right: 5px;
+}
+
+ul.sortable-list > li.disabled {
+  border: dashed 1px black;
 }
