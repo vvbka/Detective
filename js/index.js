@@ -12,6 +12,7 @@ process.app.controller('main', ['$scope', function ($scope) {
 
   var alfred = require('alfred'),
       priority = require('./lib/priority'),
+      nextPort = require('next-port'),
       strategies = require('./lib/strategy-controller')([
         'find'
       ]);
@@ -32,25 +33,38 @@ process.app.controller('main', ['$scope', function ($scope) {
   $scope.typeahead = ['hello, there'];
   $scope.exec = function (text) {
     // keep latest commands at the top of the list
-    $scope.typeahead = $scope.typeahead.reverse();
+//    $scope.typeahead = $scope.typeahead.reverse();
     $scope.typeahead.push(text);
-    $scope.typeahead = $scope.typeahead.reverse();
+//    $scope.typeahead = $scope.typeahead.reverse();
 
     // continue on next tick in order to force the
     // command to be asynchronous
     $scope.alinput = '';
     process.nextTick(function () {
-      alfred.try(text)
+      alfred.try(text);
+      console.log($scope.typeahead);
     });
   };
 
   // wrap up with typeahead
-  $('[ng-model="alinput"]').typeahead({
-    dynamic: true,
-    source: $scope.typeahead,
-    order: 'asc',
-//    hint: true,
-    highlight: true
+  nextPort(function (err, port) {
+    // simple echo server for echoing ajax
+    require('http').Server(function (req, res) {
+      res.end(JSON.stringify($scope.typeahead));
+    }).listen(port);
+
+    // keeping the source ajax-enabled allows for
+    // dynamic updating
+    $('[ng-model="alinput"]').typeahead({
+      dynamic: true,
+      source: {
+        history: {
+          url: 'http://localhost:' + port + '/'
+        }
+      },
+      order: 'asc',
+      highlight: true
+    });
   });
 
   // this switch allows us to toggle between the UI
