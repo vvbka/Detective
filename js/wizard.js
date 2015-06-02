@@ -6,6 +6,8 @@
  * Copyright (C) 2015 VBKA.
  **/
 
+priority = require('./lib/priority.js')
+
 process.app.controller('wizard', ['$scope', function ($scope) {
   $scope.players = global.players;
   $scope.masterDefinite = global.masterDefinite;
@@ -19,18 +21,15 @@ process.app.controller('wizard', ['$scope', function ($scope) {
 
   $scope.addToMyCards = function () {
     $scope.add = $scope.add.trim();
-    console.log($scope.add);
+    console.log('Adding: ' + $scope.add);
     if ($scope.add) {
       $scope.myCards.push($scope.add);
       $scope.add = '';
-      console.log($scope.myCards);
+
     }
   };
 
   $scope.setupPlayers = function () {
-    $scope.plnames = $scope.plnames.filter(function (name) {
-      return name;
-    });
 
     var detindex = 0,
       i;
@@ -40,14 +39,46 @@ process.app.controller('wizard', ['$scope', function ($scope) {
         break;
       }
     }
-
     console.log($scope.plnames[detindex] + ' is detective (playing as ' + $scope.chars[detindex] + ')');
+    
+    //initiate the Detective player
+    global.Detective = {
+      cards : $scope.myCards,
+      charName : $scope.chars[detindex],
+      name: $scope.plnames[detindex] || 'Detective',
+      turn: $('#playersSort li').index($('#playersSort').find('input:checked').parent()),
+      detective: true
+    };
+    
+    console.log(global.Detective);
+    
+    //initiate each new player
+    $('#playersSort li').each(function (i) {
+      if ($(this).find('input:checked').length != 1) {
+        var cn = $(this).text().trim();
+        var pn = $(this).find('input[type=text]').val().trim() || cn;
+        console.log(pn + ' is '+ cn);
+        
+        var newPlayer = {
+          name : pn,
+          charName : cn,
+          maybe: priority('length'),
+          sure: [],
+          turn: i,
+          possible : $scope.cards.filter(function(card){
+                        return $.inArray(card, global.Detective.cards) === -1;
+                      }) 
+        };
+        
+        global.players.push(newPlayer);
+        
+      } else {global.players.push(global.Detective)}
+      
+      
+      
+    });
   };
 
-  $('#wizard-init').on('finished', function () {
-    $scope.$apply($scope.setupPlayers);
-    $('#init-modal').modal('hide');
-  });
 
   // .players.add([name])
   // adds a player to the game (in the next player position)
@@ -76,21 +107,37 @@ process.app.controller('wizard', ['$scope', function ($scope) {
     $scope.player = $scope.playerdata[name];
   };
 
+  //fires once the ng-repeat is complete
   $scope.repeatDone = function () {
-    
     $(document).on('ready', function () {
-      $('#wizard-init').steps({
-        headerTag: 'h3',
-        bodyTag: 'section',
-        stepsOrientation: 'vertical'
+      $('.sortable').sortable({
+        items: ':not(.disabled)',
+        connectWith: '.connected'
       });
 
-       $('.sortable').sortable({
-      items: ':not(.disabled)'
+      $('#init-modal-players').modal('show');
     });
-      
-      $('#init-modal').modal('show');
-    });
-
   };
+
+  //Steps the wizard forward, checks for validation on page 1.
+  $scope.wizNext = function () {
+    if ($('#playersSort li').find('input:checked').length != 1) {
+      alert('Please identify Detective as one, and only one, player!')
+    } else {
+      $('#init-modal-players').modal('hide');
+      $('#init-modal-cards').modal('show');
+    }
+  };
+
+  //Finish the wizzard, and validate the last page
+  $scope.wizDone = function () {
+    if ($scope.myCards.length > 0) {
+      $('#init-modal-cards').modal('hide');
+      $scope.setupPlayers();
+      console.log('Detective\'s Cards: ' + $scope.myCards);
+    } else {
+      alert('Please Add the cards in your hand!')
+    }
+  };
+
 }])

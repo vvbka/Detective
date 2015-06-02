@@ -7,12 +7,15 @@ global.cardset = {};
 global.cardset.people = ['Ms. Scarlet', 'Colonel Mustard',  'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'];
 global.cardset.rooms = ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'];
 global.cardset.weapons = ['Axe', 'Bomb', 'Candlestick', 'Knife', 'Pipe', 'Poison', 'Revolver', 'Rope', 'Syringe', 'Wrench'];
+global.currentTurn = 0;
 
 process.app.controller('main', ['$scope', function ($scope) {
 
   'use strict';
 
   window.$scope  = $scope;
+  
+  $scope.currentTurn = global.currentTurn;
 
   var alfred = require('alfred'),
       priority = require('./lib/priority'),
