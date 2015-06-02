@@ -7,6 +7,7 @@
 
     <title>Detective</title>
 
+    <link href="css/jquery.typeahead.css" rel="stylesheet">
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/template.css" rel="stylesheet">
   </head>
@@ -21,7 +22,13 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
-            <input type="text" class="form-control" placeholder="{{aloutput || 'Input command ...'}}" size="70" ng-model="alinput">
+            <div class="typeahead-container">
+              <div class="typeahead-field">
+                <span class="typeahead-query">
+                  <input class="form-control" size="70" placeholder="{{aloutput || 'Input command ...'}}" ng-model="alinput" type="text">
+                </span>
+              </div>
+            </div>
           </form>
         </div>
       </div>
@@ -137,6 +144,7 @@
     <script src="js/bootstrap.js"></script>
     <script src="js/angular.js"></script>
     <script>process.app = angular.module('detective', [])</script>
+    <script src="js/jquery.typeahead.js"></script>
     <script src="js/index.js"></script>
     <script src="js/wizard.js"></script>
     

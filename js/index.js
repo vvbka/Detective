@@ -27,13 +27,31 @@ process.app.controller('main', ['$scope', function ($scope) {
     });
   });
 
-  // bind alfred's input to angular
+  // bind alfred's input to angular, and
+  // record history of commands using a typeahead
+  $scope.typeahead = ['hello, there'];
   $scope.exec = function (text) {
+    // keep latest commands at the top of the list
+    $scope.typeahead = $scope.typeahead.reverse();
+    $scope.typeahead.push(text);
+    $scope.typeahead = $scope.typeahead.reverse();
+
+    // continue on next tick in order to force the
+    // command to be asynchronous
     $scope.alinput = '';
     process.nextTick(function () {
       alfred.try(text)
     });
   };
+
+  // wrap up with typeahead
+  $('[ng-model="alinput"]').typeahead({
+    dynamic: true,
+    source: $scope.typeahead,
+    order: 'asc',
+//    hint: true,
+    highlight: true
+  });
 
   // this switch allows us to toggle between the UI
   // displaying the master's info or a given player's
