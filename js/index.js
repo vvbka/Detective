@@ -25,7 +25,22 @@ process.app.controller('main', ['$scope', function ($scope) {
       ]);
 
   // load up all the turn commands with alfred
-  alfred.init(require('./lib/commands.js'));
+  alfred.init([
+    {
+      prompts: ['* asked a question about *, *, and *'],
+      fn: function () {
+        //
+      }
+    },
+    {
+      prompts: ['help'],
+      fn: function () {
+        $('<div class="modal fade"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title">Detective | Help</h4> </div><div class="modal-body"> <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p></div><div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div></div></div></div>').appendTo(document.body).modal('show').on('bs.modal.hidden', function () {
+           $(this).remove();
+         });
+      }
+    }
+  ]);
 
   // bind alfred's output to angular
   $scope.alout = '';
