@@ -145,6 +145,11 @@ process.app.controller('wizard', ['$scope', function($scope) {
       $('#init-modal-cards').modal('hide');
       $scope.setupPlayers();
       console.log('Detective\'s Cards: ' + $scope.myCards);
+
+      setTimeout(function () {
+        $('.splash').fadeOut();
+        $('.full-container').fadeIn();
+      }, 300);
     } else {
       alert('Please Add the cards in your hand!');
     }

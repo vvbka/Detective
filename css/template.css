@@ -15,6 +15,28 @@
 .typeahead-field input {
   border-radius: 4px;
 }
+
+html,
+body,
+.splash {
+  height: 100%;
+  width: 100%;
+}
+
+.splash {
+  position: absolute;
+  display: block;
+
+  top: 0;
+  left: 0;
+
+  background-image: url(../img/splash.jpg);
+  background-size: cover;
+  background-position: center center;
+}
+
+.full-container { display: none; }
+
 /* Move down content because we have a fixed navbar that is 50px tall */
 
 body {
