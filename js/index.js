@@ -126,7 +126,7 @@ process.app.controller('main', ['$scope', function ($scope) {
     
     //console.log(img + ' is '+type);
     
-    return 'img/'+type+'/'+img+'.png';
+    return 'img/' + type + '/' + img.toLowerCase() + '.png';
   };
   
   // we use an array + an object to maintain the list of
