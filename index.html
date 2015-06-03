@@ -20,9 +20,9 @@
       <div class="navbar-header">
 
         <a class="navbar-brand" href="#">Detective</a>
-      </div>
+      </div>.
       <div id="navbar" class="navbar-collapse collapse">
-        <p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>
+        <!--<p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>-->
         <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
           <div class="typeahead-container">
             <div class="typeahead-field">
@@ -205,16 +205,29 @@
               <div class="typeahead-container">
                 <div class="typeahead-field">
                   <span class="typeahead-query">
-                  <input id="input-addmycards" ng-model="add" ng-enter="addToMyCards()" type="text" class="" autocomplete="off"></span>
-                <span class="typeahead-button">
-                 
-                  <button class="" ng-click="addToMyCards()">Add</button>
+                    <div class="input-group">
+                      <input ng-model="add" ng-enter="addToMyCards()" type="text" class="form-control" autmcomplete="off">
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="addToMyCards()">Add</button>
+                      </span>
+                    </div>
                   </span>
                 </div>
               </div>
-              <ul>
-                <li ng-repeat="(index,card) in myCards track by index">{{card}}</li>
-              </ul>
+              <table class="table">
+                <thead>
+                  <th>#</th>
+                  <td>Card</td>
+                  <td></td>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="(index,card) in myCards">
+                    <th>{{index+1}}</th>
+                    <td>{{card}}</td>
+                    <td><button type="button" class="close" aria-label="Close" ng-click="rmFromMyCards(index)"><span aria-hidden="true">&times;</span></button></td>
+                  </tr>
+                </tbody>
+              </table>
             </section>
 
           </div>

@@ -6,9 +6,11 @@
  * Copyright (C) 2015 VBKA.
  **/
 
-priority = require('./lib/priority.js')
+'use strict';
 
-process.app.controller('wizard', ['$scope', function ($scope) {
+var priority = require('./lib/priority.js')
+
+process.app.controller('wizard', ['$scope', function($scope) {
   $scope.players = global.players;
   $scope.masterDefinite = global.masterDefinite;
   $scope.cards = global.cardset.people.concat(global.cardset.rooms, global.cardset.weapons);
@@ -19,65 +21,71 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   $scope.char2det = [, , , , , , , ];
   $scope.plnames = [, , , , , , , ];
 
-  $scope.addToMyCards = function () {
-    $scope.add = $('#input-addmycards').val().trim();
-    console.log('Adding: ' + $scope.add);
+  $scope.addToMyCards = function() {
+    $scope.add = $('[ng-model="add"]').val().trim();
+    console.log('adding: ' + $scope.add);
     if ($scope.add) {
       $scope.myCards.push($scope.add);
       $scope.add = '';
-      $('#input-addmycards').val('');
-
     }
   };
 
-  $scope.setupPlayers = function () {
+  $scope.rmFromMyCards = function(index) {
+    $scope.myCards = $scope.myCards.filter(function(elm, i) {
+      return i !== index;
+    });
+  };
 
-    var detindex = 0,
-      i;
+  $('[ng-model="add"]').typeahead({
+    source: $scope.cards,
+    order: 'asc',
+    highlight: true
+  });
+
+  $scope.setupPlayers = function() {
+    var detindex = 0, i;
+
     for (i = 0; i < $scope.char2det.length; i += 1) {
       if ($scope.char2det[i]) {
         detindex = i;
         break;
       }
     }
+
     console.log($scope.plnames[detindex] + ' is detective (playing as ' + $scope.chars[detindex] + ')');
-    
-    //initiate the Detective player
+
+    // initiate the Detective player
     global.Detective = {
-      sure : $scope.myCards,
-      charName : $scope.chars[detindex],
+      sure: $scope.myCards,
+      charName: $scope.chars[detindex],
       name: $scope.plnames[detindex] || 'Detective',
       turn: $('#playersSort li').index($('#playersSort').find('input:checked').parent()),
-      detective: true,
-       
+      detective: true
     };
-    
-    
+
     //initiate each new player
-    $('#playersSort li').each(function (i) {
+    $('#playersSort li').each(function(i) {
       if ($(this).find('input:checked').length != 1) {
         var cn = $(this).text().trim();
         var pn = $(this).find('input[type=text]').val().trim() || cn;
         //console.log(pn + ' is '+ cn);
-        
+
         var newPlayer = {
-          name : pn,
-          charName : cn,
+          name: pn,
+          charName: cn,
           maybe: priority('length'),
           sure: [],
           turn: i,
           shown: [],
-          possible : $scope.cards.filter(function(card){
-                        return $.inArray(card, global.Detective.sure) === -1;
-                      }) 
+          possible: $scope.cards.filter(function(card) {
+            return $.inArray(card, global.Detective.sure) === -1;
+          })
         };
-        
+
         global.players.push(newPlayer);
-        
-      } else {global.players.push(global.Detective)}
-      
-      
-      
+      } else {
+        global.players.push(global.Detective)
+      }
     });
   };
 
@@ -85,7 +93,7 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   // .players.add([name])
   // adds a player to the game (in the next player position)
   // -> player position can be modified through the UI
-  $scope.players.add = function (player) {
+  $scope.players.add = function(player) {
     $scope.players.push(player);
     $scope.playerdata[player] = {
       maybe: priority('length'),
@@ -96,7 +104,7 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   // .players.rm([index])
   // remove a player at a specific position
   // using a position over a name makes it easier for angular
-  $scope.players.rm = function (at) {
+  $scope.players.rm = function(at) {
     var who = $scope.players[at];
     $scope.players = $scope.players.slice(0, at).concat($scope.players.slice(at + 1));
     delete $scope.playerdata[who];
@@ -104,24 +112,17 @@ process.app.controller('wizard', ['$scope', function ($scope) {
 
   // .load([name])
   // set the given player as the global/current player
-  $scope.players.load = function (name) {
+  $scope.players.load = function(name) {
     $scope.isMaster = false;
     $scope.player = $scope.playerdata[name];
   };
 
   //fires once the ng-repeat is complete
-  $scope.repeatDone = function () {
-    $(document).on('ready', function () {
+  $scope.repeatDone = function() {
+    $(document).on('ready', function() {
       $('.sortable').sortable({
         items: ':not(.disabled)',
         connectWith: '.connected'
-      });
-      
-      $('#input-addmycards').typeahead({
-        source: $scope.cards,
-        callback: {
-          onInit: function(node){console.log('started typeahead on '+ node.selector)}
-        }
       });
 
       $('#init-modal-players').modal('show');
@@ -129,7 +130,7 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   };
 
   //Steps the wizard forward, checks for validation on page 1.
-  $scope.wizNext = function () {
+  $scope.wizNext = function() {
     if ($('#playersSort li').find('input:checked').length != 1) {
       alert('Please identify Detective as one, and only one, player!')
     } else {
@@ -139,14 +140,14 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   };
 
   //Finish the wizzard, and validate the last page
-  $scope.wizDone = function () {
+  $scope.wizDone = function() {
     if ($scope.myCards.length > 0) {
       $('#init-modal-cards').modal('hide');
       $scope.setupPlayers();
       console.log('Detective\'s Cards: ' + $scope.myCards);
     } else {
-      alert('Please Add the cards in your hand!')
+      alert('Please Add the cards in your hand!');
     }
   };
 
-}])
+}]);
