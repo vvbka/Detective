@@ -151,7 +151,7 @@ var MenuTemplate = [
 // prepare for full init from electron, then do
 // our stuff
 app.on('ready', function () {
-    DetectiveWindow = new BrowserWindow({
+  DetectiveWindow = new BrowserWindow({
     width: 1200,
     height: 710
   });
@@ -160,4 +160,5 @@ app.on('ready', function () {
   
   DetectiveWindow.loadUrl('file://' + __dirname + '/index.html');
   DetectiveWindow.openDevTools();
+  DetectiveWindow.maximize();
 });
