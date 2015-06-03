@@ -9,7 +9,7 @@
 
 process.app.factory('$global', function () {
   return (window.$global = {
-    master: {},
+    master: {Guess:{room, person, weapon}, Definite:[]},
     cardset: {
       people: ['Ms. Scarlet', 'Colonel Mustard', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'],
       rooms: ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'],
