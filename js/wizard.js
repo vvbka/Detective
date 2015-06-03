@@ -10,14 +10,14 @@
 
 var priority = require('./lib/priority.js')
 
-process.app.controller('wizard', ['$scope', function($scope) {
-  $scope.players = global.players;
-  $scope.masterDefinite = global.masterDefinite;
-  $scope.cards = global.cardset.people.concat(global.cardset.rooms, global.cardset.weapons);
+process.app.controller('wizard', function($scope, $global) {
+  $scope.players = $global.players;
+  $scope.masterDefinite = $global.masterDefinite;
+  $scope.cards = $global.cardset.people.concat($global.cardset.rooms, $global.cardset.weapons);
   $scope.myCards = [];
   $scope.add = '';
 
-  $scope.chars = global.cardset.people;
+  $scope.chars = $global.cardset.people;
   $scope.char2det = [, , , , , , , ];
   $scope.plnames = [, , , , , , , ];
 
@@ -39,7 +39,8 @@ process.app.controller('wizard', ['$scope', function($scope) {
   $('[ng-model="add"]').typeahead({
     source: $scope.cards,
     order: 'asc',
-    highlight: true
+    highlight: true,
+    hint: true
   });
 
   $scope.setupPlayers = function() {
@@ -55,7 +56,7 @@ process.app.controller('wizard', ['$scope', function($scope) {
     console.log($scope.plnames[detindex] + ' is detective (playing as ' + $scope.chars[detindex] + ')');
 
     // initiate the Detective player
-    global.Detective = {
+    $global.Detective = {
       sure: $scope.myCards,
       charName: $scope.chars[detindex],
       name: $scope.plnames[detindex] || 'Detective',
@@ -78,13 +79,13 @@ process.app.controller('wizard', ['$scope', function($scope) {
           turn: i,
           shown: [],
           possible: $scope.cards.filter(function(card) {
-            return $.inArray(card, global.Detective.sure) === -1;
+            return $.inArray(card, $global.Detective.sure) === -1;
           })
         };
 
-        global.players.push(newPlayer);
+        $global.players.push(newPlayer);
       } else {
-        global.players.push(global.Detective)
+        $global.players.push($global.Detective)
       }
     });
     
@@ -160,4 +161,4 @@ process.app.controller('wizard', ['$scope', function($scope) {
     }
   };
 
-}]);
+});

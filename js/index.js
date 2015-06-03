@@ -3,13 +3,8 @@
  * Licensed under MIT.
  * Copyright (C) 2015 VBKA.
  **/
-global.cardset = {}, global.master = {};
-global.cardset.people = ['Ms. Scarlet', 'Colonel Mustard', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'];
-global.cardset.rooms = ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'];
-global.cardset.weapons = ['Axe', 'Bomb', 'Candlestick', 'Knife', 'Pipe', 'Poison', 'Revolver', 'Rope', 'Syringe', 'Wrench'];
 
-
-process.app.controller('main', ['$scope', function ($scope) {
+process.app.controller('main', function ($scope, $global) {
 
   'use strict';
 
@@ -111,26 +106,26 @@ process.app.controller('main', ['$scope', function ($scope) {
 
   // this priority queue maintains the possibilities
   // of the murder, and their respective probability
-  $scope.masterGuess = global.master.Guess = {
+  $scope.masterGuess = $global.master.Guess = {
     room: priority('prob'),
     person: priority('prob'),
     weapon: priority('prob')
   };
-  $scope.masterDefinite = global.master.Definite = {
+  $scope.masterDefinite = $global.master.Definite = {
     person: '',
     room: '',
     weapon: ''
   };
 
   //initiate the master guess
-  global.cardset.rooms.forEach(function ( room) {
-    global.master.Guess.room.add({prob: 1,itm: room});
+  $global.cardset.rooms.forEach(function ( room) {
+    $global.master.Guess.room.add({ prob: 1, itm: room });
   });
-  global.cardset.people.forEach(function (person) {
-    global.master.Guess.person.add({prob: 1,itm: person});
+  $global.cardset.people.forEach(function (person) {
+    $global.master.Guess.person.add({ prob: 1, itm: person });
   });
-  global.cardset.weapons.forEach(function (weapon) {
-    global.master.Guess.weapon.add({prob: 1, itm: weapon});
+  $global.cardset.weapons.forEach(function (weapon) {
+    $global.master.Guess.weapon.add({ prob: 1, itm: weapon });
   });
   
 
@@ -143,20 +138,20 @@ process.app.controller('main', ['$scope', function ($scope) {
   // set the given player as the global/current player
   $scope.load = function (id) {
     $scope.isMaster = false;
-    $scope.player = global.players[id];
+    $scope.player = $global.players[id];
   };
 
   //.getImagePath(img)
   //returns the path to the image on disk for a given card
   $scope.getImagePath = function (img) {
     var type;
-    if ($.inArray(img, global.cardset.weapons) != -1) {
+    if ($.inArray(img, $global.cardset.weapons) != -1) {
       type = 'weapon'
     };
-    if ($.inArray(img, global.cardset.people) != -1) {
+    if ($.inArray(img, $global.cardset.people) != -1) {
       type = 'person'
     };
-    if ($.inArray(img, global.cardset.rooms) != -1) {
+    if ($.inArray(img, $global.cardset.rooms) != -1) {
       type = 'room'
     };
 
@@ -168,7 +163,7 @@ process.app.controller('main', ['$scope', function ($scope) {
   // we use an array + an object to maintain the list of
   // players and their data so we can maintain and manipulate
   // order
-  $scope.players = global.players = [];
+  $scope.players = $global.players = [];
   $scope.playerdata = {};
 
-}])
+});
