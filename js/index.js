@@ -109,9 +109,30 @@ process.app.controller('main', ['$scope', function ($scope) {
   // bunch of globals on player change
   $scope.player = {};
 
+    // .load([id])
+  // set the given player as the global/current player
+  $scope.load = function (id) {
+    $scope.isMaster = false;
+    $scope.player = global.players[id];
+  };
+  
+  //.getImagePath(img)
+  //returns the path to the image on disk for a given card
+  $scope.getImagePath = function(img){
+    var type;
+    if($.inArray(img, global.cardset.weapons)!=-1) {type='weapon'};
+    if($.inArray(img, global.cardset.people)!=-1) {type='person'};
+    if($.inArray(img, global.cardset.rooms)!=-1) {type='room'};
+    
+    //console.log(img + ' is '+type);
+    
+    return 'img/'+type+'/'+img+'.png';
+  };
+  
   // we use an array + an object to maintain the list of
   // players and their data so we can maintain and manipulate
   // order
   $scope.players = global.players = [];
   $scope.playerdata = {};
+  
 }])

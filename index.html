@@ -22,7 +22,7 @@
         <a class="navbar-brand" href="#">Detective</a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
-      <p class="navbar-text" id="turnCounter">Current Turn: {{currentTurn}}</p>
+        <p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>
         <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
           <div class="typeahead-container">
             <div class="typeahead-field">
@@ -42,10 +42,12 @@
       <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
 
-          <li class="active"><a href="" ng-click="isMaster = true;">Master</a>
+          <li class="{{isMaster ? 'active':''}}"><a href="" ng-click="isMaster = true;">Master</a>
           </li>
 
-          <li ng-repeat="(index, plyr) in players"><a href="" ng-click="load(index);"> <span ng-show="plyr.turn===currentTurn" class="glyphicon glyphicon-triangle-right"></span>  {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span></a>
+          <li ng-repeat="(index, plyr) in players" class="{{plyr.name===player.name && !isMaster ? 'active':''}}">
+            <a href="" ng-click="load(index);"> <span ng-show="plyr.turn===currentTurn" class="glyphicon glyphicon-triangle-right"></span> {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span>
+            </a>
           </li>
 
         </ul>
@@ -53,8 +55,8 @@
 
       <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
-        <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}}</h1>
-
+        <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}} {{( (!isMaster && player.name!==player.charName ) ? ' ('+player.charName+')':'' )}}</h1>
+       
         <!--Master Guess Dsiplay-->
         <div class="row placeholders" ng-show="isMaster">
           <div class="col-xs-7 col-sm-4 ">
@@ -81,10 +83,10 @@
         <div class="row placeholders" ng-show="!isMaster">
 
 
-          <div ng-repeat="card in player.sure" class="col-sm-2 ">
-            <img src="img/person/green.png" class="img" alt="person">
-            <h4>Mr. Green</h4>
-            <span class="text-muted">94%</span>
+          <div ng-repeat="card in player.sure" class="col-sm-2 {{$first ? 'col-sm-offset-1':''}}">
+            <img src="{{getImagePath(card)}}" class="img" alt="sure card">
+            <h4>{{card}}</h4>
+            
           </div>
 
         </div>
@@ -140,6 +142,9 @@
           </table>
         </div>
 
+      <div class="possibleListing" ng-show="!isMaster">
+        {{player.possible}}
+      </div>
 
       </div>
     </div>
@@ -149,72 +154,78 @@
   <!--The init wizzard-->
   <div ng-controller="wizard">
 
-    <div id="init-modal-players" class="modal fade">
+    <div id="init-modal-players" data-keyboard="false" class="modal fade">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">Welcome To Detective</h4>
           </div>
           <div class="modal-body">
-             
-              <h3>Player Order</h3>
-              <section>
-                <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
-                <ul id="playersSort" class="sortable sortable-list connected">
-                  <li ng-repeat="(index,char) in chars" data-cid="{{index}}" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
-                   <span class="charname">{{char}}</span> 
-                    
-                    <input type="text" class="form-control" ng-model="plnames[index]">
-                    <input type="checkbox" class="form-control" ng-model="char2det[index]">
-                  </li>
-                </ul>
-                <br>
-                <h4>Non Playing Characters:</h4>
-                <ul id="unusedPlayers" class="sortable sortable-list connected">
+
+            <h3>Player Order</h3>
+            <section>
+              <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
+              <ul id="playersSort" class="sortable sortable-list connected">
+                <li ng-repeat="(index,char) in chars" data-cid="{{index}}" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
+                  <span class="charname">{{char}}</span>
+
+                  <input type="text" class="form-control" ng-model="plnames[index]">
+                  <input type="checkbox" class="form-control" ng-model="char2det[index]">
+                </li>
+              </ul>
+              <br>
+              <h4>Non Playing Characters:</h4>
+              <ul id="unusedPlayers" class="sortable sortable-list connected">
 
 
-                </ul>
+              </ul>
 
-              </section>
+            </section>
 
-            
+
           </div>
           <div class="modal-footer">
-              <button ng-click="wizNext()" class="btn btn-primary">Next</button>
+            <button ng-click="wizNext()" class="btn btn-primary">Next</button>
           </div>
         </div>
       </div>
     </div>
-    
-    <div id="init-modal-cards" class="modal fade">
+
+    <div id="init-modal-cards" data-keyboard="false" class="modal fade">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title">Welcome To Detective</h4>
           </div>
           <div class="modal-body">
-              
-              <h3>Detective's Cards</h3>
-              <section>
-                <p>Please list all the cards in Detective's hand</p>
-                <div class="input-group">
-                  <input ng-model="add" ng-enter="addToMyCards()" type="text" class="form-control">
-                  <span class="input-group-btn"><button class="btn btn-success" ng-click="addToMyCards()">Add</button></span>
+
+            <h3>Detective's Cards</h3>
+            <section>
+              <p>Please list all the cards in Detective's hand</p>
+              <div class="typeahead-container">
+                <div class="typeahead-field">
+                  <span class="typeahead-query">
+                  <input id="input-addmycards" ng-model="add" ng-enter="addToMyCards()" type="text" class="" autocomplete="off"></span>
+                <span class="typeahead-button">
+                 
+                  <button class="" ng-click="addToMyCards()">Add</button>
+                  </span>
                 </div>
-                <ul>
-                  <li ng-repeat="(index,card) in myCards track by index">{{card}}</li>
-                </ul>
-              </section>
-            
+              </div>
+              <ul>
+                <li ng-repeat="(index,card) in myCards track by index">{{card}}</li>
+              </ul>
+            </section>
+
           </div>
           <div class="modal-footer">
-              <button ng-click="wizDone();" class="btn btn-success">Finish</button>
+            <button ng-click="wizDone();" class="btn btn-success">Finish</button>
           </div>
         </div>
       </div>
     </div>
-    
-    
+
+
   </div>
   <script>
     var $ = jQuery = require('./js/jquery.js');

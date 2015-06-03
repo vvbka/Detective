@@ -20,11 +20,12 @@ process.app.controller('wizard', ['$scope', function ($scope) {
   $scope.plnames = [, , , , , , , ];
 
   $scope.addToMyCards = function () {
-    $scope.add = $scope.add.trim();
+    $scope.add = $('#input-addmycards').val().trim();
     console.log('Adding: ' + $scope.add);
     if ($scope.add) {
       $scope.myCards.push($scope.add);
       $scope.add = '';
+      $('#input-addmycards').val('');
 
     }
   };
@@ -43,21 +44,21 @@ process.app.controller('wizard', ['$scope', function ($scope) {
     
     //initiate the Detective player
     global.Detective = {
-      cards : $scope.myCards,
+      sure : $scope.myCards,
       charName : $scope.chars[detindex],
       name: $scope.plnames[detindex] || 'Detective',
       turn: $('#playersSort li').index($('#playersSort').find('input:checked').parent()),
-      detective: true
+      detective: true,
+       
     };
     
-    console.log(global.Detective);
     
     //initiate each new player
     $('#playersSort li').each(function (i) {
       if ($(this).find('input:checked').length != 1) {
         var cn = $(this).text().trim();
         var pn = $(this).find('input[type=text]').val().trim() || cn;
-        console.log(pn + ' is '+ cn);
+        //console.log(pn + ' is '+ cn);
         
         var newPlayer = {
           name : pn,
@@ -65,8 +66,9 @@ process.app.controller('wizard', ['$scope', function ($scope) {
           maybe: priority('length'),
           sure: [],
           turn: i,
+          shown: [],
           possible : $scope.cards.filter(function(card){
-                        return $.inArray(card, global.Detective.cards) === -1;
+                        return $.inArray(card, global.Detective.sure) === -1;
                       }) 
         };
         
@@ -113,6 +115,13 @@ process.app.controller('wizard', ['$scope', function ($scope) {
       $('.sortable').sortable({
         items: ':not(.disabled)',
         connectWith: '.connected'
+      });
+      
+      $('#input-addmycards').typeahead({
+        source: $scope.cards,
+        callback: {
+          onInit: function(node){console.log('started typeahead on '+ node.selector)}
+        }
       });
 
       $('#init-modal-players').modal('show');
