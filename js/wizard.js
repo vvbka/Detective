@@ -87,6 +87,11 @@ process.app.controller('wizard', ['$scope', function($scope) {
         global.players.push(global.Detective)
       }
     });
+    
+    
+    
+    
+    
   };
 
 

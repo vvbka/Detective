@@ -79,23 +79,47 @@
           </div>
 
           <h2 class="sub-header">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
-          <div ng-show="isMaster" class="table-responsive">
+          <div ng-show="isMaster" class="table-responsive row">
             <table class="table table-striped">
               <thead>
                 <tr>
                   <th>Person</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="row in masterGuess.person track by $index">
+                  <td>{{row.itm + ' (' + row.prob + ')' || '--' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table table-striped">
+              <thead>
+                <tr>
                   <th>Room</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="row in masterGuess.room track by $index">
+                  
+                  <td>{{row.itm + ' (' + row.prob + ')'|| '--' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  
                   <th>Weapon</th>
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="row in masterGuess">
-                  <td>{{row.person || '--' }}</td>
-                  <td>{{row.room || '--' }}</td>
-                  <td>{{row.weapon || '--' }}</td>
+                <tr ng-repeat="row in masterGuess.weapon track by $index">
+                  
+                  <td>{{row.itm+ ' (' + row.prob + ')' || '--' }}</td>
                 </tr>
               </tbody>
             </table>
+          
           </div>
 
           <!--The Player's Display Table-->

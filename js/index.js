@@ -3,24 +3,23 @@
  * Licensed under MIT.
  * Copyright (C) 2015 VBKA.
  **/
-global.cardset = {};
-global.cardset.people = ['Ms. Scarlet', 'Colonel Mustard',  'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'];
+global.cardset = {}, global.master = {};
+global.cardset.people = ['Ms. Scarlet', 'Colonel Mustard', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'];
 global.cardset.rooms = ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'];
 global.cardset.weapons = ['Axe', 'Bomb', 'Candlestick', 'Knife', 'Pipe', 'Poison', 'Revolver', 'Rope', 'Syringe', 'Wrench'];
-global.currentTurn = 0;
+
 
 process.app.controller('main', ['$scope', function ($scope) {
 
   'use strict';
 
-  window.$scope  = $scope;
-  
-  $scope.currentTurn = global.currentTurn;
+  window.$scope = $scope;
+
 
   var alfred = require('alfred'),
-      priority = require('./lib/priority'),
-      nextPort = require('next-port'),
-      strategies = require('./lib/strategy-controller')([
+    priority = require('./lib/priority'),
+    nextPort = require('next-port'),
+    strategies = require('./lib/strategy-controller')([
         'find'
       ]);
 
@@ -35,9 +34,9 @@ process.app.controller('main', ['$scope', function ($scope) {
     {
       prompts: ['help'],
       fn: function () {
-        $('<div class="modal fade"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title">Detective | Help</h4> </div><div class="modal-body"> <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p></div><div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div></div></div></div>').appendTo(document.body).modal('show').on('bs.modal.hidden', function () {
-           $(this).remove();
-         });
+        $('<div class="modal fade" data-keyboard="true"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title">Detective | Help</h4> </div><div class="modal-body"> <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p></div><div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div></div></div></div>').appendTo(document.body).modal('show').on('bs.modal.hidden', function () {
+          $(this).remove();
+        });
       }
     }
   ]);
@@ -64,7 +63,7 @@ process.app.controller('main', ['$scope', function ($scope) {
     $scope.typeahead = $scope.typeahead.filter(function (item, index, self) {
       item = item.toLowerCase();
 
-      var n= -1;
+      var n = -1;
       for (var i = 0; i < self.length; i += 1) {
         if (self[i].toLowerCase() === item) {
           n = i;
@@ -112,42 +111,64 @@ process.app.controller('main', ['$scope', function ($scope) {
 
   // this priority queue maintains the possibilities
   // of the murder, and their respective probability
-  $scope.masterGuess = priority();
-  $scope.masterDefinite = global.masterDefinite = {
-    people: [],
-    places: [],
-    weapons: []
+  $scope.masterGuess = global.master.Guess = {
+    room: priority('prob'),
+    person: priority('prob'),
+    weapon: priority('prob')
   };
+  $scope.masterDefinite = global.master.Definite = {
+    person: '',
+    room: '',
+    weapon: ''
+  };
+
+  //initiate the master guess
+  global.cardset.rooms.forEach(function ( room) {
+    global.master.Guess.room.add({prob: 1,itm: room});
+  });
+  global.cardset.people.forEach(function (person) {
+    global.master.Guess.person.add({prob: 1,itm: person});
+  });
+  global.cardset.weapons.forEach(function (weapon) {
+    global.master.Guess.weapon.add({prob: 1, itm: weapon});
+  });
+  
 
   // the player global will be the current selected
   // player in the UI, so we don't have to modify a whole
   // bunch of globals on player change
   $scope.player = {};
 
-    // .load([id])
+  // .load([id])
   // set the given player as the global/current player
   $scope.load = function (id) {
     $scope.isMaster = false;
     $scope.player = global.players[id];
   };
-  
+
   //.getImagePath(img)
   //returns the path to the image on disk for a given card
-  $scope.getImagePath = function(img){
+  $scope.getImagePath = function (img) {
     var type;
-    if($.inArray(img, global.cardset.weapons)!=-1) {type='weapon'};
-    if($.inArray(img, global.cardset.people)!=-1) {type='person'};
-    if($.inArray(img, global.cardset.rooms)!=-1) {type='room'};
-    
+    if ($.inArray(img, global.cardset.weapons) != -1) {
+      type = 'weapon'
+    };
+    if ($.inArray(img, global.cardset.people) != -1) {
+      type = 'person'
+    };
+    if ($.inArray(img, global.cardset.rooms) != -1) {
+      type = 'room'
+    };
+
     //console.log(img + ' is '+type);
-    
+
     return 'img/' + type + '/' + img.toLowerCase() + '.png';
   };
-  
+
   // we use an array + an object to maintain the list of
   // players and their data so we can maintain and manipulate
   // order
   $scope.players = global.players = [];
   $scope.playerdata = {};
-  
+
 }])
