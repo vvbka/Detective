@@ -25,9 +25,6 @@ app.on('window-all-closed', function () {
   }
 });
 
-
-
-
 var MenuTemplate = [
   {
     label: 'Electron',
@@ -147,7 +144,6 @@ var MenuTemplate = [
   },
 ];
 
-
 // prepare for full init from electron, then do
 // our stuff
 app.on('ready', function () {
@@ -159,6 +155,6 @@ app.on('ready', function () {
   Menu.setApplicationMenu(Menu.buildFromTemplate(MenuTemplate));
   
   DetectiveWindow.loadUrl('file://' + __dirname + '/index.html');
-  DetectiveWindow.openDevTools();
+  if (process.env.NODE_ENV === 'development') DetectiveWindow.openDevTools();
   DetectiveWindow.maximize();
 });

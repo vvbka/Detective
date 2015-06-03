@@ -12,7 +12,8 @@
     "solver": "0.0.2"
   },
   "scripts": {
-    "start": "./node_modules/.bin/electron ."
+    "start": "NODE_ENV=production ./node_modules/.bin/electron .",
+    "test": "NODE_ENV=development ./node_modules/.bin/electron ."
   },
   "author": "VBKA",
   "license": "MIT"
