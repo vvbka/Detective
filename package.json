@@ -8,6 +8,7 @@
     "cutils": "git+https://git@bitbucket.org/vbka/cutils.git",
     "electron-prebuilt": "^0.27.2",
     "eventemitter2": "^0.4.14",
+    "natural": "^0.2.1",
     "next-port": "0.0.4",
     "solver": "0.0.2"
   },

@@ -8,9 +8,10 @@
 
 'use strict';
 
-var priority = require('./lib/priority.js')
-
 process.app.controller('wizard', function($scope, $global) {
+  var priority = require('./lib/priority'),
+      format = require('util').format;
+
   $scope.players = $global.players;
   $scope.masterDefinite = $global.masterDefinite;
   $scope.cards = $global.cardset.people.concat($global.cardset.rooms, $global.cardset.weapons);
@@ -53,8 +54,6 @@ process.app.controller('wizard', function($scope, $global) {
       }
     }
 
-    console.log($scope.plnames[detindex] + ' is detective (playing as ' + $scope.chars[detindex] + ')');
-
     // initiate the Detective player
     $global.Detective = {
       sure: $scope.myCards,
@@ -67,34 +66,39 @@ process.app.controller('wizard', function($scope, $global) {
     //initiate each new player
     $('#playersSort li').each(function(i) {
       if ($(this).find('input:checked').length != 1) {
-        var cn = $(this).text().trim();
-        var pn = $(this).find('input[type=text]').val().trim() || cn;
-        //console.log(pn + ' is '+ cn);
-
-        var newPlayer = {
-          name: pn,
-          charName: cn,
-          maybe: priority('length'),
-          sure: [],
-          turn: i,
-          shown: [],
-          possible: $scope.cards.filter(function(card) {
-            return $.inArray(card, $global.Detective.sure) === -1;
-          })
-        };
+        var cn = $(this).text().trim(),
+            newPlayer = {
+              name: $(this).find('input[type=text]').val().trim() || cn,
+              charName: cn,
+              maybe: priority('length'),
+              sure: [],
+              turn: i,
+              shown: [],
+              ques: {},
+              possible: $scope.cards.filter(function(card) {
+                return $global.Detective.sure.indexOf(card) === -1;
+              })
+            };
 
         $global.players.push(newPlayer);
+        $global.classifiers.players.addDocument(newPlayer.name, newPlayer.name);
       } else {
-        $global.players.push($global.Detective)
+        $global.players.push($global.Detective);
+        $global.classifiers.players.addDocument($global.Detective.name, $global.Detective.name);
       }
     });
-    
-    
-    
-    
-    
+
+    $global.classifiers.players.train();
   };
 
+  //
+  $scope.cleanPlayers = function () {
+    for (var i = 0; i < $scope.plnames.length; i += 1) {
+      if (!$scope.plnames[i]) {
+        $('[data-cid="' + i + '"]').remove().appendTo($('#unusedPlayers'));
+      }
+    }
+  };
 
   // .players.add([name])
   // adds a player to the game (in the next player position)
@@ -138,7 +142,7 @@ process.app.controller('wizard', function($scope, $global) {
   //Steps the wizard forward, checks for validation on page 1.
   $scope.wizNext = function() {
     if ($('#playersSort li').find('input:checked').length != 1) {
-      alert('Please identify Detective as one, and only one, player!')
+      alert('Please identify Detective as one (and only one) player!')
     } else {
       $('#init-modal-players').modal('hide');
       $('#init-modal-cards').modal('show');
@@ -150,14 +154,13 @@ process.app.controller('wizard', function($scope, $global) {
     if ($scope.myCards.length > 0) {
       $('#init-modal-cards').modal('hide');
       $scope.setupPlayers();
-      console.log('Detective\'s Cards: ' + $scope.myCards);
 
       setTimeout(function () {
         $('.splash').fadeOut();
         $('.full-container').fadeIn();
       }, 300);
     } else {
-      alert('Please Add the cards in your hand!');
+      alert('Please add the cards in your hand!');
     }
   };
 
