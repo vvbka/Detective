@@ -41,7 +41,7 @@ process.app.controller('main', function($scope, $global) {
         weapons: $global.classifiers.weapons.classify(input)
       };
 
-      console.log(question);
+      console.log(yield question.asker + ' asked about ' + question.person + ', ' + question.rooms + ', ' + question.weapons);
     }
   }]);
 
@@ -55,6 +55,7 @@ process.app.controller('main', function($scope, $global) {
 
   // bind alfred's input to angular, and
   // record history of commands using a typeahead
+  $scope.getinput = false;
   $scope.typeahead = ['Help me out.'];
   $scope.exec = function () {
     // fix up text
@@ -81,10 +82,18 @@ process.app.controller('main', function($scope, $global) {
     // continue on next tick in order to force the
     // command to be asynchronous
     $scope.alinput = '';
-    process.nextTick(function() {
-      $global.alfred.try(text);
+    process.nextTick(function () {
+      if ($scope.getinput) {
+        $scope.getinput = false;
+        $global.alfred.events.emit('input', text);
+      } else $global.alfred.try(text);
     });
   };
+
+  // bind to alfred
+  $global.alfred.events.on('get-input', function () {
+    $scope.getinput = true;
+  });
 
   // wrap up with typeahead
   nextPort(function(err, port) {
