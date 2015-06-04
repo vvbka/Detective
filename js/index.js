@@ -140,7 +140,10 @@ process.app.controller('main', function($scope, $global) {
           });
 
           console.log('P(%s in master) = %s', first, 1 - sum);
-          $global.master.Guess[$scope.cardtype(first)].prob = 1 - sum;
+          $global.master.Guess[$scope.cardtype(first)].update('itm', {
+            prob: 1 - sum,
+            itm: first
+          });
         }
       }
 
