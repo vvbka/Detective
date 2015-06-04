@@ -76,7 +76,7 @@ process.app.controller('wizard', function($scope, $global) {
               shown: [],
               ques: {},
               possible: $scope.cards.filter(function(card) {
-                return (~$global.Detective.sure.indexOf(card));
+                return ($global.Detective.sure.indexOf(card) == -1);
               })
             };
 
