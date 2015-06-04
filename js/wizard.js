@@ -76,7 +76,7 @@ process.app.controller('wizard', function($scope, $global) {
               shown: [],
               ques: {},
               possible: $scope.cards.filter(function(card) {
-                return $global.Detective.sure.indexOf(card) === -1;
+                return (~$global.Detective.sure.indexOf(card));
               })
             };
 
@@ -88,6 +88,19 @@ process.app.controller('wizard', function($scope, $global) {
       }
     });
 
+    //update master guess with new data - ie. Detectives cards are probability 0;
+    $global.Detective.sure.forEach(function(card, i){
+      var nObj = {prob:0, itm:card}, res = 0;
+      res = $global.master.Guess.room.update('itm', nObj);
+      if(res===1 || res === -1) {
+        res = $global.master.Guess.people.update('itm', nObj);
+      }
+      if(res===1 || res === -1) {
+        res = $global.master.Guess.weapon.update('itm', nObj);
+      }
+          
+    });
+    
     $global.classifiers.players.train();
   };
 
