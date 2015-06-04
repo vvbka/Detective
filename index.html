@@ -80,7 +80,8 @@
 
           <h2 class="sub-header">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
           <div ng-show="isMaster" class="table-responsive row">
-            <table class="table table-striped">
+            <div class="table-responsive col-md-4">
+             <table class="table table-striped">
               <thead>
                 <tr>
                   <th>Person</th>
@@ -92,6 +93,8 @@
                 </tr>
               </tbody>
             </table>
+            </div>
+            <div class="table-responsive col-md-4">
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -105,6 +108,8 @@
                 </tr>
               </tbody>
             </table>
+            </div>
+            <div class="table-responsive col-md-4">
             <table class="table table-striped">
               <thead>
                 <tr>
@@ -119,7 +124,7 @@
                 </tr>
               </tbody>
             </table>
-          
+          </div>
           </div>
 
           <!--The Player's Display Table-->
