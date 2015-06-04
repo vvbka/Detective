@@ -70,7 +70,9 @@ process.app.controller('wizard', function($scope, $global) {
             newPlayer = {
               name: $(this).find('input[type=text]').val().trim() || cn,
               charName: cn,
-              maybe: priority('length'),
+              maybe: priority('length', function (a, b) {
+                return (a - b) < 0;
+              }),
               sure: [],
               turn: i,
               shown: [],
