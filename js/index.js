@@ -36,12 +36,24 @@ process.app.controller('main', function($scope, $global) {
     fn: function* (input) {
       var question = {
         asker: $global.classifiers.players.classify(input),
+        answeree: $global.classifiers.players.classify(yield 'Who answered?'),
         person: $global.classifiers.people.classify(input),
-        rooms: $global.classifiers.rooms.classify(input),
-        weapons: $global.classifiers.weapons.classify(input)
-      };
+        room: $global.classifiers.rooms.classify(input),
+        weapon: $global.classifiers.weapons.classify(input)
+      }, i;
 
-      console.log(yield question.asker + ' asked about ' + question.person + ', ' + question.rooms + ', ' + question.weapons);
+      // look for the starting player
+      for (i = 0; i < $global.players.length; i += 1)
+        if ($global.players[i].name === question.asker)
+          for (i = i + 1; i < $global.players.length; i += 1)
+            if ($global.players[i].name === question.answeree) {
+              i = $global.players.length;
+              break;
+            } else $global.players[i].possible = $global.players[i].possible.filter(function (item) {
+              return [question.person, question.room, question.weapon].indexOf(item) === -1;
+            });
+
+      $global.alfred.output.say('Input command ...');
     }
   }]);
 
