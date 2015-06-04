@@ -7,6 +7,8 @@
 process.app.controller('main', function ($scope, $global) {
   'use strict';
 
+  window.$scope = $scope;
+
   var priority = require('./lib/priority'),
     nextPort = require('next-port'),
     BayesClassifier = require('natural').BayesClassifier,
@@ -64,7 +66,6 @@ process.app.controller('main', function ($scope, $global) {
                 return !~question.cards.indexOf(item);
               });
 
-        console.log('answerer found at: %s', answerer);
         // Step #3: Eliminate cards from the question which are NOT present
         // in the master guess.
         question.person = $global.master.Guess.person.filter(function (prsn) {
@@ -156,7 +157,6 @@ process.app.controller('main', function ($scope, $global) {
             });
 
             if (updated) {
-              console.log('P(%s in master) = %s', card, 1 - sum);
               $global.master.Guess[$scope.cardtype(card)].update('itm', {
                 prob: 1 - sum,
                 itm: card
