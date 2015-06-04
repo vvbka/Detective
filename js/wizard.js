@@ -92,10 +92,10 @@ process.app.controller('wizard', function($scope, $global) {
     $global.Detective.sure.forEach(function(card, i){
       var nObj = {prob:0, itm:card}, res = 0;
       res = $global.master.Guess.room.update('itm', nObj);
-      if(res===1 || res === -1) {
+      if(res===-1) {
         res = $global.master.Guess.person.update('itm', nObj);
       }
-      if(res===1 || res === -1) {
+      if(res===-1) {
         res = $global.master.Guess.weapon.update('itm', nObj);
       }
           
