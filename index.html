@@ -138,17 +138,17 @@
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="row in player.guess">
-                  <td>{{row.person || '--' }}</td>
-                  <td>{{row.room || '--' }}</td>
-                  <td>{{row.weapon || '--' }}</td>
+                <tr ng-repeat="row in player.maybe">
+                  <td>{{ row[0] || '--' }}</td>
+                  <td>{{ row[1] || '--' }}</td>
+                  <td>{{ row[2] || '--' }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div class="possibleListing" ng-show="!isMaster">
+          <!--<div class="possibleListing" ng-show="!isMaster">
             {{player.possible}}
-          </div>
+          </div>-->
         </div>
       </div>
     </div>
