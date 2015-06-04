@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "alfred": "git+https://git@bitbucket.org/karimsa/alfred.git",
+    "array.prototype.findindex": "^1.0.0",
     "cutils": "git+https://git@bitbucket.org/vbka/cutils.git",
     "electron-prebuilt": "^0.27.2",
     "eventemitter2": "^0.4.14",
