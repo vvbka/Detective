@@ -42,7 +42,7 @@ process.app.controller('main', function($scope, $global) {
         person: $global.classifiers.people.classify(input),
         room: $global.classifiers.rooms.classify(input),
         weapon: $global.classifiers.weapons.classify(input)
-      }, answerer, i;
+      }, answerer = -1, i;
 
       // create full card list
       question.cards = [question.person, question.room, question.weapon];
@@ -60,6 +60,7 @@ process.app.controller('main', function($scope, $global) {
               return !~ question.cards.indexOf(item);
             });
 
+      console.log('answerer found at: %s', answerer);
       // Step #3: Eliminate cards from the question which are NOT present
       // in the master guess.
       question.person = $global.master.Guess.person.filter(function (prsn) {
@@ -76,63 +77,77 @@ process.app.controller('main', function($scope, $global) {
 
       // Step #4: Eliminate cards remaining in the question which are NOT
       // in the Answerer's possibles.
-      question.person = $global.players[answerer].possible.filter(function (prsn) {
-        return prsn === question.person;
-      }).length > 0 ? question.person : null;
+      if (answerer !== -1) {
+        question.person = $global.players[answerer].possible.filter(function (prsn) {
+          return prsn === question.person;
+        }).length > 0 ? question.person : null;
 
-      question.room = $global.players[answerer].possible.filter(function (rm) {
-        return rm === question.room;
-      }).length > 0 ? question.room : null;
+        question.room = $global.players[answerer].possible.filter(function (rm) {
+          return rm === question.room;
+        }).length > 0 ? question.room : null;
 
-      question.weapon = $global.players[answerer].possible.filter(function (wpn) {
-        return wpn === question.weapon;
-      }).length > 0 ? question.weapon : null;
+        question.weapon = $global.players[answerer].possible.filter(function (wpn) {
+          return wpn === question.weapon;
+        }).length > 0 ? question.weapon : null;
+      }
 
       // create clean stack
       question.cards = [question.person, question.room, question.weapon].filter(function (card) {
         return card;
       });
 
-      // Step #5: Add remaining cards to a row in Answerer's maybe stack.
-      $global.players[answerer].maybe.add(question.cards);
+      if (answerer !== -1) {
+        // Step #5: Add remaining cards to a row in Answerer's maybe stack.
+        $global.players[answerer].maybe.add(question.cards);
 
-      // Step #6: Check Answerer's maybes for any row with only one item.
-      // Step #7: For each such row:
-      while ($global.players[answerer].maybe.first().length < 2) {
-        var first = $global.players[answerer].maybe.pop()[0];
+        // Step #6: Check Answerer's maybes for any row with only one item.
+        // Step #7: For each such row:
+        while ($global.players[answerer].maybe.first().length < 2) {
+          var first = $global.players[answerer].maybe.pop()[0];
 
-        // Step #7.1: Add to Answerer's definite.
-        $global.players[answerer].sure.push(first);
+          // Step #7.1: Add to Answerer's definite.
+          $global.players[answerer].sure.push(first);
 
-        // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
-        $global.master.Guess.person = $global.master.Guess.person.filter(function (card) { return card !== first; });
-        $global.master.Guess.room = $global.master.Guess.room.filter(function (card) { return card !== first; });
-        $global.master.Guess.weapon = $global.master.Guess.weapon.filter(function (card) { return card !== first; });
+          // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+          $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
+            return card !== first;
+          });
 
-        // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
-        // card in the master guess, do:
-        // Step #8.1: For each player in players do:
-        for (var player of $global.players) {
-          // Step #8.1.1: For each row in player's maybes do:
-          for (var row of player.maybe) {
-            // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
-            if (row.indexOf(first) !== -1) {
-              console.log('::push(%s) to probabilties', 1 / row.length);
+          // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
+          // card in the master guess, do:
+          // Step #8.1: For each player in players do:
+          var probabilities = [];
+          for (var player of $global.players) {
+            // Step #8.1.1: For each row in player's maybes do:
+            for (var row of player.maybe) {
+              // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
+              if (row.indexOf(first) !== -1) {
+                probabilities.push(1 / row.length);
+              }
             }
           }
+
+          // Step #8.1.2: Multiply every element in the array by 1 / array.length.
+          probabilities = probabilities.map(function (p) {
+            return p * (1 / probabilities.length);
+          });
+
+          // Step #8.1.3: Sum all elements in the array, and set the probability of
+          // card in the master guess to 1 - sum.
+          var sum = 0;
+          probabilities.forEach(function (p) {
+            sum += p;
+          });
+
+          console.log('P(%s in master) = %s', first, 1 - sum);
+          $global.master.Guess[$scope.cardtype(first)].prob = 1 - sum;
         }
-
-        // Step #8.1.2: Multiply every element in the array by 1 / array.length.
-        // WHAT ELEMENTS?!?!
-
-        // Step #8.1.3: Sum all elements in the array, and set the probability of
-        // card in the master guess to 1 - sum.
-        // WHAT ARRAY?!?!
       }
 
       // ..
       console.log(JSON.stringify(question, null, 2));
       $global.alfred.output.say('Input command ...');
+      return 'Input command ...';
     }
   }]);
 
@@ -258,20 +273,19 @@ process.app.controller('main', function($scope, $global) {
     $scope.player = $global.players[id];
   };
 
+  // .cardtype(card)
+  // get card type
+  $scope.cardtype = function (card) {
+    if ($global.cardset.weapons.indexOf(card) !== -1) return 'weapon';
+    if ($global.cardset.people.indexOf(card) !== -1) return 'person';
+
+    return 'room';
+  };
+
   // .getImagePath(img)
   // returns the path to the image on disk for a given card
   $scope.getImagePath = function (img) {
-    var type;
-
-    if ($global.cardset.weapons.indexOf(img) !== -1) {
-      type = 'weapon';
-    } else if ($global.cardset.people.indexOf(img) !== -1) {
-      type = 'person';
-    } else {
-      type = 'room';
-    }
-
-    return 'img/' + type + '/' + img.toLowerCase() + '.png';
+    return 'img/' + $scope.cardtype(img) + '/' + img.toLowerCase() + '.png';
   };
 
   // we use an array + an object to maintain the list of

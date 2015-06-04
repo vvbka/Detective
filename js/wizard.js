@@ -100,7 +100,9 @@ process.app.controller('wizard', function($scope, $global) {
       }
           
     });
-    
+
+    $global.classifiers.players.addDocument('nobody', 'nobody');    
+    $global.classifiers.players.addDocument('no one', 'nobody');
     $global.classifiers.players.train();
   };
 
