@@ -50,22 +50,22 @@
           <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}} {{( (!isMaster && player.name!==player.charName ) ? ' ('+player.charName+')':'' )}}</h1>
 
           <!--Master Guess Dsiplay-->
-          <div class="row placeholders" ng-show="isMaster">
+          <div class="row placeholders" ng-show="isMaster && masterDefinite.person">
             <div class="col-xs-7 col-sm-4 ">
-              <img src="img/person/green.png" class="img" alt="person">
-              <h4>Mr. Green</h4>
+              <img src="{{getImagePath(masterDefinite.person)}}" class="img" alt="person">
+              <h4>{{masterDefinite.person}}</h4>
               <span class="text-muted">94%</span>
             </div>
 
             <div class="col-xs-7 col-sm-4 ">
-              <img class="img" alt="room" src="img/room/hall.png">
-              <h4>Hall</h4>
+              <img src="{{getImagePath(masterDefinite.room)}}" class="img" alt="room">
+              <h4>{{masterDefinite.room}}</h4>
               <span class="text-muted">66.6%</span>
             </div>
 
             <div class="col-xs-7 col-sm-4 ">
-              <img src="img/weapon/knife.png" class="img" alt="weapon">
-              <h4>Knife</h4>
+              <img src="{{getImagePath(masterDefinite.weapon)}}" class="img" alt="weapon">
+              <h4>{{masterDefinite.weapon}}</h4>
               <span class="text-muted">4%</span>
             </div>
           </div>
