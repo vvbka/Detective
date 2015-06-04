@@ -34,25 +34,104 @@ process.app.controller('main', function($scope, $global) {
   }, {
     prompts: ['* asked a question about * in the * with a *'],
     fn: function* (input) {
+      // Step #1: Use NaiveBayes Classifier to parse
+      // the question.
       var question = {
         asker: $global.classifiers.players.classify(input),
-        answeree: $global.classifiers.players.classify(yield 'Who answered?'),
+        answerer: $global.classifiers.players.classify(yield 'Who answered?'),
         person: $global.classifiers.people.classify(input),
         room: $global.classifiers.rooms.classify(input),
         weapon: $global.classifiers.weapons.classify(input)
-      }, i;
+      }, answerer, i;
 
-      // look for the starting player
+      // create full card list
+      question.cards = [question.person, question.room, question.weapon];
+
+      // Step #2: Remove all three cards from possibles of all people between
+      // who asked and who answered.
       for (i = 0; i < $global.players.length; i += 1)
         if ($global.players[i].name === question.asker)
           for (i = i + 1; i < $global.players.length; i += 1)
-            if ($global.players[i].name === question.answeree) {
+            if ($global.players[i].name === question.answerer) {
+              answerer = i;
               i = $global.players.length;
               break;
             } else $global.players[i].possible = $global.players[i].possible.filter(function (item) {
-              return [question.person, question.room, question.weapon].indexOf(item) === -1;
+              return !~ question.cards.indexOf(item);
             });
 
+      // Step #3: Eliminate cards from the question which are NOT present
+      // in the master guess.
+      question.person = $global.master.Guess.person.filter(function (prsn) {
+        return prsn.itm === question.person;
+      }).length > 0 ? question.person : null;
+
+      question.room = $global.master.Guess.room.filter(function (rm) {
+        return rm.itm === question.room;
+      }).length > 0 ? question.room : null;
+
+      question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
+        return wpn.itm === question.weapon;
+      }).length > 0 ? question.weapon : null;
+
+      // Step #4: Eliminate cards remaining in the question which are NOT
+      // in the Answerer's possibles.
+      question.person = $global.players[answerer].possible.filter(function (prsn) {
+        return prsn === question.person;
+      }).length > 0 ? question.person : null;
+
+      question.room = $global.players[answerer].possible.filter(function (rm) {
+        return rm === question.room;
+      }).length > 0 ? question.room : null;
+
+      question.weapon = $global.players[answerer].possible.filter(function (wpn) {
+        return wpn === question.weapon;
+      }).length > 0 ? question.weapon : null;
+
+      // create clean stack
+      question.cards = [question.person, question.room, question.weapon].filter(function (card) {
+        return card;
+      });
+
+      // Step #5: Add remaining cards to a row in Answerer's maybe stack.
+      $global.players[answerer].maybe.add(question.cards);
+
+      // Step #6: Check Answerer's maybes for any row with only one item.
+      // Step #7: For each such row:
+      while ($global.players[answerer].maybe.first().length < 2) {
+        var first = $global.players[answerer].maybe.pop()[0];
+
+        // Step #7.1: Add to Answerer's definite.
+        $global.players[answerer].sure.push(first);
+
+        // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+        $global.master.Guess.person = $global.master.Guess.person.filter(function (card) { return card !== first; });
+        $global.master.Guess.room = $global.master.Guess.room.filter(function (card) { return card !== first; });
+        $global.master.Guess.weapon = $global.master.Guess.weapon.filter(function (card) { return card !== first; });
+
+        // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
+        // card in the master guess, do:
+        // Step #8.1: For each player in players do:
+        for (var player of $global.players) {
+          // Step #8.1.1: For each row in player's maybes do:
+          for (var row of player.maybe) {
+            // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
+            if (row.indexOf(first) !== -1) {
+              console.log('::push(%s) to probabilties', 1 / row.length);
+            }
+          }
+        }
+
+        // Step #8.1.2: Multiply every element in the array by 1 / array.length.
+        // WHAT ELEMENTS?!?!
+
+        // Step #8.1.3: Sum all elements in the array, and set the probability of
+        // card in the master guess to 1 - sum.
+        // WHAT ARRAY?!?!
+      }
+
+      // ..
+      console.log(JSON.stringify(question, null, 2));
       $global.alfred.output.say('Input command ...');
     }
   }]);
