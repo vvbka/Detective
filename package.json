@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "a statistics-based clue solver",
   "main": "app.js",
+  "engines": {
+    "node": "0.12.x"
+  },
   "dependencies": {
     "alfred": "git+https://git@bitbucket.org/karimsa/alfred.git",
     "array.prototype.findindex": "^1.0.0",
@@ -11,9 +14,11 @@
     "eventemitter2": "^0.4.14",
     "natural": "^0.2.1",
     "next-port": "0.0.4",
+    "rimraf": "^2.3.4",
     "solver": "0.0.2"
   },
   "scripts": {
+    "preinstall": "rimraf node_modules",
     "start": "NODE_ENV=production ./node_modules/.bin/electron .",
     "test": "NODE_ENV=development ./node_modules/.bin/electron ."
   },
