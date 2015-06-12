@@ -149,7 +149,8 @@ var MenuTemplate = [
 app.on('ready', function () {
   DetectiveWindow = new BrowserWindow({
     width: 1200,
-    height: 710
+    height: 710,
+    icon: __dirname + '/img/icon-128x128.png'
   });
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(MenuTemplate));

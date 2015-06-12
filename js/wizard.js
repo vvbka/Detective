@@ -70,7 +70,9 @@ process.app.controller('wizard', function($scope, $global) {
             newPlayer = {
               name: $(this).find('input[type=text]').val().trim() || cn,
               charName: cn,
-              maybe: priority('length'),
+              maybe: priority('length', function (a, b) {
+                return (a - b) < 0;
+              }),
               sure: [],
               turn: i,
               shown: [],
@@ -88,17 +90,15 @@ process.app.controller('wizard', function($scope, $global) {
       }
     });
 
-    //update master guess with new data - ie. Detectives cards are probability 0;
-    $global.Detective.sure.forEach(function(card, i){
-      var nObj = {prob:0, itm:card}, res = 0;
-      res = $global.master.Guess.room.update('itm', nObj);
-      if(res===-1) {
-        res = $global.master.Guess.person.update('itm', nObj);
-      }
-      if(res===-1) {
-        res = $global.master.Guess.weapon.update('itm', nObj);
-      }
-          
+    //update master guess with new data - ie. Detectives cards are not to be considered.
+    $global.master.Guess.person = $global.master.Guess.person.filter(function (card) {
+      return !~ $global.Detective.sure.indexOf(card.itm);
+    });
+    $global.master.Guess.room = $global.master.Guess.room.filter(function (card) {
+      return !~ $global.Detective.sure.indexOf(card.itm);
+    });
+    $global.master.Guess.weapon = $global.master.Guess.weapon.filter(function (card) {
+      return !~ $global.Detective.sure.indexOf(card.itm);
     });
 
     $global.classifiers.players.addDocument('nobody', 'nobody');    
