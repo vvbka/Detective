@@ -226,6 +226,10 @@ ul.sortable-list > li.disabled {
 Board Display CSS
 **/
 
+table.board {
+  border: black solid 1px;
+}
+
 table.board td {
   height: 20px;
   width: 20px;
@@ -233,12 +237,34 @@ table.board td {
   
 }
 
-table.board td.roomINT, td.outside {
-  border: none !important;
+table.board td.roomINT, 
+table.board td.outside,
+table.board td.piece-0 {
+  border: none;
 }
 
-td.cnTL {
+table.board td.piece-1 {
+  border: green solid 1px;
+}
+
+table.board td.piece-3 {
+  border: black solid 1px;
+  background-color: gray;
+  
+}
+
+table.board > tbody > tr > td.cnTL {
   border-top: black solid 1px;
   border-left: black solid 1px;
+  border-bottom: none;
+  border-right: none;
   
+}
+
+table.board td.door, .piece-2 {
+  background-color: firebrick;
+}
+
+.room-label {
+  position: absolute;
 }

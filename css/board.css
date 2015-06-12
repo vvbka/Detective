@@ -6,8 +6,12 @@
     height: 20px;
     width: 20px;
     border: black solid 1px;
+  
 }
 
+.board {
+  border-spacing: 2px;
+}
 .board .roomINT,
 .board .outside {
     border: none;
@@ -20,4 +24,5 @@
 
 .board .red {
     border-color: firebrick;
+    background: firebrick;
 }
