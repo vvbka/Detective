@@ -24,7 +24,7 @@ process.app.controller('wizard', function($scope, $global) {
 
   $scope.addToMyCards = function() {
     $scope.add = $('[ng-model="add"]').val().trim();
-    if ($scope.add && $scope.cards.indexOf($scope.add) !== -1) {
+    if ($scope.add && $scope.myCards.indexOf($scope.add) !== -1) {
       console.log('adding: ' + $scope.add);
       $scope.myCards.push($scope.add);
       $scope.add = '';
