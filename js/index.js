@@ -12,9 +12,6 @@ process.app.controller('main', function ($scope, $global) {
     var priority = require('./lib/priority'),
         nextPort = require('next-port'),
         BayesClassifier = require('natural').BayesClassifier,
-        strategies = require('./lib/strategy-controller')($global, [
-      'find'
-    ]),
         array = Array.prototype.slice.call.bind(Array.prototype.slice);
 
     // load classifiers
