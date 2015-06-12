@@ -41,6 +41,8 @@ process.app.controller('BoardController', function ($scope, $global) {
 
             if (result.destination === Detective.room) {
                 // ...
+            } else {
+                // ...
             }
         });
     };
