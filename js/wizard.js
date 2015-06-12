@@ -27,8 +27,9 @@ process.app.controller('wizard', function($scope, $global) {
     if ($scope.add && $scope.myCards.indexOf($scope.add) === -1) {
       console.log('adding: ' + $scope.add);
       $scope.myCards.push($scope.add);
-      $scope.add = '';
     }
+
+    $scope.add = '';
   };
 
   $scope.rmFromMyCards = function(index) {
