@@ -52,29 +52,45 @@
           <!--Master Guess Dsiplay-->
           <div class="row placeholders" ng-show="isMaster">
             <div class="col-xs-7 col-sm-4 ">
-              <img src="{{getImagePath(masterGuess.person.first().itm)}}" class="img" alt="person">
-              <h4>{{masterGuess.person.first().itm}}</h4>
-              <span class="text-muted">{{100 * masterGuess.person.first().prob}}%</span>
+              <div>
+                <div>
+                  <img src="{{getImagePath(masterGuess.person.first().itm)}}" class="img" alt="person">
+                  <h4>{{masterGuess.person.first().itm}}</h4>
+                  <span class="text-muted">{{100 * masterGuess.person.first().prob}}%</span>
+                </div>
+              </div>
             </div>
 
             <div class="col-xs-7 col-sm-4 ">
-              <img src="{{getImagePath(masterGuess.room.first().itm)}}" class="img" alt="room">
-              <h4>{{masterGuess.room.first().itm}}</h4>
-              <span class="text-muted">{{100 * masterGuess.person.first().prob}}%</span>
+              <div>
+                <div>
+                  <img src="{{getImagePath(masterGuess.room.first().itm)}}" class="img" alt="room">
+                  <h4>{{masterGuess.room.first().itm}}</h4>
+                  <span class="text-muted">{{100 * masterGuess.person.first().prob}}%</span>
+                </div>
+              </div>
             </div>
 
             <div class="col-xs-7 col-sm-4 ">
-              <img src="{{getImagePath(masterGuess.weapon.first().itm)}}" class="img" alt="weapon">
-              <h4>{{masterGuess.weapon.first().itm}}</h4>
-              <span class="text-muted">{{100 * masterGuess.person.first().prob}}%</span>
+              <div>
+                <div>
+                  <img src="{{getImagePath(masterGuess.weapon.first().itm)}}" class="img" alt="weapon">
+                  <h4>{{masterGuess.weapon.first().itm}}</h4>
+                  <span class="text-muted">{{100 * masterGuess.person.first().prob}}%</span>
+                </div>
+              </div>
             </div>
           </div>
 
           <!--Player Hand Guess Dsiplay-->
           <div class="row placeholders" ng-show="!isMaster">
             <div ng-repeat="card in player.sure" class="col-sm-2 {{$first ? 'col-sm-offset-1':''}}">
-              <img src="{{getImagePath(card)}}" class="img" alt="sure card">
-              <h4>{{card}}</h4>
+              <div>
+                <div>
+                  <img src="{{getImagePath(card)}}" class="img" alt="sure card">
+                  <h4>{{card}}</h4>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -217,7 +233,7 @@
                 <td></td>
               </thead>
               <tbody>
-                <tr ng-repeat="(index,card) in myCards">
+                <tr ng-repeat="(index,card) in myCards track by index">
                   <th>{{index+1}}</th>
                   <td>{{card}}</td>
                   <td>
