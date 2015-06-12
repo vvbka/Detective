@@ -11,7 +11,7 @@
 process.app.controller('wizard', function($scope, $global) {
   var priority = require('./lib/priority'),
       format = require('util').format,
-      getStartingLcocation = function(player){
+      getStartingLocation = function(player){
         switch(player){
           case 'Mr. Green':
             return [9, 24];
