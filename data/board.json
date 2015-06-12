@@ -35,7 +35,7 @@
         "10,20": "Ballroom",
         "1,20": "Conservatory",
         "1,13": "Billiard Room",
-        "2,8": "Library",
+        "2,8": "Library"
     },
     "doors": {
         "study": [
