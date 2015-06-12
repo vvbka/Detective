@@ -21,3 +21,10 @@ process.app.directive('ngRepeatEnd', function() {
     }
   }
 });
+
+process.app.filter('double', function () {
+  var nplaces = Math.pow(10, 2);
+  return function (num) {
+    return Math.round(nplaces * num) / nplaces;
+  };
+});
