@@ -220,3 +220,25 @@ ul.sortable-list > li.disabled {
   height: 200px;
   width: auto;
 }
+
+
+/**
+Board Display CSS
+**/
+
+table.board td {
+  height: 20px;
+  width: 20px;
+  border: black solid 1px;
+  
+}
+
+table.board td.roomINT, td.outside {
+  border: none !important;
+}
+
+td.cnTL {
+  border-top: black solid 1px;
+  border-left: black solid 1px;
+  
+}

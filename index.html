@@ -18,7 +18,8 @@
   <div class="full-container">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
-        <div class="navbar-header"><a class="navbar-brand" href="#">Detective</a></div>
+        <div class="navbar-header"><a class="navbar-brand" href="#">Detective</a>
+        </div>
         <div id="navbar" class="navbar-collapse collapse">
           <!--<p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>-->
           <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
@@ -38,7 +39,8 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="{{isMaster ? 'active':''}}"><a href="#" ng-click="isMaster = true;">Master</a></li>
+            <li class="{{isMaster ? 'active':''}}"><a href="#" ng-click="isMaster = true;">Master</a>
+            </li>
             <li ng-repeat="(index, plyr) in players" class="{{plyr.name===player.name && !isMaster ? 'active':''}}">
               <a href="" ng-click="load(index);"> <span ng-show="plyr.turn===currentTurn" class="glyphicon glyphicon-triangle-right"></span> {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span>
               </a>
@@ -97,48 +99,48 @@
           <h2 class="sub-header">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
           <div ng-show="isMaster" class="table-responsive row">
             <div class="table-responsive col-md-4">
-             <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Person</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="row in masterGuess.person track by $index">
-                  <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
-                </tr>
-              </tbody>
-            </table>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Person</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="row in masterGuess.person track by $index">
+                    <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="table-responsive col-md-4">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Room</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="row in masterGuess.room track by $index">
-                  <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)'|| '--' }}</td>
-                </tr>
-              </tbody>
-            </table>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Room</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="row in masterGuess.room track by $index">
+                    <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)'|| '--' }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="table-responsive col-md-4">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  
-                  <th>Weapon</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="row in masterGuess.weapon track by $index">
-                  <td>{{row.itm+ ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+
+                    <th>Weapon</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="row in masterGuess.weapon track by $index">
+                    <td>{{row.itm+ ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!--The Player's Display Table-->
@@ -168,83 +170,747 @@
     </div>
   </div>
 
-    <!--The init wizzard-->
-    <div ng-controller="wizard">
-      <div id="init-modal-players" data-backdrop="static" data-keyboard="false" class="modal fade">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Welcome To Detective</h4>
-            </div>
-            <div class="modal-body">
-              <h3>Player Order</h3>
-              <section>
-                <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
-                <ul id="playersSort" class="sortable sortable-list connected">
-                  <li ng-repeat="(index,char) in chars" data-cid="{{index}}" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
-                    <span class="charname">{{char}}</span>
+  <!--The init wizzard-->
+  <div ng-controller="wizard">
+    <div id="init-modal-players" data-backdrop="static" data-keyboard="false" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Welcome To Detective</h4>
+          </div>
+          <div class="modal-body">
+            <h3>Player Order</h3>
+            <section>
+              <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
+              <ul id="playersSort" class="sortable sortable-list connected">
+                <li ng-repeat="(index,char) in chars" data-cid="{{index}}" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
+                  <span class="charname">{{char}}</span>
 
-                    <input type="text" class="form-control" ng-model="plnames[index]">
-                    <input type="checkbox" class="form-control" ng-model="char2det[index]">
-                  </li>
-                </ul>
-                <br>
-                <h4>Non Playing Characters:</h4>
-                <ul id="unusedPlayers" class="sortable sortable-list connected">
-                </ul>
-              </section>
-            </div>
-            <div class="modal-footer">
-              <button ng-click="cleanPlayers()" class="btn btn-default pull-left">Remove Empty Players</button>
-              <button ng-click="wizNext()" class="btn btn-primary">Next</button>
-            </div>
+                  <input type="text" class="form-control" ng-model="plnames[index]">
+                  <input type="checkbox" class="form-control" ng-model="char2det[index]">
+                </li>
+              </ul>
+              <br>
+              <h4>Non Playing Characters:</h4>
+              <ul id="unusedPlayers" class="sortable sortable-list connected">
+              </ul>
+            </section>
+          </div>
+          <div class="modal-footer">
+            <button ng-click="cleanPlayers()" class="btn btn-default pull-left">Remove Empty Players</button>
+            <button ng-click="wizNext()" class="btn btn-primary">Next</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div id="init-modal-cards" data-backdrop="static" data-keyboard="false" class="modal fade">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Welcome To Detective</h4>
-            </div>
-            <div class="modal-body">
-              <h3>Detective's Cards</h3>
-              <section>
-                <p>Please list all the cards in Detective's hand</p>
-                <div class="typeahead-container">
-                  <div class="typeahead-field">
-                    <span class="typeahead-query">
+    <div id="init-modal-cards" data-backdrop="static" data-keyboard="false" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Welcome To Detective</h4>
+          </div>
+          <div class="modal-body">
+            <h3>Detective's Cards</h3>
+            <section>
+              <p>Please list all the cards in Detective's hand</p>
+              <div class="typeahead-container">
+                <div class="typeahead-field">
+                  <span class="typeahead-query">
                     <div class="input-group">
                       <input ng-model="add" ng-enter="addToMyCards()" type="text" class="form-control" autmcomplete="off">
                       <span class="input-group-btn">
                         <button class="btn btn-default" type="button" ng-click="addToMyCards()">Add</button>
                       </span>
-                  </div>
-                  </span>
                 </div>
-            </div>
-            <table class="table">
-              <thead>
-                <th>#</th>
-                <td>Card</td>
-                <td></td>
-              </thead>
-              <tbody>
-                <tr ng-repeat="(index,card) in myCards track by index">
-                  <th>{{index+1}}</th>
-                  <td>{{card}}</td>
-                  <td>
-                    <button type="button" class="close" aria-label="Close" ng-click="rmFromMyCards(index)"><span aria-hidden="true">&times;</span></button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            </section>
+                </span>
+              </div>
           </div>
-          <div class="modal-footer">
-            <button ng-click="wizDone();" class="btn btn-success">Finish</button>
-          </div>
+          <table class="table">
+            <thead>
+              <th>#</th>
+              <td>Card</td>
+              <td></td>
+            </thead>
+            <tbody>
+              <tr ng-repeat="(index,card) in myCards track by index">
+                <th>{{index+1}}</th>
+                <td>{{card}}</td>
+                <td>
+                  <button type="button" class="close" aria-label="Close" ng-click="rmFromMyCards(index)"><span aria-hidden="true">&times;</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button ng-click="wizDone();" class="btn btn-success">Finish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+
+  <div class="modal fade" id="modal-board">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"></div>
+        <div class="modal-body">
+            <table class="board">
+    <tr>
+        <td class="roomINT cdTL"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+        <td></td>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+        <td></td>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td class="roomINT"></td>
+        <td class="roomINT"></td>
+        <td class="roomINT"></td>
+        <td class="roomINT"></td>
+        <td class="roomINT"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+    </tr>
+    <tr>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+    </tr>
+    <tr>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="outside"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
         </div>
       </div>
     </div>
