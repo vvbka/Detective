@@ -262,10 +262,13 @@
             <table ng-controller="BoardController" class="board">
         <tbody>
             <tr ng-repeat="(rindex,row) in board">
-                <td ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[rindex+','+$index]" class="room-label"> {{labels[rindex+','+$index]}} </span></td>
+                <td ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span></td>
             </tr>
         </tbody>
     </table>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-targe="modal-board" data-dismiss="modal">Done</button>
         </div>
       </div>
     </div>
