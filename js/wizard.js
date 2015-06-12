@@ -10,7 +10,25 @@
 
 process.app.controller('wizard', function($scope, $global) {
   var priority = require('./lib/priority'),
-      format = require('util').format;
+      format = require('util').format,
+      getStartingLcocation = function(player){
+        switch(player){
+          case 'Mr. Green':
+            return [9, 24];
+          case 'Ms. Scarlet':
+            return [16, 0];
+          case 'Colonel Mustard':
+            return [23, 7];
+          case 'Professor Plum':
+            return [0, 5];
+          case 'Mrs. White':
+            return [24, 14];
+          case 'Mrs. Peacock':
+            return [0, 18];
+          
+        }
+      }
+      ;
 
   $scope.players = $global.players;
   $scope.masterDefinite = $global.masterDefinite;
@@ -61,7 +79,8 @@ process.app.controller('wizard', function($scope, $global) {
       charName: $scope.chars[detindex],
       name: $scope.plnames[detindex] || 'Detective',
       turn: $('#playersSort li').index($('#playersSort').find('input:checked').parent()),
-      detective: true
+      detective: true,
+      location:getStartingLocation($scope.chars[detindex]) //x,y
     };
 
     //initiate each new player
@@ -80,13 +99,17 @@ process.app.controller('wizard', function($scope, $global) {
               ques: {},
               possible: $scope.cards.filter(function(card) {
                 return ($global.Detective.sure.indexOf(card) == -1);
-              })
+              }),
+              location: getStartingLocation(cn),
+              shown:[]
             };
 
         $global.players.push(newPlayer);
         $global.classifiers.players.addDocument(newPlayer.name, newPlayer.name);
       } else {
         $global.players.push($global.Detective);
+        $global.classifiers.players.addDocument('I', $global.Detective.name);
+        $global.classifiers.players.addDocument('Me', $global.Detective.name);
         $global.classifiers.players.addDocument($global.Detective.name, $global.Detective.name);
       }
     });

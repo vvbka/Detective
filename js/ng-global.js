@@ -14,6 +14,7 @@ process.app.factory('$global', function () {
       people: ['Ms. Scarlet', 'Colonel Mustard', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'],
       rooms: ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'],
       weapons: ['Axe', 'Bomb', 'Candlestick', 'Knife', 'Pipe', 'Poison', 'Revolver', 'Rope', 'Syringe', 'Wrench']
-    }
+    },
+    Detective:{}
   });
 });
