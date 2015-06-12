@@ -196,3 +196,27 @@ ul#unusedPlayers > li {
 ul.sortable-list > li.disabled {
   border: dashed 1px black;
 }
+
+/**
+ **/
+
+.row.placeholders > div {
+  height: 300px;
+}
+
+.row.placeholders > div > div {
+  height: 100%;
+  width: 100%;
+
+  display: table;
+}
+
+.row.placeholders > div > div > div {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.row.placeholders .img {
+  height: 200px;
+  width: auto;
+}
