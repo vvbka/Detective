@@ -73,7 +73,7 @@ process.app.controller('main', function ($scope, $global) {
                   var ret = pos[Math.floor(Math.random()*(pos.length-1))] 
                   console.log('Show Card %s', ret);
                 
-                  askr.shown.push(re);
+                  askr.shown.push(ret);
                   
                   //return a card back to the Alfred window
                   $global.alfred.output.say('Show Card: '+ret);
@@ -98,13 +98,17 @@ process.app.controller('main', function ($scope, $global) {
                 for (i = 0; i < $global.players.length; i += 1)
                     if ($global.players[i].name === question.asker)
                         for (i = i + 1; i < $global.players.length; i += 1)
+                          
                             if ($global.players[i].name === question.answerer) {
                                 answerer = i;
                                 i = $global.players.length;
                                 break;
-                            } else $global.players[i].possible = $global.players[i].possible.filter(function (item) {
+                            } else if ($global.players[i].name != $global.Detective.name) {
+                                console.log($global.players[i].name)
+                              $global.players[i].possible = $global.players[i].possible.filter(function (item) {
                                 return !~question.cards.indexOf(item);
                             });
+                                   }
 
                             // Step #3: Eliminate cards from the question which are NOT present
                             // in the master guess.
