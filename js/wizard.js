@@ -123,21 +123,18 @@ process.app.controller('wizard', function ($scope, $global) {
         });
 
         //add the corrent probability to the Master Guess, now that we have a proper length for it
-        var pPers = 1/$global.master.Guess.person.length,
-            pRm = 1/$global.master.Guess.room.length,
-            pWep = 1/$global.master.Guess.weapon.length;
-         
+        var newP = 1/($global.master.Guess.person.length + $global.master.Guess.room.length + $global.master.Guess.weapon.length);
          
         $global.master.Guess.person.forEach(function(pers){
-            $global.master.Guess.person.update('itm', {prob:pPers, itm:pers.itm});
+            $global.master.Guess.person.update('itm', {prob:newP, itm:pers.itm});
         });
         
         $global.master.Guess.room.forEach(function(rm){
-            $global.master.Guess.room.update('itm', {prob:pRm, itm:rm.itm});
+            $global.master.Guess.room.update('itm', {prob:newP, itm:rm.itm});
         });
         
         $global.master.Guess.weapon.forEach(function(wep){
-            $global.master.Guess.weapon.update('itm', {prob:pWep, itm:wep.itm});
+            $global.master.Guess.weapon.update('itm', {prob:newP, itm:wep.itm});
         });
         
         //and 'nobody' as a potetntial answerer
