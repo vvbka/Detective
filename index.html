@@ -2,296 +2,333 @@
 <html lang="en" ng-app="detective">
 
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Detective</title>
+    <title>Detective</title>
 
-  <link href="css/jquery.typeahead.css" rel="stylesheet">
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/template.css" rel="stylesheet">
+    <link href="css/jquery.typeahead.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/template.css" rel="stylesheet">
 </head>
 
 <body ng-controller="main">
-  <div class="splash"></div>
-  <div class="full-container">
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header"><a class="navbar-brand" href="#">Detective</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <!--<p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>-->
-          <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#modal-board">Game Board</button>
-          <form class="navbar-form" style="text-align:center; max-width:700px;" ng-submit="exec(alinput)">
-            <div class="typeahead-container">
-              <div class="typeahead-field">
-                <span class="typeahead-query">
+    <div class="splash"></div>
+    <div class="full-container">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header"><a class="navbar-brand" href="#">Detective</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <!--<p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>-->
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#modal-board">Game Board</button>
+                        <button type="button" class="btn" data-toggle="modal" data-target="#modal-strats"><span class="glyphicon glyphicon-cog"></span>
+                        </button>
+                    </div>
+                    <form class="navbar-form" style="text-align:center; max-width:700px;" ng-submit="exec(alinput)">
+                        <div class="typeahead-container">
+                            <div class="typeahead-field">
+                                <span class="typeahead-query">
                   <input class="form-control" size="70" placeholder="{{aloutput || 'Input command ...'}}" ng-model="alinput" type="text">
                 </span>
-              </div>
-            </div>
-          </form>
-        
-        </div>
-      </div>
-    </nav>
+                            </div>
+                        </div>
+                    </form>
 
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-            <li class="{{isMaster ? 'active':''}}"><a href="#" ng-click="isMaster = true;">Master</a>
-            </li>
-            <li ng-repeat="(index, plyr) in players" class="{{plyr.name===player.name && !isMaster ? 'active':''}}">
-              <a href="" ng-click="load(index);"> <span ng-show="plyr.turn===currentTurn" class="glyphicon glyphicon-triangle-right"></span> {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}} {{( (!isMaster && player.name!==player.charName ) ? ' ('+player.charName+')':'' )}}</h1>
-
-          <!--Master Guess Dsiplay-->
-          <div class="row placeholders" ng-show="isMaster">
-            <div class="col-xs-7 col-sm-4 ">
-              <div>
-                <div>
-                  <img src="{{getImagePath(masterGuess.person.first().itm)}}" class="img" alt="person">
-                  <h4>{{masterGuess.person.first().itm}}</h4>
-                  <span class="text-muted">{{100 * masterGuess.person.first().prob | double}}%</span>
                 </div>
-              </div>
             </div>
+        </nav>
 
-            <div class="col-xs-7 col-sm-4 ">
-              <div>
-                <div>
-                  <img src="{{getImagePath(masterGuess.room.first().itm)}}" class="img" alt="room">
-                  <h4>{{masterGuess.room.first().itm}}</h4>
-                  <span class="text-muted">{{100 * masterGuess.person.first().prob | double}}%</span>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <ul class="nav nav-sidebar">
+                        <li class="{{isMaster ? 'active':''}}"><a href="#" ng-click="isMaster = true;">Master</a>
+                        </li>
+                        <li ng-repeat="(index, plyr) in players" class="{{plyr.name===player.name && !isMaster ? 'active':''}}">
+                            <a href="" ng-click="load(index);"> <span ng-show="plyr.turn===currentTurn" class="glyphicon glyphicon-triangle-right"></span> {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-              </div>
-            </div>
 
-            <div class="col-xs-7 col-sm-4 ">
-              <div>
-                <div>
-                  <img src="{{getImagePath(masterGuess.weapon.first().itm)}}" class="img" alt="weapon">
-                  <h4>{{masterGuess.weapon.first().itm}}</h4>
-                  <span class="text-muted">{{100 * masterGuess.person.first().prob | double}}%</span>
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                    <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}} {{( (!isMaster && player.name!==player.charName ) ? ' ('+player.charName+')':'' )}}</h1>
+
+                    <!--Master Guess Dsiplay-->
+                    <div class="row placeholders" ng-show="isMaster">
+                        <div class="col-xs-7 col-sm-4 ">
+                            <div>
+                                <div>
+                                    <img src="{{getImagePath(masterGuess.person.first().itm)}}" class="img" alt="person">
+                                    <h4>{{masterGuess.person.first().itm}}</h4>
+                                    <span class="text-muted">{{100 * masterGuess.person.first().prob | double}}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-7 col-sm-4 ">
+                            <div>
+                                <div>
+                                    <img src="{{getImagePath(masterGuess.room.first().itm)}}" class="img" alt="room">
+                                    <h4>{{masterGuess.room.first().itm}}</h4>
+                                    <span class="text-muted">{{100 * masterGuess.person.first().prob | double}}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-7 col-sm-4 ">
+                            <div>
+                                <div>
+                                    <img src="{{getImagePath(masterGuess.weapon.first().itm)}}" class="img" alt="weapon">
+                                    <h4>{{masterGuess.weapon.first().itm}}</h4>
+                                    <span class="text-muted">{{100 * masterGuess.person.first().prob | double}}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Player Hand Guess Dsiplay-->
+                    <div class="row placeholders" ng-show="!isMaster">
+                        <div ng-repeat="card in player.sure" class="col-sm-2 {{$first ? 'col-sm-offset-1':''}}">
+                            <div>
+                                <div>
+                                    <img src="{{getImagePath(card)}}" class="img" alt="sure card">
+                                    <h4>{{card}}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="sub-header">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
+                    <div ng-show="isMaster" class="table-responsive row">
+                        <div class="table-responsive col-md-4">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Person</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in masterGuess.person track by $index">
+                                        <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-responsive col-md-4">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in masterGuess.room track by $index">
+                                        <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)'|| '--' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-responsive col-md-4">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+
+                                        <th>Weapon</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in masterGuess.weapon track by $index">
+                                        <td>{{row.itm+ ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!--The Player's Display Table-->
+                    <div ng-show="!isMaster" class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Person</th>
+                                    <th>Room</th>
+                                    <th>Weapon</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in player.maybe">
+                                    <td>{{ row[0] || '--' }}</td>
+                                    <td>{{ row[1] || '--' }}</td>
+                                    <td>{{ row[2] || '--' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="possibleListing" ng-show="!isMaster">
+                        {{player.possible}}
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-
-          <!--Player Hand Guess Dsiplay-->
-          <div class="row placeholders" ng-show="!isMaster">
-            <div ng-repeat="card in player.sure" class="col-sm-2 {{$first ? 'col-sm-offset-1':''}}">
-              <div>
-                <div>
-                  <img src="{{getImagePath(card)}}" class="img" alt="sure card">
-                  <h4>{{card}}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h2 class="sub-header">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
-          <div ng-show="isMaster" class="table-responsive row">
-            <div class="table-responsive col-md-4">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Person</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="row in masterGuess.person track by $index">
-                    <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="table-responsive col-md-4">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Room</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="row in masterGuess.room track by $index">
-                    <td>{{row.itm + ' (' + ((row.prob * 100) | double) + '%)'|| '--' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="table-responsive col-md-4">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-
-                    <th>Weapon</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="row in masterGuess.weapon track by $index">
-                    <td>{{row.itm+ ' (' + ((row.prob * 100) | double) + '%)' || '--' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!--The Player's Display Table-->
-          <div ng-show="!isMaster" class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Person</th>
-                  <th>Room</th>
-                  <th>Weapon</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="row in player.maybe">
-                  <td>{{ row[0] || '--' }}</td>
-                  <td>{{ row[1] || '--' }}</td>
-                  <td>{{ row[2] || '--' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="possibleListing" ng-show="!isMaster">
-            {{player.possible}}
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!--The init wizzard-->
-  <div ng-controller="wizard">
-    <div id="init-modal-players" data-backdrop="static" data-keyboard="false" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Welcome To Detective</h4>
-          </div>
-          <div class="modal-body">
-            <h3>Player Order</h3>
-            <section>
-              <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
-              <ul id="playersSort" class="sortable sortable-list connected">
-                <li ng-repeat="(index,char) in chars" data-cid="{{index}}" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
-                  <span class="charname">{{char}}</span>
-
-                  <input type="text" class="form-control" ng-model="plnames[index]">
-                  <input type="checkbox" class="form-control" ng-model="char2det[index]">
-                </li>
-              </ul>
-              <br>
-              <h4>Non Playing Characters:</h4>
-              <ul id="unusedPlayers" class="sortable sortable-list connected">
-              </ul>
-            </section>
-          </div>
-          <div class="modal-footer">
-            <button ng-click="cleanPlayers()" class="btn btn-default pull-left">Remove Empty Players</button>
-            <button ng-click="wizNext()" class="btn btn-primary">Next</button>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <div id="init-modal-cards" data-backdrop="static" data-keyboard="false" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Welcome To Detective</h4>
-          </div>
-          <div class="modal-body">
-            <h3>Detective's Cards</h3>
-            <section>
-              <p>Please list all the cards in Detective's hand</p>
-              <div class="typeahead-container">
-                <div class="typeahead-field">
-                  <span class="typeahead-query">
+    <!--The init wizzard-->
+    <div ng-controller="wizard">
+        <div id="init-modal-players" data-backdrop="static" data-keyboard="false" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Welcome To Detective</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h3>Player Order</h3>
+                        <section>
+                            <p>Set the order of the players, Miss. Scarlet always moves first. You may assign each player a nickname, and check the box next to Detective's player.</p>
+                            <ul id="playersSort" class="sortable sortable-list connected">
+                                <li ng-repeat="(index,char) in chars" data-cid="{{index}}" class="{{index == 0 ? 'disabled' : ''}}" ng-repeat-end="repeatDone()">
+                                    <span class="charname">{{char}}</span>
+
+                                    <input type="text" class="form-control" ng-model="plnames[index]">
+                                    <input type="checkbox" class="form-control" ng-model="char2det[index]">
+                                </li>
+                            </ul>
+                            <br>
+                            <h4>Non Playing Characters:</h4>
+                            <ul id="unusedPlayers" class="sortable sortable-list connected">
+                            </ul>
+                        </section>
+                    </div>
+                    <div class="modal-footer">
+                        <button ng-click="cleanPlayers()" class="btn btn-default pull-left">Remove Empty Players</button>
+                        <button ng-click="wizNext()" class="btn btn-primary">Next</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="init-modal-cards" data-backdrop="static" data-keyboard="false" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Welcome To Detective</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h3>Detective's Cards</h3>
+                        <section>
+                            <p>Please list all the cards in Detective's hand</p>
+                            <div class="typeahead-container">
+                                <div class="typeahead-field">
+                                    <span class="typeahead-query">
                     <div class="input-group">
                       <input ng-model="add" ng-enter="addToMyCards()" type="text" class="form-control" autmcomplete="off">
                       <span class="input-group-btn">
                         <button class="btn btn-default" type="button" ng-click="addToMyCards()">Add</button>
                       </span>
+                                </div>
+                                </span>
+                            </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <th>#</th>
+                            <td>Card</td>
+                            <td></td>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="(index,card) in myCards track by index">
+                                <th>{{index+1}}</th>
+                                <td>{{card}}</td>
+                                <td>
+                                    <button type="button" class="close" aria-label="Close" ng-click="rmFromMyCards(index)"><span aria-hidden="true">&times;</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </section>
                 </div>
-                </span>
-              </div>
-          </div>
-          <table class="table">
-            <thead>
-              <th>#</th>
-              <td>Card</td>
-              <td></td>
-            </thead>
-            <tbody>
-              <tr ng-repeat="(index,card) in myCards track by index">
-                <th>{{index+1}}</th>
-                <td>{{card}}</td>
-                <td>
-                  <button type="button" class="close" aria-label="Close" ng-click="rmFromMyCards(index)"><span aria-hidden="true">&times;</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          </section>
+                <div class="modal-footer">
+                    <button ng-click="wizDone();" class="btn btn-success">Finish</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-footer">
-          <button ng-click="wizDone();" class="btn btn-success">Finish</button>
-        </div>
-      </div>
     </div>
-  </div>
-  </div>
-
-
-  <div class="modal fade" ng-controller="BoardController" id="modal-board">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header"></div>
-        <div class="modal-body">
-            <table  class="board">
-        <tbody>
-            <tr ng-repeat="(rindex,row) in board">
-                <td ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span></td>
-            </tr>
-        </tbody>
-    </table>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-default pull-left" ng-click="alert('I should do a move here')">Done</button> 
-          <button class="btn btn-primary" href="" data-target="modal-board" data-dismiss="modal">Done</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <script>
-    var $ = jQuery = require('./js/jquery.js')
-  </script>
-  <script src="js/bootstrap.js"></script>
-  <script src="js/angular.js"></script>
-  <script>
-    process.app = angular.module('detective', [])
-  </script>
-  <script src="js/jquery.typeahead.js"></script>
-  <script src="js/ng-custom.js"></script>
-  <script src="js/sortable.js"></script>
-  <script src="js/ng-global.js"></script>
-  <script src="js/index.js"></script>
-  <script src="js/wizard.js"></script>
-  <script src="js/board.js"></script>
+
+    <div ng-controller="BoardController">
+        <div class="modal fade" id="modal-board">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header"></div>
+                    <div class="modal-body">
+                        <table class="board">
+                            <tbody>
+                                <tr ng-repeat="(rindex,row) in board">
+                                    <td ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default pull-left" ng-click="alert('I should do a move here')">Done</button>
+                        <button class="btn btn-primary" href="" data-target="modal-board" data-dismiss="modal">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal-strats">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Strategy Control</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-2 modal-sidebar">
+                                <ul>
+                                    <li ng-repeat="(fname,strat) in stratctl.strategies">
+                                        <a href="#" ng-click="loadStrat(fname)">{{strat.name}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-10">
+                                <p>Some text about what to do.</p>
+                                <textarea class="form-control" ng-model="stratCode" rows="15"></textarea>
+                                <button type="button" class="btn btn-primary btn-md pull-right" ng-click="saveStrat()">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-warning pull-left" ng-click="reloadStrats()">Reload Strategies</button>
+                        <button class="btn btn-default" data-dismiss="modal">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var $ = jQuery = require('./js/jquery.js')
+    </script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/angular.js"></script>
+    <script>
+        process.app = angular.module('detective', [])
+    </script>
+    <script src="js/jquery.typeahead.js"></script>
+    <script src="js/ng-custom.js"></script>
+    <script src="js/sortable.js"></script>
+    <script src="js/ng-global.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/wizard.js"></script>
+    <script src="js/board.js"></script>
 
 </body>
 
