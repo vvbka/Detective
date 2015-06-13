@@ -11,9 +11,8 @@ var $ = {
 }, stratctl = require('./lib/strategy-controller')($);
 
 stratctl.getBest(function (result) {
-  console.log('result => %s', JSON.stringify(result, null, 2));
-  
-  setTimeout(function () {
-    console.log('best => %s', JSON.stringify(stratctl.best, null, 2));
-  }, 1000);
+  console.log(require('util').inspect(result, {
+    colors: true,
+    depth: Infinity
+  }));
 });
