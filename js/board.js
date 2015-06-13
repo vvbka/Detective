@@ -67,6 +67,7 @@ process.app.controller('BoardController', function ($scope, $global) {
     // create new strategy
     $scope.newStrat = function () {
         $global.editor.setValue('module.exports = function (destination) {\n  \'use strict\';\n  \n  // TODO: ... write some logic ...\n};');
+        $global.editor.gotoLine(1);
         $scope.activestrat = {
             fname: '',
             name: ''
