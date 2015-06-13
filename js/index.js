@@ -157,11 +157,13 @@ process.app.controller('main', function ($scope, $global) {
                         // Step #7.1: Add to Answerer's definite.
                         $global.players[answerer].sure.push(first);
 
-                        // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+                        
+                    }
+                  
+                  // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
                         $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
                             return card.itm !== first;
                         });
-                    }
 
                     // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
                     // card in the master guess, do:

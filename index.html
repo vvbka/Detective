@@ -22,7 +22,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <!--<p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>-->
-          <form class="navbar-form" style="text-align:center;" ng-submit="exec(alinput)">
+          <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#modal-board">Game Board</button>
+          <form class="navbar-form" style="text-align:center; max-width:700px;" ng-submit="exec(alinput)">
             <div class="typeahead-container">
               <div class="typeahead-field">
                 <span class="typeahead-query">
@@ -31,6 +32,7 @@
               </div>
             </div>
           </form>
+        
         </div>
       </div>
     </nav>
@@ -254,12 +256,12 @@
   </div>
 
 
-  <div class="modal fade" id="modal-board">
+  <div class="modal fade" ng-controller="BoardController" id="modal-board">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header"></div>
         <div class="modal-body">
-            <table ng-controller="BoardController" class="board">
+            <table  class="board">
         <tbody>
             <tr ng-repeat="(rindex,row) in board">
                 <td ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span></td>
@@ -268,7 +270,8 @@
     </table>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" data-targe="modal-board" data-dismiss="modal">Done</button>
+          <button class="btn btn-default pull-left" ng-click="alert('I should do a move here')">Done</button> 
+          <button class="btn btn-primary" href="" data-target="modal-board" data-dismiss="modal">Done</button>
         </div>
       </div>
     </div>
