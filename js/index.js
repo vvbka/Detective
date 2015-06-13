@@ -23,6 +23,11 @@ process.app.controller('main', function ($scope, $global) {
         });
     });
 
+    // for the ACE editor
+    $global.editor = ace.edit("editor");
+    $global.editor.setTheme("ace/theme/monokai");
+    $global.editor.getSession().setMode("ace/mode/javascript");
+
     var priority = require('./lib/priority'),
         nextPort = require('next-port'),
         BayesClassifier = require('natural').BayesClassifier,

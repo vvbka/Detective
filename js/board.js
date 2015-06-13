@@ -11,13 +11,13 @@ process.app.controller('BoardController', function ($scope, $global) {
         Detective = $global.Detective,
         board = require('./data/board.json');
 
-    $scope.strats = ['find'];
+    $scope.strats = ['find-a-card'];
     $scope.stratctl = null;
-    $scope.activectl = null;
+    $scope.activestrat = null;
     $scope.board = board.board;
     $scope.labels = board.labels;
     $scope.doors = board.doors;
-    $scope.stratCode = '';
+    $scope.savable = true;
 
     // add room resolution to Detective
     Object.defineProperty(Detective, 'room', {
@@ -38,7 +38,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     // alfred binding for turn handling
     $global.myTurn = function () {
-        stratctl.getBest(function (result) {
+        $scope.stratctl.getBest(function (result) {
             console.log('result = ' + JSON.stringify(result));
             console.log('Detective.room = ' + Detective.room);
 
@@ -54,11 +54,55 @@ process.app.controller('BoardController', function ($scope, $global) {
     $scope.loadStrat = function (strat) {
         fs.readFile(path.resolve(__dirname, '.', 'lib', 'strategies', strat + '.js'), 'utf8', $global.tc(function (data) {
             $scope.$apply(function () {
-                $scope.activectl = strat;
-                $scope.stratCode = data;
+                $scope.activestrat = {
+                    fname: strat,
+                    name: $scope.stratctl.strategies[strat].name
+                };
+
+                $global.editor.setValue(data);
+                $global.editor.gotoLine(1);
             });
         }));
     };
+
+    // create new strategy
+    $scope.newStrat = function () {
+        $global.editor.setValue('module.exports = function (destination) {\n  \'use strict\';\n  \n  // TODO: ... write some logic ...\n};');
+        $scope.activestrat = {
+            fname: '',
+            name: ''
+        };
+    };
+
+    // saving code
+    $scope.save = function () {
+        var fname = $scope.activestrat.name.toLowerCase().replace(/\W+/g, '-');
+        if (fname) {
+            fs.writeFile(path.resolve(__dirname, '.', 'lib', 'strategies', fname + '.js'), $global.editor.getValue(), $global.tc(function () {
+                $scope.$apply(function () {
+                    console.log('saving: ' + fname);
+                
+                    $scope.strats.push(fname);
+                    $scope.strats = $scope.strats.filter(function (elm, index, self) {
+                        return self.indexOf(elm) === index;
+                    });
+                
+                    console.log($scope.strats);
+                });
+            }));
+        }
+    };
+
+    $global.editor.commands.addCommand({
+        name: 'Save',
+        bindKey: {
+            win: 'Ctrl-S',
+            mac: 'Command-S'
+        },
+        exec: function (editor) {
+            $scope.save();
+        }
+    });
 
     // reset the entire controller
     $scope.reloadStrats = function () {

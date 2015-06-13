@@ -284,24 +284,34 @@
         </div>
 
         <div class="modal fade" id="modal-strats">
-            <div class="modal-dialog">
+            <div class="modal-dialog" style="width: 80%; ">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4>Strategy Control</h4>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-2 modal-sidebar">
-                                <ul class="nav nav-pills nav-stacked">
-                                    <li ng-repeat="(fname,strat) in stratctl.strategies" class="{{ activectl === fname ? 'active' : '' }}">
-                                        <a href="#" ng-click="loadStrat(fname)">{{strat.name}}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-10">
-                                <p>Some text about what to do.</p>
-                                <textarea class="form-control" ng-model="stratCode" rows="15"></textarea>
-                                <button type="button" class="btn btn-primary btn-md pull-right" ng-click="saveStrat()">Save</button>
+                        <div class="container-fluid">
+                            <div class="row-fluid">
+                                <div class="col-md-4 modal-sidebar">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li>
+                                            <a href="#" ng-click="newStrat()">Create new ...</a>
+                                        </li>
+                                        <li ng-repeat="(fname,strat) in stratctl.strategies" class="{{ activestrat.fname === fname ? 'active' : '' }}">
+                                            <a href="#" ng-click="loadStrat(fname)">{{strat.name}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <p>Some text about what to do.</p>
+                                    <input type="text" class="form-control" ng-model="activestrat.name" placeholder="Enter a name for your strategy ...">
+                                    <pre id="editor">module.exports = function (destination) {
+  'use strict';
+  
+  // TODO: ... write some logic ...
+};</pre>
+                                    <button type="button" class="btn btn-primary btn-md pull-right" ng-click="saveStrat()" ng-disabled="!$scope.activestrat.name.trim()">Save</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -342,6 +352,7 @@
     <script src="js/ng-custom.js"></script>
     <script src="js/sortable.js"></script>
     <script src="js/ng-global.js"></script>
+    <script src="ace/ace.js"></script>
     <script src="js/index.js"></script>
     <script src="js/wizard.js"></script>
     <script src="js/board.js"></script>

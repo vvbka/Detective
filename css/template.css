@@ -277,3 +277,18 @@ table.board td.door,
 [ng-model="stratCode"] {
     margin-bottom: 10px;
 }
+/**
+ * code editor
+ **/
+
+[ng-model="activestrat.name"] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#editor {
+    height: 400px;
+}
+
+.hoverable:not(:hover) .onhover { display: none; }
+.hoverable:hover .default { display: none; }
