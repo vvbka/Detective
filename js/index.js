@@ -182,6 +182,25 @@ process.app.controller('main', function ($scope, $global) {
 
                 if (answerer !== -1) {
                     // Step #5: Add remaining cards to a row in Answerer's maybe stack.
+                    //but first, let's space them out properly if we need to.
+                    if(question.cards.length < 3) {
+                        var cardStore = [null, null, null];
+                        for (var c of question.cards){
+                            var t = $scope.cardtype(c);
+                            switch(t){
+                                case('person'):
+                                    cardStore[0] = c;
+                                    break;
+                                case('room'):
+                                    cardStore[1] = c;
+                                    break;
+                                case('weapon'):
+                                    cardStore[2] = c;
+                                    break;
+                            };
+                        };
+                        question.cards = cardStore;
+                    }
                     $global.players[answerer].maybe.add(question.cards);
 
                     // Step #6: Check Answerer's maybes for any row with only one item.
