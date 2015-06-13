@@ -134,7 +134,7 @@ process.app.controller('main', function ($scope, $global) {
                     } //end if
                     //console.log(i + ' : ' + $global.players[i].name !== $global.Detective.name && i !== asker);
                     if ($global.players[i].name !== $global.Detective.name && i !== asker) {
-                        console.log('EMILINATE FROM: '+$global.players[i].name);
+                        console.log('ELIMINATE FROM: '+$global.players[i].name);
                         $global.players[i].possible = $global.players[i].possible.filter(function (item) {
                             return !~question.cards.indexOf(item);
                         });
