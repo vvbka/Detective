@@ -125,21 +125,23 @@ process.app.controller('main', function ($scope, $global) {
                 }
                     
                 for (i = asker; i < $global.players.length; i += 1) {
-                    console.log('INDEX: '+ i);
+                    //console.log('INDEX: '+ i);
                     if ($global.players[i].name === question.answerer) {
                         answerer = i;
                         i = $global.players.length;
                         console.log('found answerer '+ $global.players[answerer].name +' at ' + answerer);
                         break;
-                    } 
-                    console.log(i + ' : ' + $global.players[i].name !== $global.Detective.name && i !== asker);
+                    } //end if
+                    //console.log(i + ' : ' + $global.players[i].name !== $global.Detective.name && i !== asker);
                     if ($global.players[i].name !== $global.Detective.name && i !== asker) {
                         console.log('EMILINATE FROM: '+$global.players[i].name);
                         $global.players[i].possible = $global.players[i].possible.filter(function (item) {
                             return !~question.cards.indexOf(item);
                         });
-                    } //end elseIF
-                    if(i===$global.players.length-1){i=-1;console.log("Reached the end of players, looking from top");}
+                    } //end if
+                    if(i===$global.players.length-1){
+                        i=-1;//console.log("Reached the end of players, looking from top");
+                        }
                 }
 
                 // Step #3: Eliminate cards from the question which are NOT present
