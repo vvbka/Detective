@@ -98,8 +98,7 @@ process.app.controller('wizard', function ($scope, $global) {
                         possible: $scope.cards.filter(function (card) {
                             return ($global.Detective.sure.indexOf(card) == -1);
                         }),
-                        location: getStartingLocation(cn),
-                        shown: []
+                        location: getStartingLocation(cn)
                     };
 
                 $global.players.push(newPlayer);
@@ -123,6 +122,25 @@ process.app.controller('wizard', function ($scope, $global) {
             return !~$global.Detective.sure.indexOf(card.itm);
         });
 
+        //add the corrent probability to the Master Guess, now that we have a proper length for it
+        var pPers = 1/$global.master.Guess.person.length,
+            pRm = 1/$global.master.Guess.room.length,
+            pWep = 1/$global.master.Guess.weapon.length;
+         
+         
+        $global.master.Guess.person.forEach(function(pers){
+            $global.master.Guess.person.update('itm', {prob:pPers, itm:pers.itm});
+        });
+        
+        $global.master.Guess.room.forEach(function(rm){
+            $global.master.Guess.room.update('itm', {prob:pRm, itm:rm.itm});
+        });
+        
+        $global.master.Guess.weapon.forEach(function(wep){
+            $global.master.Guess.weapon.update('itm', {prob:pWep, itm:wep.itm});
+        });
+        
+        //and 'nobody' as a potetntial answerer
         $global.classifiers.players.addDocument('nobody', 'nobody');
         $global.classifiers.players.addDocument('no one', 'nobody');
         $global.classifiers.players.train();
