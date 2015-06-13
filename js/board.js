@@ -36,6 +36,7 @@ process.app.controller('BoardController', function ($scope, $global) {
     });
 
     // alfred binding for turn handling
+    window.$$$ = $scope;
     $global.myTurn = function () {
         $scope.stratctl.getBest(function (result) {
             console.log('result = ' + JSON.stringify(result));
