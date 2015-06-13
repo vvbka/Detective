@@ -1,3 +1,10 @@
+/// <reference path="../typings/node/node.d.ts"/>
+/**
+ * js/ng-custom.js - detective
+ * custom Angular directives, filters, etc...
+ * Licensed under MIT.
+ * Copyright (C) 2015 VBKA.
+ **/
 process.app.directive('ngEnter', function() {
         return function(scope, element, attrs) {
             element.bind("keydown keypress", function(event) {
