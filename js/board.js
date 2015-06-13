@@ -102,6 +102,30 @@ process.app.controller('BoardController', function ($scope, $global) {
         }
     });
 
+   //Update the game board with player locations
+   $('#modal-board').on('show.bs.modal', function (ev) {
+       var dL = $global.Detective.location, sel = '#board-'+dL[0]+'-'+dL[1];
+       $(sel).addClass($global.Detective.charName.split(' ')[1]+'-bg');
+       $(sel).html('<span class="glyphicon glyphicon-search"></span>');
+       
+       for(var pl of $global.players) {
+           sel = '#board-'+pl.location[0]+'-'+pl.location[1];
+           $(sel).addClass(pl.charName.split(' ')[1]+'-bg');
+       }; 
+   });
+   
+   //be a good samaritan and cleanup after the modal closes, things might be different next time
+   $('#modal-board').on('hidden.bs.modal', function (ev) {
+       var dL = $global.Detective.location, sel = '#board-'+dL[0]+'-'+dL[1];
+       $(sel).removeClass($global.Detective.charName.split(' ')[1]+'-bg');
+       $(sel).html('');
+       
+       for(var pl of $global.players) {
+           sel = '#board-'+pl.location[0]+'-'+pl.location[1];
+           $(sel).removeClass(pl.charName.split(' ')[1]+'-bg');
+       }; 
+   });
+
     // reset the entire controller
     $scope.reloadStrats = function () {
         $scope.stratctl = require('./lib/strategy-controller')($global);

@@ -271,7 +271,7 @@
                         <table class="board">
                             <tbody>
                                 <tr ng-repeat="(rindex,row) in board">
-                                    <td ng-repeat="piece in row track by $index" class="piece-{{piece}} {{whoHere([$index+','+rindex]).split(' ')[1]}}-bg"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
+                                    <td id="board-{{$index}}-{{rindex}}" ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
                                     </td>
                                 </tr>
                             </tbody>
