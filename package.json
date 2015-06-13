@@ -16,7 +16,8 @@
     "next-port": "0.0.4",
     "rimraf": "^2.3.4",
     "solver": "0.0.2",
-    "javascript-astar": "git+https://github.com/bgrins/javascript-astar.git"
+    "javascript-astar": "git+https://github.com/bgrins/javascript-astar.git",
+    "trashcan": "~0.1.2"
   },
   "scripts": {
     "preinstall": "rimraf node_modules",

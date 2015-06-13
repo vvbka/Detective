@@ -203,7 +203,7 @@
                         </section>
                     </div>
                     <div class="modal-footer">
-                        <button ng-click="cleanPlayers()" class="btn btn-default pull-left">Remove Empty Players</button>
+                        <!--<button ng-click="cleanPlayers()" class="btn btn-default pull-left">Remove Empty Players</button>-->
                         <button ng-click="wizNext()" class="btn btn-primary">Next</button>
                     </div>
                 </div>
@@ -292,8 +292,8 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-2 modal-sidebar">
-                                <ul>
-                                    <li ng-repeat="(fname,strat) in stratctl.strategies">
+                                <ul class="nav nav-pills nav-stacked">
+                                    <li ng-repeat="(fname,strat) in stratctl.strategies" class="{{ activectl === fname ? 'active' : '' }}">
                                         <a href="#" ng-click="loadStrat(fname)">{{strat.name}}</a>
                                     </li>
                                 </ul>
@@ -309,6 +309,22 @@
                         <button class="btn btn-warning pull-left" ng-click="reloadStrats()">Reload Strategies</button>
                         <button class="btn btn-default" data-dismiss="modal">Done</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-err">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>{{error.title}}</h4>
+                </div>
+                <div class="modal-body">
+                    <code><pre>{{error.stack}}</pre></code>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

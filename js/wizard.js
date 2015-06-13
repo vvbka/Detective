@@ -128,15 +128,6 @@ process.app.controller('wizard', function ($scope, $global) {
         $global.classifiers.players.train();
     };
 
-    //
-    $scope.cleanPlayers = function () {
-        for (var i = 0; i < $scope.plnames.length; i += 1) {
-            if (!$scope.plnames[i]) {
-                $('[data-cid="' + i + '"]').remove().appendTo($('#unusedPlayers'));
-            }
-        }
-    };
-
     // .players.add([name])
     // adds a player to the game (in the next player position)
     // -> player position can be modified through the UI
@@ -181,6 +172,12 @@ process.app.controller('wizard', function ($scope, $global) {
         if ($('#playersSort li').find('input:checked').length != 1) {
             alert('Please identify Detective as one (and only one) player!')
         } else {
+            for (var i = 0; i < $scope.plnames.length; i += 1) {
+                if (!$scope.plnames[i]) {
+                    $('[data-cid="' + i + '"]').remove().appendTo($('#unusedPlayers'));
+                }
+            }
+
             $('#init-modal-players').modal('hide');
             $('#init-modal-cards').modal('show');
         }

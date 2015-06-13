@@ -13,6 +13,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     $scope.strats = ['find'];
     $scope.stratctl = null;
+    $scope.activectl = null;
     $scope.board = board.board;
     $scope.labels = board.labels;
     $scope.doors = board.doors;
@@ -51,18 +52,18 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     // load strategy for editing
     $scope.loadStrat = function (strat) {
-        fs.readFile(path.resolve(__dirname, '.', 'lib', 'strategies', strat + '.js'), 'utf8', function (err, data) {
-            if (err) {} else {
-                $scope.$apply(function () {
-                    $scope.stratCode = data;
-                });
-            }
-        });
+        fs.readFile(path.resolve(__dirname, '.', 'lib', 'strategies', strat + '.js'), 'utf8', $global.tc(function (data) {
+            $scope.$apply(function () {
+                $scope.activectl = strat;
+                $scope.stratCode = data;
+            });
+        }));
     };
 
     // reset the entire controller
     $scope.reloadStrats = function () {
         $scope.stratctl = require('./lib/strategy-controller')($global, $scope.strats);
+        $('#modal-strats').modal('hide');
     };
 
     // load up the controller
