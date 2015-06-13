@@ -40,8 +40,12 @@ process.app.controller('wizard', function ($scope, $global) {
     $scope.plnames = [, , , , , , , ];
 
     $scope.addToMyCards = function () {
-        $scope.add = $('[ng-model="add"]').val().trim();
-        if ($scope.add && $scope.myCards.indexOf($scope.add) === -1) {
+        $scope.add = $('[ng-model="add"]').val().trim().toLowerCase().split(/\s+/g).map(function (name) {
+          console.log(name);
+          return name[0].toUpperCase() + name.substr(1);
+        }).join(' ');
+
+        if ($scope.add && $scope.myCards.indexOf($scope.add) === -1 && $scope.cards.indexOf($scope.add) !== -1) {
             console.log('adding: ' + $scope.add);
             $scope.myCards.push($scope.add);
         }
