@@ -11,7 +11,6 @@ process.app.controller('BoardController', function ($scope, $global) {
         Detective = $global.Detective,
         board = require('./data/board.json');
 
-    $scope.strats = ['find-a-card'];
     $scope.stratctl = null;
     $scope.activestrat = null;
     $scope.board = board.board;
@@ -106,7 +105,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     // reset the entire controller
     $scope.reloadStrats = function () {
-        $scope.stratctl = require('./lib/strategy-controller')($global, $scope.strats);
+        $scope.stratctl = require('./lib/strategy-controller')($global);
         $('#modal-strats').modal('hide');
     };
 
