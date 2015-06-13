@@ -13,6 +13,7 @@ process.app.controller('main', function ($scope, $global) {
     $scope.error = {};
     $global.tc = require('trashcan');
     $global.tc.on('error', function (error) {
+        console.log(error);
         $scope.$apply(function () {
             $scope.error = {
                 title: String(error),

@@ -292,3 +292,54 @@ table.board td.door,
 
 .hoverable:not(:hover) .onhover { display: none; }
 .hoverable:hover .default { display: none; }
+
+/**
+* Character name based CSS
+**/
+.Scarlet {
+    color: #dc103b;
+}
+
+.Mustard {
+    color: #dca032;
+}
+
+.Green {
+    color: #015f01;
+}
+
+.Peacock {
+    color: #035c6e;
+}
+
+.White {
+    color: #e4c181;
+}
+
+.Plum {
+    color: #82174b;
+}
+
+.Scarlet-bg {
+    background-color: #dc103b;
+}
+
+.Mustard-bg {
+    background-color: #dca032;
+}
+
+.Green-bg {
+    background-color: #015f01;
+}
+
+.Peacock-bg {
+    background-color: #035c6e;
+}
+
+.White-bg {
+    background-color: #e4c181;
+}
+
+.Plum-bg {
+    background-color: #82174b;
+}

@@ -48,7 +48,7 @@
                         <li class="{{isMaster ? 'active':''}}"><a href="#" ng-click="isMaster = true;">Master</a>
                         </li>
                         <li ng-repeat="(index, plyr) in players" class="{{plyr.name===player.name && !isMaster ? 'active':''}}">
-                            <a href="" ng-click="load(index);"> <span ng-show="plyr.turn===currentTurn" class="glyphicon glyphicon-triangle-right"></span> {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span>
+                            <a href="" ng-click="load(index);"> {{plyr.name}} <span ng-show="plyr.detective" class="glyphicon glyphicon-search"></span> <span class="pull-right {{plyr.charName.split(' ')[1]}}">({{plyr.charName}})</span>
                             </a>
                         </li>
                     </ul>
@@ -259,8 +259,10 @@
     </div>
     </div>
 
-
+<!--Things relating to the game, and board-->
+    
     <div ng-controller="BoardController">
+        <!--A modal that displays the game board to indicate to the player where to move the game piece-->
         <div class="modal fade" id="modal-board">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -269,20 +271,20 @@
                         <table class="board">
                             <tbody>
                                 <tr ng-repeat="(rindex,row) in board">
-                                    <td ng-repeat="piece in row track by $index" class="piece-{{piece}}"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
+                                    <td ng-repeat="piece in row track by $index" class="piece-{{piece}} {{whoHere([$index+','+rindex]).split(' ')[1]}}-bg"> <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-default pull-left" ng-click="alert('I should do a move here')">Done</button>
+                        <button class="btn btn-default pull-left" ng-click="alert('I should do a move here')">My Turn</button>
                         <button class="btn btn-primary" href="" data-target="modal-board" data-dismiss="modal">Done</button>
                     </div>
                 </div>
             </div>
         </div>
-
+<!--Dialog for editing the strategies in Detective-->
         <div class="modal fade" id="modal-strats">
             <div class="modal-dialog" style="width: 80%; ">
                 <div class="modal-content">
