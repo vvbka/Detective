@@ -15,6 +15,7 @@ process.app.factory('$global', function () {
       rooms: ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'],
       weapons: ['Axe', 'Bomb', 'Candlestick', 'Knife', 'Pipe', 'Poison', 'Revolver', 'Rope', 'Syringe', 'Wrench']
     },
-    Detective:{}
+    Detective:{},
+    players : []
   });
 });

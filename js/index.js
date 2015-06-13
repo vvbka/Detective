@@ -34,23 +34,65 @@ process.app.controller('main', function ($scope, $global) {
   }, {
         prompts: ['* asked a question about * in the * with a *'],
         fn: function* (input) {
+          console.log(input);
             // Step #1: Use NaiveBayes Classifier to parse
             // the question.
             var question = {
                     asker: $global.classifiers.players.classify(input),
-                    answerer: $global.classifiers.players.classify(
-                        yield 'Who answered?'),
+                    answerer: $global.classifiers.players.classify(yield 'Who answered?'),
                     person: $global.classifiers.people.classify(input),
                     room: $global.classifiers.rooms.classify(input),
                     weapon: $global.classifiers.weapons.classify(input)
                 },
                 answerer = -1,
                 i;
-
+            
+          
+          
             try {
                 // create full card list
                 question.cards = [question.person, question.room, question.weapon];
 
+              //Interject if we have to provide an answer
+              if(question.answerer === $global.Detective.name) {
+                console.log('Detective Answers!')
+                //get the subset of cards which are in our hand, and in the question
+                var pos = question.cards.filter(function(q){return ($.inArray(q, $global.Detective.sure)!=-1)});
+                console.log(pos)
+                
+                if(pos.length > 0){ //check that we do actually have such a card
+                  //get any cards we may have previously shown this player
+                  var askr = $global.players.getByName(question.asker);
+                  var shown = askr.shown.filter(function(sc){
+                    return ($.inArray(sc, pos)!=-1);
+                  }); 
+                  console.log("we have shown: "+ shown);
+                  
+                  if(shown.length > 0 ) pos = shown; 
+                  
+                  var ret = pos[Math.floor(Math.random()*(pos.length-1))] 
+                  console.log('Show Card %s', ret);
+                
+                  askr.shown.push(re);
+                  
+                  //return a card back to the Alfred window
+                  $global.alfred.output.say('Show Card: '+ret);
+                  $scope.$apply();
+                  setTimeout(function(){
+                    $global.alfred.output.say('Input Command...');
+                    $scope.$apply();
+                  }, 3000)
+                  return ret 
+                  
+                } else {
+                  console.log('Detective Can\'t Answer!')
+                  question.answerer = $global.classifiers.players.classify(yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
+                }
+                
+                
+              }
+              
+              
                 // Step #2: Remove all three cards from possibles of all people between
                 // who asked and who answered.
                 for (i = 0; i < $global.players.length; i += 1)
@@ -317,6 +359,20 @@ process.app.controller('main', function ($scope, $global) {
     // we use an array + an object to maintain the list of
     // players and their data so we can maintain and manipulate
     // order
+    
     $scope.players = $global.players = [];
+    
+    $global.players.getByName = function(name){
+      
+      var tgt = 'name';
+      if($.inArray(name, $global.cardset.people) != -1){
+        tgt = 'charName'
+      }
+      //console.log('using target %s searching for %s', tgt, name)
+      return this.filter(function(p){return p[tgt] === name})[0];
+      
+    };
+    
+    
     $scope.playerdata = {};
 });
