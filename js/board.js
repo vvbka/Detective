@@ -42,7 +42,7 @@ process.app.controller('BoardController', function ($scope, $global) {
             console.log('Detective.room = ' + Detective.room);
 
             if (result.place === Detective.room) {
-                // ...
+                $global.alfred.say('Ask: Was it %s in the %s with a %s?', result.person, result.place, result.weapon);
             } else {
                 // ...
             }
