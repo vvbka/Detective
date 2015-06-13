@@ -5,380 +5,395 @@
  **/
 
 process.app.controller('main', function ($scope, $global) {
-    'use strict';
+  'use strict';
 
-    window.$scope = $scope;
+  window.$scope = $scope;
 
-    var priority = require('./lib/priority'),
-        nextPort = require('next-port'),
-        BayesClassifier = require('natural').BayesClassifier,
-        array = Array.prototype.slice.call.bind(Array.prototype.slice);
+  var priority = require('./lib/priority'),
+    nextPort = require('next-port'),
+    BayesClassifier = require('natural').BayesClassifier,
+    array = Array.prototype.slice.call.bind(Array.prototype.slice);
 
-    // load classifiers
-    $global.classifiers = {
-        players: new BayesClassifier(),
-        people: BayesClassifier.restore(require('./data/people-classifier.json')),
-        rooms: BayesClassifier.restore(require('./data/rooms-classifier.json')),
-        weapons: BayesClassifier.restore(require('./data/weapons-classifier.json'))
-    };
+  // load classifiers
+  $global.classifiers = {
+    players: new BayesClassifier(),
+    people: BayesClassifier.restore(require('./data/people-classifier.json')),
+    rooms: BayesClassifier.restore(require('./data/rooms-classifier.json')),
+    weapons: BayesClassifier.restore(require('./data/weapons-classifier.json'))
+  };
 
-    // make alfred globally available
-    $global.alfred = require('alfred');
-    $global.alfred.init([{
-        prompts: ['help'],
-        fn: function* () {
-            $('<div class="modal fade" data-keyboard="true"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title">Detective | Help</h4> </div><div class="modal-body"> <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p></div><div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div></div></div></div>').appendTo(document.body).modal('show').on('bs.modal.hidden', function () {
-                $(this).remove();
+  // make alfred globally available
+  $global.alfred = require('alfred');
+  $global.alfred.init([{
+    prompts: ['help'],
+    fn: function* () {
+      $('<div class="modal fade" data-keyboard="true"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title">Detective | Help</h4> </div><div class="modal-body"> <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p></div><div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div></div></div></div>').appendTo(document.body).modal('show').on('bs.modal.hidden', function () {
+        $(this).remove();
+      });
+    }
+  }, {
+    prompts: ['* asked a question about * in the * with a *'],
+    fn: function* (input) {
+      console.log(input);
+      // Step #1: Use NaiveBayes Classifier to parse
+      // the question.
+      var question = {
+          asker: $global.classifiers.players.classify(input),
+          answerer: $global.classifiers.players.classify(
+            yield 'Who answered?'),
+          person: $global.classifiers.people.classify(input),
+          room: $global.classifiers.rooms.classify(input),
+          weapon: $global.classifiers.weapons.classify(input)
+        },
+        answerer = -1,
+        i;
+
+
+      try {
+        // create full card list
+        question.cards = [question.person, question.room, question.weapon];
+
+        //Interject if we have to provide an answer
+        if (question.answerer === $global.Detective.name) {
+          console.log('Detective Answers!')
+            //get the subset of cards which are in our hand, and in the question
+          var pos = question.cards.filter(function (q) {
+            return ($.inArray(q, $global.Detective.sure) != -1)
+          });
+          console.log(pos)
+
+          if (pos.length > 0) { //check that we do actually have such a card
+            //get any cards we may have previously shown this player
+            var askr = $global.players.getByName(question.asker);
+            var shown = askr.shown.filter(function (sc) {
+              return ($.inArray(sc, pos) != -1);
             });
+            console.log("we have shown: " + shown);
+
+            if (shown.length > 0) pos = shown;
+
+            var ret = pos[Math.floor(Math.random() * (pos.length - 1))]
+            console.log('Show Card %s', ret);
+
+            askr.shown.push(ret);
+
+            //return a card back to the Alfred window
+            $global.alfred.output.say('Show Card: ' + ret);
+            $scope.$apply();
+            setTimeout(function () {
+              $global.alfred.output.say('Input Command...');
+              $scope.$apply();
+            }, 3000)
+            return ret
+
+          } else {
+            console.log('Detective Can\'t Answer!')
+            question.answerer = $global.classifiers.players.classify(
+              yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
+          }
+
         }
-  }, {
-        prompts: ['* asked a question about * in the * with a *'],
-        fn: function* (input) {
-          console.log(input);
-            // Step #1: Use NaiveBayes Classifier to parse
-            // the question.
-            var question = {
-                    asker: $global.classifiers.players.classify(input),
-                    answerer: $global.classifiers.players.classify(yield 'Who answered?'),
-                    person: $global.classifiers.people.classify(input),
-                    room: $global.classifiers.rooms.classify(input),
-                    weapon: $global.classifiers.weapons.classify(input)
-                },
-                answerer = -1,
-                i;
-            
-          
-          
-            try {
-                // create full card list
-                question.cards = [question.person, question.room, question.weapon];
 
-              //Interject if we have to provide an answer
-              if(question.answerer === $global.Detective.name) {
-                console.log('Detective Answers!')
-                //get the subset of cards which are in our hand, and in the question
-                var pos = question.cards.filter(function(q){return ($.inArray(q, $global.Detective.sure)!=-1)});
-                console.log(pos)
-                
-                if(pos.length > 0){ //check that we do actually have such a card
-                  //get any cards we may have previously shown this player
-                  var askr = $global.players.getByName(question.asker);
-                  var shown = askr.shown.filter(function(sc){
-                    return ($.inArray(sc, pos)!=-1);
-                  }); 
-                  console.log("we have shown: "+ shown);
-                  
-                  if(shown.length > 0 ) pos = shown; 
-                  
-                  var ret = pos[Math.floor(Math.random()*(pos.length-1))] 
-                  console.log('Show Card %s', ret);
-                
-                  askr.shown.push(ret);
-                  
-                  //return a card back to the Alfred window
-                  $global.alfred.output.say('Show Card: '+ret);
-                  $scope.$apply();
-                  setTimeout(function(){
-                    $global.alfred.output.say('Input Command...');
-                    $scope.$apply();
-                  }, 3000)
-                  return ret 
-                  
-                } else {
-                  console.log('Detective Can\'t Answer!')
-                  question.answerer = $global.classifiers.players.classify(yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
-                }
-                
-                
-              }
-              
-              
-                // Step #2: Remove all three cards from possibles of all people between
-                // who asked and who answered.
-                for (i = 0; i < $global.players.length; i += 1)
-                    if ($global.players[i].name === question.asker)
-                        for (i = i + 1; i < $global.players.length; i += 1)
-                          
-                            if ($global.players[i].name === question.answerer) {
-                                answerer = i;
-                                i = $global.players.length;
-                                break;
-                            } else if ($global.players[i].name != $global.Detective.name) {
-                                console.log($global.players[i].name)
-                              $global.players[i].possible = $global.players[i].possible.filter(function (item) {
-                                return !~question.cards.indexOf(item);
-                            });
-                                   }
+        // Step #2: Remove all three cards from possibles of all people between
+        // who asked and who answered.
+        for (i = 0; i < $global.players.length; i += 1)
+          if ($global.players[i].name === question.asker)
+            for (i = i + 1; i < $global.players.length; i += 1)
 
-                            // Step #3: Eliminate cards from the question which are NOT present
-                            // in the master guess.
-                question.person = $global.master.Guess.person.filter(function (prsn) {
-                    return prsn.itm === question.person;
-                }).length > 0 ? question.person : null;
+        if ($global.players[i].name === question.answerer) {
+          answerer = i;
+          i = $global.players.length;
+          break;
+        } else if ($global.players[i].name != $global.Detective.name) {
+          console.log($global.players[i].name)
+          $global.players[i].possible = $global.players[i].possible.filter(function (item) {
+            return !~question.cards.indexOf(item);
+          });
+        }
 
-                question.room = $global.master.Guess.room.filter(function (rm) {
-                    return rm.itm === question.room;
-                }).length > 0 ? question.room : null;
+        // Step #3: Eliminate cards from the question which are NOT present
+        // in the master guess.
+        question.person = $global.master.Guess.person.filter(function (prsn) {
+          return prsn.itm === question.person;
+        }).length > 0 ? question.person : null;
 
-                question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
-                    return wpn.itm === question.weapon;
-                }).length > 0 ? question.weapon : null;
+        question.room = $global.master.Guess.room.filter(function (rm) {
+          return rm.itm === question.room;
+        }).length > 0 ? question.room : null;
 
-                // Step #4: Eliminate cards remaining in the question which are NOT
-                // in the Answerer's possibles.
-                if (answerer !== -1) {
-                    question.person = $global.players[answerer].possible.filter(function (prsn) {
-                        return prsn === question.person;
-                    }).length > 0 ? question.person : null;
+        question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
+          return wpn.itm === question.weapon;
+        }).length > 0 ? question.weapon : null;
 
-                    question.room = $global.players[answerer].possible.filter(function (rm) {
-                        return rm === question.room;
-                    }).length > 0 ? question.room : null;
+        // Step #4: Eliminate cards remaining in the question which are NOT
+        // in the Answerer's possibles.
+        if (answerer !== -1) {
+          question.person = $global.players[answerer].possible.filter(function (prsn) {
+            return prsn === question.person;
+          }).length > 0 ? question.person : null;
 
-                    question.weapon = $global.players[answerer].possible.filter(function (wpn) {
-                        return wpn === question.weapon;
-                    }).length > 0 ? question.weapon : null;
-                }
+          question.room = $global.players[answerer].possible.filter(function (rm) {
+            return rm === question.room;
+          }).length > 0 ? question.room : null;
 
-                // create clean stack
-                question.cards = [question.person, question.room, question.weapon].filter(function (card) {
-                    return card;
-                });
+          question.weapon = $global.players[answerer].possible.filter(function (wpn) {
+            return wpn === question.weapon;
+          }).length > 0 ? question.weapon : null;
+        }
 
-                if (answerer !== -1) {
-                    // Step #5: Add remaining cards to a row in Answerer's maybe stack.
-                    $global.players[answerer].maybe.add(question.cards);
+        // create clean stack
+        question.cards = [question.person, question.room, question.weapon].filter(function (card) {
+          return card;
+        });
 
-                    // Step #6: Check Answerer's maybes for any row with only one item.
-                    // Step #7: For each such row:
-                    while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length < 2) {
-                        var first = $global.players[answerer].maybe.pop()[0];
+        if (answerer !== -1) {
+          // Step #5: Add remaining cards to a row in Answerer's maybe stack.
+          $global.players[answerer].maybe.add(question.cards);
 
-                        // Step #7.1: Add to Answerer's definite.
-                        $global.players[answerer].sure.push(first);
+          // Step #6: Check Answerer's maybes for any row with only one item.
+          // Step #7: For each such row:
+          while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length < 2) {
+            var first = $global.players[answerer].maybe.pop()[0];
 
-                        
-                    }
-                  
-                  // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
-                        $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
-                            return card.itm !== first;
-                        });
+            // Step #7.1: Add to Answerer's definite.
+            $global.players[answerer].sure.push(first);
 
-                    // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
-                    // card in the master guess, do:
-                    var guess = array($global.master.Guess.person).concat(array($global.master.Guess.room), array($global.master.Guess.weapon)).map(function (card) {
-                        return card.itm;
-                    });
+            // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+            $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
+              return card.itm !== first;
+            });
 
-                    // update probabilities of all guesses
-                    for (var card of guess) {
-                        var updated = false,
-                            probabilities = [];
+          } //while...
 
-                        // Step #8.1: For each player in players do:
-                        for (var player of $global.players) {
-                            if (!player.detective) {
-                                // Step #8.1.1: For each row in player's maybes do:
-                                for (var row of player.maybe) {
-                                    // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
-                                    if (row.indexOf(card) !== -1) {
-                                        probabilities.push(1 / row.length);
-                                        updated = true;
-                                    }
-                                }
-                            }
-                        }
+        } //if...
 
-                        // Step #8.1.2: Multiply every element in the array by 1 / array.length.
-                        probabilities = probabilities.map(function (p) {
-                            return p * (1 / probabilities.length);
-                        });
-
-                        // Step #8.1.3: Sum all elements in the array, and set the probability of
-                        // card in the master guess to 1 - sum.
-                        var sum = 0;
-                        probabilities.forEach(function (p) {
-                            sum += p;
-                        });
-
-                        if (updated) {
-                            $global.master.Guess[$scope.cardtype(card)].update('itm', {
-                                prob: 1 - sum,
-                                itm: card
-                            });
-                        }
-                    }
-                }
-
-                // ..
-                console.log(JSON.stringify(question, null, 2));
-                $global.alfred.output.say('Input command ...');
-                $scope.$apply();
-            } catch (e) {
-                console.error(String(e));
-                console.error(String(e.stack))
+        //handle case where no one answeres, those cards must therefore be in either our hand, their hand, or the answer
+        if (question.answerer === 'nobody') {
+          console.log('nobody answered')
+          for (var c of question.cards) {
+            //console.log('update '+ c)
+            if (!~$.inArray(c, $global.players[$global.players.getByName(question.asker)].possible)) {
+              $global.master.Guess[$scope.cardtype(c)].update('itm', {prob: 1,itm: c});
+            } else {
+              $global.players[$global.players.getByName(question.asker)].maybe.add(question.cards);
+              $global.master.Guess[$scope.cardtype(c)].update('itm', {prob: 0.5,itm: c});
             }
+            
+          } //end for
+        } //endif nobody 
+
+
+        // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
+        // card in the master guess, do:
+        var guess = array($global.master.Guess.person).concat(array($global.master.Guess.room), array($global.master.Guess.weapon)).map(function (card) {
+          return card.itm;
+        });
+
+        // update probabilities of all guesses
+        for (var card of guess) {
+          var updated = false,
+            probabilities = [];
+
+          // Step #8.1: For each player in players do:
+          for (var player of $global.players) {
+            if (!player.detective) {
+              // Step #8.1.1: For each row in player's maybes do:
+              for (var row of player.maybe) {
+                // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
+                if (row.indexOf(card) !== -1) {
+                  probabilities.push(1 / row.length);
+                  updated = true;
+                }
+              }
+            }
+          }
+
+          // Step #8.1.2: Multiply every element in the array by 1 / array.length.
+          probabilities = probabilities.map(function (p) {
+            return p * (1 / probabilities.length);
+          });
+
+          // Step #8.1.3: Sum all elements in the array, and set the probability of
+          // card in the master guess to 1 - sum.
+          var sum = 0;
+          probabilities.forEach(function (p) {
+            sum += p;
+          });
+
+          if (updated) {
+            $global.master.Guess[$scope.cardtype(card)].update('itm', {
+              prob: 1 - sum,
+              itm: card
+            });
+          }
         }
+        //} //<
+
+        // ..
+        console.log(JSON.stringify(question, null, 2));
+        $global.alfred.output.say('Input command ...');
+        $scope.$apply();
+      } catch (e) {
+        console.error(String(e));
+        console.error(String(e.stack))
+      }
+    }
   }, {
-        prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn'],
-        fn: $global.myTurn
+    prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn'],
+    fn: $global.myTurn
   }]);
 
-    // bind alfred's output to angular
-    $scope.alout = '';
-    $global.alfred.events.on('say', function (text) {
-        $scope.$apply(function () {
-            $scope.aloutput = text;
-        });
+  // bind alfred's output to angular
+  $scope.alout = '';
+  $global.alfred.events.on('say', function (text) {
+    $scope.$apply(function () {
+      $scope.aloutput = text;
     });
+  });
 
-    // bind alfred's input to angular, and
-    // record history of commands using a typeahead
-    $scope.getinput = false;
-    $scope.typeahead = ['Help me out.'];
-    $scope.exec = function () {
-        // fix up text
-        var text = $('[ng-model="alinput"]').val();
-        text = text[0].toUpperCase() + text.substr(1).toLowerCase();
-        if (text[text.length - 1] !== '.') text += '.';
+  // bind alfred's input to angular, and
+  // record history of commands using a typeahead
+  $scope.getinput = false;
+  $scope.typeahead = ['Help me out.'];
+  $scope.exec = function () {
+    // fix up text
+    var text = $('[ng-model="alinput"]').val();
+    text = text[0].toUpperCase() + text.substr(1).toLowerCase();
+    if (text[text.length - 1] !== '.') text += '.';
 
-        // keep latest commands at the top of the list
-        $scope.typeahead.push(text);
-        $scope.typeahead = $scope.typeahead.filter(function (item, index, self) {
-            item = item.toLowerCase();
+    // keep latest commands at the top of the list
+    $scope.typeahead.push(text);
+    $scope.typeahead = $scope.typeahead.filter(function (item, index, self) {
+      item = item.toLowerCase();
 
-            var n = -1;
-            for (var i = 0; i < self.length; i += 1) {
-                if (self[i].toLowerCase() === item) {
-                    n = i;
-                    break;
-                }
-            }
-
-            return index === n;
-        });
-
-        // continue on next tick in order to force the
-        // command to be asynchronous
-        $scope.alinput = '';
-        process.nextTick(function () {
-            if ($scope.getinput) {
-                $scope.getinput = false;
-                $global.alfred.events.emit('input', text);
-            } else $global.alfred.try(text);
-        });
-    };
-
-    // bind to alfred
-    $global.alfred.events.on('get-input', function () {
-        $scope.getinput = true;
-    });
-
-    // wrap up with typeahead
-    nextPort(function (err, port) {
-        // simple echo server for echoing ajax
-        require('http').Server(function (req, res) {
-            res.end(JSON.stringify($scope.typeahead));
-        }).listen(port);
-
-        // keeping the source ajax-enabled allows for
-        // dynamic updating
-        $('[ng-model="alinput"]').typeahead({
-            dynamic: true,
-            source: {
-                history: {
-                    url: 'http://localhost:' + port + '/'
-                }
-            },
-            order: 'asc',
-            highlight: true
-        });
-    });
-
-    // this switch allows us to toggle between the UI
-    // displaying the master's info or a given player's
-    // info
-    $scope.isMaster = true;
-
-    // this priority queue maintains the possibilities
-    // of the murder, and their respective probability
-    $scope.masterGuess = $global.master.Guess = {
-        room: priority('prob'),
-        person: priority('prob'),
-        weapon: priority('prob')
-    };
-    $scope.masterDefinite = $global.master.Definite = {
-        person: '',
-        room: '',
-        weapon: ''
-    };
-
-    //initiate the master guess
-    $global.cardset.rooms.forEach(function (room) {
-        $global.master.Guess.room.add({
-            prob: 0,
-            itm: room
-        });
-    });
-    $global.cardset.people.forEach(function (person) {
-        $global.master.Guess.person.add({
-            prob: 0,
-            itm: person
-        });
-    });
-    $global.cardset.weapons.forEach(function (weapon) {
-        $global.master.Guess.weapon.add({
-            prob: 0,
-            itm: weapon
-        });
-    });
-
-
-    // the player global will be the current selected
-    // player in the UI, so we don't have to modify a whole
-    // bunch of globals on player change
-    $scope.player = {};
-
-    // .load([id])
-    // set the given player as the global/current player
-    $scope.load = function (id) {
-        $scope.isMaster = false;
-        $scope.player = $global.players[id];
-    };
-
-    // .cardtype(card)
-    // get card type
-    $scope.cardtype = function (card) {
-        if ($global.cardset.weapons.indexOf(card) !== -1) return 'weapon';
-        if ($global.cardset.people.indexOf(card) !== -1) return 'person';
-
-        return 'room';
-    };
-
-    // .getImagePath(img)
-    // returns the path to the image on disk for a given card
-    $scope.getImagePath = function (img) {
-        return 'img/' + $scope.cardtype(img) + '/' + img.toLowerCase() + '.png';
-    };
-
-    // we use an array + an object to maintain the list of
-    // players and their data so we can maintain and manipulate
-    // order
-    
-    $scope.players = $global.players = [];
-    
-    $global.players.getByName = function(name){
-      
-      var tgt = 'name';
-      if($.inArray(name, $global.cardset.people) != -1){
-        tgt = 'charName'
+      var n = -1;
+      for (var i = 0; i < self.length; i += 1) {
+        if (self[i].toLowerCase() === item) {
+          n = i;
+          break;
+        }
       }
-      //console.log('using target %s searching for %s', tgt, name)
-      return this.filter(function(p){return p[tgt] === name})[0];
-      
-    };
-    
-    
-    $scope.playerdata = {};
+
+      return index === n;
+    });
+
+    // continue on next tick in order to force the
+    // command to be asynchronous
+    $scope.alinput = '';
+    process.nextTick(function () {
+      if ($scope.getinput) {
+        $scope.getinput = false;
+        $global.alfred.events.emit('input', text);
+      } else $global.alfred.try(text);
+    });
+  };
+
+  // bind to alfred
+  $global.alfred.events.on('get-input', function () {
+    $scope.getinput = true;
+  });
+
+  // wrap up with typeahead
+  nextPort(function (err, port) {
+    // simple echo server for echoing ajax
+    require('http').Server(function (req, res) {
+      res.end(JSON.stringify($scope.typeahead));
+    }).listen(port);
+
+    // keeping the source ajax-enabled allows for
+    // dynamic updating
+    $('[ng-model="alinput"]').typeahead({
+      dynamic: true,
+      source: {
+        history: {
+          url: 'http://localhost:' + port + '/'
+        }
+      },
+      order: 'asc',
+      highlight: true
+    });
+  });
+
+  // this switch allows us to toggle between the UI
+  // displaying the master's info or a given player's
+  // info
+  $scope.isMaster = true;
+
+  // this priority queue maintains the possibilities
+  // of the murder, and their respective probability
+  $scope.masterGuess = $global.master.Guess = {
+    room: priority('prob'),
+    person: priority('prob'),
+    weapon: priority('prob')
+  };
+  $scope.masterDefinite = $global.master.Definite = {
+    person: '',
+    room: '',
+    weapon: ''
+  };
+
+  //initiate the master guess
+  $global.cardset.rooms.forEach(function (room) {
+    $global.master.Guess.room.add({
+      prob: 0,
+      itm: room
+    });
+  });
+  $global.cardset.people.forEach(function (person) {
+    $global.master.Guess.person.add({
+      prob: 0,
+      itm: person
+    });
+  });
+  $global.cardset.weapons.forEach(function (weapon) {
+    $global.master.Guess.weapon.add({
+      prob: 0,
+      itm: weapon
+    });
+  });
+
+  // the player global will be the current selected
+  // player in the UI, so we don't have to modify a whole
+  // bunch of globals on player change
+  $scope.player = {};
+
+  // .load([id])
+  // set the given player as the global/current player
+  $scope.load = function (id) {
+    $scope.isMaster = false;
+    $scope.player = $global.players[id];
+  };
+
+  // .cardtype(card)
+  // get card type
+  $scope.cardtype = function (card) {
+    if ($global.cardset.weapons.indexOf(card) !== -1) return 'weapon';
+    if ($global.cardset.people.indexOf(card) !== -1) return 'person';
+
+    return 'room';
+  };
+
+  // .getImagePath(img)
+  // returns the path to the image on disk for a given card
+  $scope.getImagePath = function (img) {
+    return 'img/' + $scope.cardtype(img) + '/' + img.toLowerCase() + '.png';
+  };
+
+  // we use an array + an object to maintain the list of
+  // players and their data so we can maintain and manipulate
+  // order
+  $scope.players = $global.players = [];
+  $global.players.getByName = function (name) {
+    var tgt = 'name';
+    if ($.inArray(name, $global.cardset.people) != -1) {
+      tgt = 'charName'
+    }
+    //console.log('using target %s searching for %s', tgt, name)
+    return this.filter(function (p) {
+      return p[tgt] === name
+    })[0];
+
+  };
+
+  $scope.playerdata = {};
 });
