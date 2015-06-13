@@ -6,15 +6,17 @@
 process.app.controller('BoardController', function ($scope, $global) {
     'use strict';
 
-    var Detective = $global.Detective,
-        board = require('./data/board.json'),
-        stratctl = require('./lib/strategy-controller')($global, [
-            'find'
-        ]);
+    var fs = require('fs'),
+        path = require('path'),
+        Detective = $global.Detective,
+        board = require('./data/board.json');
 
+    $scope.strats = ['find'];
+    $scope.stratctl = null;
     $scope.board = board.board;
     $scope.labels = board.labels;
     $scope.doors = board.doors;
+    $scope.stratCode = '';
 
     // add room resolution to Detective
     Object.defineProperty(Detective, 'room', {
@@ -39,11 +41,30 @@ process.app.controller('BoardController', function ($scope, $global) {
             console.log('result = ' + JSON.stringify(result));
             console.log('Detective.room = ' + Detective.room);
 
-            if (result.destination === Detective.room) {
+            if (result.place === Detective.room) {
                 // ...
             } else {
                 // ...
             }
         });
     };
+
+    // load strategy for editing
+    $scope.loadStrat = function (strat) {
+        fs.readFile(path.resolve(__dirname, '.', 'lib', 'strategies', strat + '.js'), 'utf8', function (err, data) {
+            if (err) {} else {
+                $scope.$apply(function () {
+                    $scope.stratCode = data;
+                });
+            }
+        });
+    };
+
+    // reset the entire controller
+    $scope.reloadStrats = function () {
+        $scope.stratctl = require('./lib/strategy-controller')($global, $scope.strats);
+    };
+
+    // load up the controller
+    $scope.reloadStrats();
 });
