@@ -64,7 +64,8 @@ process.app.controller('main', function ($scope, $global) {
                     room: $global.classifiers.rooms.classify(input),
                     weapon: $global.classifiers.weapons.classify(input)
                 },
-                answerer = -1,
+                answerer = -1, 
+                asker,
                 i;
 
 
@@ -115,19 +116,30 @@ process.app.controller('main', function ($scope, $global) {
 
                 // Step #2: Remove all three cards from possibles of all people between
                 // who asked and who answered.
-                for (i = 0; i < $global.players.length; i += 1)
-                    if ($global.players[i].name === question.asker)
-                        for (i = i + 1; i < $global.players.length; i += 1)
-
-                if ($global.players[i].name === question.answerer) {
-                    answerer = i;
-                    i = $global.players.length;
-                    break;
-                } else if ($global.players[i].name != $global.Detective.name) {
-                    console.log($global.players[i].name)
-                    $global.players[i].possible = $global.players[i].possible.filter(function (item) {
-                        return !~question.cards.indexOf(item);
-                    });
+                    //1. get the index of the asker
+                for (i = 0; i < $global.players.length; i += 1) {
+                    if ($global.players[i].name === question.asker) {
+                        asker = i;
+                        console.log("asker %s found at %d", $global.players[i].name, asker);    
+                    }
+                }
+                    
+                for (i = asker; i < $global.players.length; i += 1) {
+                    console.log('INDEX: '+ i);
+                    if ($global.players[i].name === question.answerer) {
+                        answerer = i;
+                        i = $global.players.length;
+                        console.log('found answerer '+ $global.players[answerer].name +' at ' + answerer);
+                        break;
+                    } 
+                    console.log(i + ' : ' + $global.players[i].name !== $global.Detective.name && i !== asker);
+                    if ($global.players[i].name !== $global.Detective.name && i !== asker) {
+                        console.log('EMILINATE FROM: '+$global.players[i].name);
+                        $global.players[i].possible = $global.players[i].possible.filter(function (item) {
+                            return !~question.cards.indexOf(item);
+                        });
+                    } //end elseIF
+                    if(i===$global.players.length-1){i=-1;console.log("Reached the end of players, looking from top");}
                 }
 
                 // Step #3: Eliminate cards from the question which are NOT present
@@ -190,7 +202,7 @@ process.app.controller('main', function ($scope, $global) {
                 if (question.answerer === 'nobody') {
                     console.log('nobody answered')
                     for (var c of question.cards) {
-                        //console.log('update '+ c)
+                        console.log('update '+ c)
                         if (!~$.inArray(c, $global.players[$global.players.getByName(question.asker)].possible)) {
                             $global.master.Guess[$scope.cardtype(c)].update('itm', {
                                 prob: 1,
