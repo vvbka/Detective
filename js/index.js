@@ -393,10 +393,7 @@ process.app.controller('main', function ($scope, $global) {
     $scope.masterGuess = $global.master.Guess = {
         room: priority('prob'),
         person: priority('prob'),
-        weapon: priority('prob'),
-        prob: function () {
-            return $global.master.Guess.person.first().prob * $global.master.Guess.weapon.first().prob * $global.master.Guess.room.first().prob;
-        }
+        weapon: priority('prob')
     };
     $scope.masterDefinite = $global.master.Definite = {
         person: '',
