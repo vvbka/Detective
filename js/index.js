@@ -109,7 +109,9 @@ process.app.controller('main', function ($scope, $global) {
         }
   }, {
         prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn', 'my turn'],
-        fn: $global.myTurn
+        fn: function* () {
+            $global.myTurn();
+        }
   }]);
 
 
@@ -348,6 +350,7 @@ process.app.controller('main', function ($scope, $global) {
         process.nextTick(function () {
             if ($scope.getinput) {
                 $scope.getinput = false;
+                $scope.$apply();
                 $global.alfred.events.emit('input', text);
             } else $global.alfred.try(text);
         });
@@ -356,6 +359,7 @@ process.app.controller('main', function ($scope, $global) {
     // bind to alfred
     $global.alfred.events.on('get-input', function () {
         $scope.getinput = true;
+        $scope.$apply();
     });
 
     // wrap up with typeahead

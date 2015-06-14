@@ -343,3 +343,19 @@ table.board td.door,
 .Plum-bg {
     background-color: #82174b;
 }
+
+@media (max-width: 768px) {
+  .navbar-collapse.collapse {
+    display: block;
+    height: auto;
+    padding-bottom: 0;
+    overflow: visible;
+    border: none;
+    box-shadow: none;
+  }
+
+  .navbar-inverse .navbar-form {
+    border: none;
+    box-shadow: none;
+  }
+}

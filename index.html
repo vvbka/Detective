@@ -261,7 +261,7 @@
 
 <!--Things relating to the game, and board-->
     
-    <div ng-controller="BoardController">
+    <div ng-controller="BoardController as boardCtl">
         <!--A modal that displays the game board to indicate to the player where to move the game piece-->
         <div class="modal fade" id="modal-board">
             <div class="modal-dialog">
@@ -278,7 +278,7 @@
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-default pull-left" ng-click="alert('I should do a move here')">My Turn</button>
+                        <button class="btn btn-default pull-left" ng-click="boardCtl.turn()">My Turn</button>
                         <button class="btn btn-primary" href="" data-target="modal-board" data-dismiss="modal">Done</button>
                     </div>
                 </div>
@@ -357,10 +357,9 @@
     <script src="js/sortable.js"></script>
     <script src="js/ng-global.js"></script>
     <script src="ace/ace.js"></script>
+    <script src="js/board.js"></script>
     <script src="js/index.js"></script>
     <script src="js/wizard.js"></script>
-    <script src="js/board.js"></script>
-
 </body>
 
 </html>

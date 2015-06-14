@@ -8,8 +8,17 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     var fs = require('fs'),
         path = require('path'),
+        util = require('util'),
         Detective = $global.Detective,
-        board = require('./data/board.json');
+        board = require('./data/board.json'),
+        astarmod = require('javascript-astar'),
+        astar = astarmod.astar,
+        Graph = astarmod.Graph,
+        sum = function (arr) {
+            var nsum = 0;
+            for (var n of arr) nsum += n;
+            return nsum;
+        };
 
     $scope.stratctl = null;
     $scope.activestrat = null;
@@ -35,17 +44,87 @@ process.app.controller('BoardController', function ($scope, $global) {
         }
     });
 
-    // alfred binding for turn handling
-    window.$$$ = $scope;
-    $global.myTurn = function () {
-        $scope.stratctl.getBest(function (result) {
-            if (result.place === Detective.room) {
-                $global.alfred.say('Ask: Was it %s in the %s with a %s?', result.person, result.place, result.weapon);
-            } else {
-                // ...
-            }
+    // question handling
+    this.ask = function (ques) {
+        $global.alfred.input.get(util.format('Ask: "was it %s in the %s with a %s?" Who answered?', ques.person, ques.place, ques.weapon), function (answerer) {
+            $global.handleTurn($.extend({
+                askerer: Detective.name,
+                answerer: $global.classifiers.players.classify(answerer)
+            }, ques));
         });
     };
+
+    // alfred binding for turn handling
+    window.$$$ = $scope;
+    this.turn = $global.myTurn = function () {
+        $scope.stratctl.getBest(function (result) {
+            if (result.place === Detective.room) {
+                this.ask(result);
+            } else {
+                $global.alfred.input.get('It\'s time to move. Roll the dice, and tell me what you get.', function (roll) {
+                    // assume every numeric value given in the answer
+                    // is to be summed up; that'll allow us to dynamically
+                    // use any number of dice in the game
+                    roll = sum(roll.split(/\s+/g).map(function (n) {
+                        return parseInt(n, 10);
+                    }).filter(function (n) {
+                        return !isNaN(n);
+                    }));
+                    
+                    console.log('roll calculated to be %s', roll);
+                    
+                    // calculate closest room
+                    var rooms = {},
+                        room,
+                        door,
+                        Bmap = $scope.board.slice().map(function (row) {
+                          return row.slice().map(function (piece) {
+                            // everything that is greater than one,
+                            // we do not want astar to try and traverse
+                            // so we give it an infinite weight to avoid
+                            // involving it in astar's search
+                            return piece === 2 ? 1 : (piece > 1 ? 0 : piece);
+                          });
+                        }),
+                        B = new Graph(Bmap),
+                        search = function (end) {
+                            console.log('computing astar from (%s,%s) to (%s,%s)', Detective.location[0], Detective.location[1], end[0], end[1]);
+                            var value = astar.search(
+                                B,
+                                B.grid[Detective.location[0]][Detective.location[1]],
+                                B.grid[end[0]][end[1]]
+                            );
+                            console.log('path weight: %s', util.inspect(value, {
+                                colors: true
+                            }));
+                            return value;
+                        };
+                    
+                    console.log(util.inspect(Bmap, {
+                        colors: true
+                    }));
+                    
+                    // calculate distance to every door
+                    // of every room
+                    for (room in $scope.doors) {
+                        if ($scope.doors.hasOwnProperty(room)) {
+                            rooms[room] = [];
+                            for (door of $scope.doors[room]) {
+                                rooms[room].push(search(door));
+                            }
+                            
+                            // use the closest door for the room's
+                            // weight
+                            rooms[room] = Math.min.apply(Math, rooms[room]);
+                        }
+                    }
+                    
+                    // ...
+                    console.log(rooms);
+                });
+            }
+        }.bind(this));
+    }.bind(this);
 
     // load strategy for editing
     $scope.loadStrat = function (strat) {
