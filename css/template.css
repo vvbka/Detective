@@ -265,6 +265,10 @@ table.board td.door,
     background-color: aqua;
 }
 
+.board .path {
+    background-color: green;
+}
+
 .det-piece {
     text-align: center;
 }

@@ -72,6 +72,37 @@ process.app.controller('BoardController', function ($scope, $global) {
             }, ques));
         });
     };
+    
+    // path handling
+    $scope.path = [];
+    $scope.evalPath = function (path, roll) {
+        // show the board
+        if (!$('#modal-board').is('.in')) {
+            $('.modal.in').modal('hide');
+            $('#modal-board').modal('show');
+        }
+        
+        // fix the path (astar reverses x and y)
+        $scope.path = path.map(function (vertex) {
+            return [vertex.y, vertex.x];
+        }).filter(function (elm, index) {
+            // we are only capable of traversing
+            // the first `roll` nodes of a path
+            // since that is what the dice proclaimed
+            return index < roll;
+        });
+        
+        // prepare for undo
+        $('#modal-board').one('bs.modal.hidden', function () {
+            $scope.$apply(function () {
+                $scope.path = [];
+            });
+        });
+        
+        // try and apply
+        try { $scope.$apply() }
+        catch (e) { /* ignore if angular is upset at double $apply */ }
+    };
 
     // alfred binding for turn handling
     window.$$$ = $scope;
@@ -92,10 +123,10 @@ process.app.controller('BoardController', function ($scope, $global) {
                     
                     console.log('roll calculated to be %s', roll);
                     
-                    // calculate closest room
                     var rooms = {},
                         room,
                         point,
+                        door,
                         Bmap = $scope.board.slice().map(function (row) {
                           return row.slice().map(function (piece) {
                             // everything that is greater than one,
@@ -113,14 +144,33 @@ process.app.controller('BoardController', function ($scope, $global) {
                                 B.grid[end[1]][end[0]]
                             );
                         },
+                        rpath = [],
                         closest = [Infinity,'none'];
                     
                     //console.log(util.inspect(Bmap, {
                     //    colors: true
                     //}));
                     
+                    // get distance and path to result.place
+                    for (point of $scope.entries[result.place]) {
+                        var tmp = search(point);
+                        
+                        // since all weights are 1 or 0, the weight
+                        // of the path must be the length of the path
+                        // plus the door itself
+                        if (rpath.length === 0 || rpath.length > tmp.length) {
+                            rpath = tmp;
+                        }
+                    }
+                    
+                    // if we can reach that room on this turn, we
+                    // should immediately aim for that
+                    if (rpath.length <= roll) {
+                        return $scope.evalPath(rpath, roll);
+                    }
+                    
                     // calculate distance to every door
-                    // of every room
+                    // of every room to calculate closest room
                     console.time('astar');
                     for (room in $scope.entries) {
                         if ($scope.entries.hasOwnProperty(room)) {
@@ -132,13 +182,26 @@ process.app.controller('BoardController', function ($scope, $global) {
                                 
                                 // since all weights are 1 or 0, the weight
                                 // of the path must be the length of the path
+                                // plus the door itself
                                 if (rooms[room][rooms[room].length - 1].length < min.length || min.length === 0) {
+                                    door = $scope.doors[room][rooms[room].length - 1];
                                     min = rooms[room][rooms[room].length - 1];
+                                    
+                                    // add the respective door at the end of the
+                                    // path
+                                    min.push({
+                                        visited: true,
+                                        weight: 1,
+                                        
+                                        // swap x and y for consistency with
+                                        // rest of the nodes
+                                        x: door[1],
+                                        y: door[0]
+                                    });
                                 }
                             }
                             
-                            // use the closest door for the room's
-                            // weight
+                            // use the closest door for the room's weight
                             rooms[room] = min;
                             
                             // calculate closest room as well
@@ -150,9 +213,31 @@ process.app.controller('BoardController', function ($scope, $global) {
                     console.timeEnd('astar');
                     
                     // ...
-                    console.log('%s is the closest room at a distance of %s steps.', closest[1], closest[0] + 1);
+                    console.log('%s is the closest room at a distance of %s steps.', closest[1], closest[0]);
+                    console.log('%s was recommended by best strategy.', result.place);
                     
-                    // ...
+                    // if they're both the same, then just evaluate path
+                    if (result.place === closest[1]) {
+                        return $scope.evalPath(rooms[closest[1]], roll);
+                    }
+                    
+                    // re-calculate strategies for closest room
+                    $scope.stratctl.getBest(closest[1], function (clResult) {
+                        var best = rpath,
+                            ratios = {
+                                closest: clResult.weight / closest[0],
+                                result: result.weight / rpath.length
+                            };
+                        
+                        // determine best path based on ratios
+                        console.log(ratios);
+                        if (ratios.closest > ratios.result) {
+                            best = rooms[closest[1]];
+                        }
+                        
+                        // evaluate path
+                        $scope.evalPath(best, roll);
+                    });
                 });
             }
         }.bind(this));
@@ -221,11 +306,27 @@ process.app.controller('BoardController', function ($scope, $global) {
     $scope.loc2class = function (x, y) {
         for (var player of $global.players) {
             if (player.location[0] === x && player.location[1] === y) {
-                return player.charName.split(' ')[1] + '-bg';
+                return ' ' + player.charName.split(' ')[1] + '-bg';
             }
         }
         
         return '';
+    };
+    
+    $scope.onPath = function (x, y) {
+        for (var vertex of $scope.path) {
+            if (vertex[0] === x && vertex[1] === y) return true;
+        }
+        
+        return false;
+    };
+    
+    $scope.stepn = function (x, y) {
+        for (var i = 0; i < $scope.path.length; i += 1) {
+            if ($scope.path[i][0] === x && $scope.path[i][1] === y) return i;
+        }
+        
+        return -1;
     };
 
     // reset the entire controller
