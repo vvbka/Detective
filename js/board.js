@@ -92,6 +92,9 @@ process.app.controller('BoardController', function ($scope, $global) {
             return index < roll;
         });
         
+        // take detective to the last vertex
+        Detective.location = $scope.path[$scope.path.length - 1];
+        
         // try and apply
         try { $scope.$apply() }
         catch (e) { /* ignore if angular is upset at double $apply */ }
@@ -99,10 +102,14 @@ process.app.controller('BoardController', function ($scope, $global) {
     
     // handle path undos
     $('#modal-board').on('hidden.bs.modal', function () {
-      $scope.$apply(function () {
         $scope.path = [];
-      });
+        $global.locationSet();
     });
+    
+    $global.locationSet = function () {
+        $scope.detloc = Detective.location;
+        $scope.$apply();
+    };
 
     // alfred binding for turn handling
     window.$$$ = $scope;
@@ -303,9 +310,17 @@ process.app.controller('BoardController', function ($scope, $global) {
         return Detective.location && Detective.location[0] === x && Detective.location[1] === y;
     };
     
+    $scope.isCDetHere = function (x, y) {
+        return $scope.detloc && $scope.detloc[0] === x && $scope.detloc[1] === y;
+    };
+    
     $scope.loc2class = function (x, y) {
         for (var player of $global.players) {
             if (player.location[0] === x && player.location[1] === y) {
+                return ' ' + player.charName.split(' ')[1] + '-bg';
+            }
+
+            if (player.detective && $scope.detloc[0] === x && $scope.detloc[1] === y) {
                 return ' ' + player.charName.split(' ')[1] + '-bg';
             }
         }
