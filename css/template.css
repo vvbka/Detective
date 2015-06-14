@@ -260,6 +260,14 @@ table.board td.door,
 .room-label {
     position: absolute;
 }
+
+.board .entry {
+    background-color: aqua;
+}
+
+.det-piece {
+    text-align: center;
+}
 /**
  * Modal for Strategies
  **/

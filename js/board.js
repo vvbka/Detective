@@ -25,7 +25,26 @@ process.app.controller('BoardController', function ($scope, $global) {
     $scope.board = board.board;
     $scope.labels = board.labels;
     $scope.doors = board.doors;
+    $scope.entries = board.entries;
     $scope.savable = true;
+    
+    // is this an entry point
+    $scope.isEntry = function (x, y) {
+        //console.log('[%s,%s]',x,y);
+        
+        for (var room in $scope.entries) {
+            if ($scope.entries.hasOwnProperty(room)) {
+                for (var entry of $scope.entries[room]) {
+                    if (entry[0] === x && entry[1] === y) {
+                        //console.log('=> is entry');
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    };
 
     // add room resolution to Detective
     Object.defineProperty(Detective, 'room', {
@@ -76,7 +95,7 @@ process.app.controller('BoardController', function ($scope, $global) {
                     // calculate closest room
                     var rooms = {},
                         room,
-                        door,
+                        point,
                         Bmap = $scope.board.slice().map(function (row) {
                           return row.slice().map(function (piece) {
                             // everything that is greater than one,
@@ -88,39 +107,52 @@ process.app.controller('BoardController', function ($scope, $global) {
                         }),
                         B = new Graph(Bmap),
                         search = function (end) {
-                            console.log('computing astar from (%s,%s) to (%s,%s)', Detective.location[0], Detective.location[1], end[0], end[1]);
-                            var value = astar.search(
+                            return astar.search(
                                 B,
-                                B.grid[Detective.location[0]][Detective.location[1]],
-                                B.grid[end[0]][end[1]]
+                                B.grid[Detective.location[1]][Detective.location[0]],
+                                B.grid[end[1]][end[0]]
                             );
-                            console.log('path weight: %s', util.inspect(value, {
-                                colors: true
-                            }));
-                            return value;
-                        };
+                        },
+                        closest = [Infinity,'none'];
                     
-                    console.log(util.inspect(Bmap, {
-                        colors: true
-                    }));
+                    //console.log(util.inspect(Bmap, {
+                    //    colors: true
+                    //}));
                     
                     // calculate distance to every door
                     // of every room
-                    for (room in $scope.doors) {
-                        if ($scope.doors.hasOwnProperty(room)) {
+                    console.time('astar');
+                    for (room in $scope.entries) {
+                        if ($scope.entries.hasOwnProperty(room)) {
+                            var min = [];
                             rooms[room] = [];
-                            for (door of $scope.doors[room]) {
-                                rooms[room].push(search(door));
+                            
+                            for (point of $scope.entries[room]) {
+                                rooms[room].push(search(point));
+                                
+                                // since all weights are 1 or 0, the weight
+                                // of the path must be the length of the path
+                                if (rooms[room][rooms[room].length - 1].length < min.length || min.length === 0) {
+                                    min = rooms[room][rooms[room].length - 1];
+                                }
                             }
                             
                             // use the closest door for the room's
                             // weight
-                            rooms[room] = Math.min.apply(Math, rooms[room]);
+                            rooms[room] = min;
+                            
+                            // calculate closest room as well
+                            if (rooms[room].length < closest[0]) {
+                                closest = [rooms[room].length, room];
+                            }
                         }
                     }
+                    console.timeEnd('astar');
                     
                     // ...
-                    console.log(rooms);
+                    console.log('%s is the closest room at a distance of %s steps.', closest[1], closest[0] + 1);
+                    
+                    // ...
                 });
             }
         }.bind(this));
@@ -180,30 +212,21 @@ process.app.controller('BoardController', function ($scope, $global) {
             $scope.save();
         }
     });
-
-   //Update the game board with player locations
-   $('#modal-board').on('show.bs.modal', function (ev) {
-       var dL = $global.Detective.location, sel = '#board-'+dL[0]+'-'+dL[1];
-       $(sel).addClass($global.Detective.charName.split(' ')[1]+'-bg');
-       $(sel).html('<span class="glyphicon glyphicon-search"></span>');
-       
-       for(var pl of $global.players) {
-           sel = '#board-'+pl.location[0]+'-'+pl.location[1];
-           $(sel).addClass(pl.charName.split(' ')[1]+'-bg');
-       }; 
-   });
-   
-   //be a good samaritan and cleanup after the modal closes, things might be different next time
-   $('#modal-board').on('hidden.bs.modal', function (ev) {
-       var dL = $global.Detective.location, sel = '#board-'+dL[0]+'-'+dL[1];
-       $(sel).removeClass($global.Detective.charName.split(' ')[1]+'-bg');
-       $(sel).html('');
-       
-       for(var pl of $global.players) {
-           sel = '#board-'+pl.location[0]+'-'+pl.location[1];
-           $(sel).removeClass(pl.charName.split(' ')[1]+'-bg');
-       }; 
-   });
+    
+    // misc helpers for dynamic board updating
+    $scope.isDetHere = function (x, y) {
+        return Detective.location && Detective.location[0] === x && Detective.location[1] === y;
+    };
+    
+    $scope.loc2class = function (x, y) {
+        for (var player of $global.players) {
+            if (player.location[0] === x && player.location[1] === y) {
+                return player.charName.split(' ')[1] + '-bg';
+            }
+        }
+        
+        return '';
+    };
 
     // reset the entire controller
     $scope.reloadStrats = function () {
