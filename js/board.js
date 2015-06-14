@@ -92,17 +92,17 @@ process.app.controller('BoardController', function ($scope, $global) {
             return index < roll;
         });
         
-        // prepare for undo
-        $('#modal-board').one('bs.modal.hidden', function () {
-            $scope.$apply(function () {
-                $scope.path = [];
-            });
-        });
-        
         // try and apply
         try { $scope.$apply() }
         catch (e) { /* ignore if angular is upset at double $apply */ }
     };
+    
+    // handle path undos
+    $('#modal-board').on('hidden.bs.modal', function () {
+      $scope.$apply(function () {
+        $scope.path = [];
+      });
+    });
 
     // alfred binding for turn handling
     window.$$$ = $scope;
