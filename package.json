@@ -17,6 +17,7 @@
     "next-port": "0.0.4",
     "q": "^1.4.1",
     "rimraf": "^2.3.4",
+    "secure-random": "^1.1.1",
     "solver": "0.0.2",
     "trashcan": "~0.1.2"
   },
