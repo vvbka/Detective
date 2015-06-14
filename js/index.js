@@ -217,7 +217,7 @@ process.app.controller('main', function ($scope, $global) {
 
                     // Step #6: Check Answerer's maybes for any row with only one item.
                     // Step #7: For each such row:
-                    while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length < 2) {
+                    while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().filter(function(n){ return n != undefined }).length < 2) {
                         var first = $global.players[answerer].maybe.pop()[0];
 
                         // Step #7.1: Add to Answerer's definite.
