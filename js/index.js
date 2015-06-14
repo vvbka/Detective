@@ -53,10 +53,7 @@ process.app.controller('main', function ($scope, $global) {
         }
   }, {
         prompts: ['* asked a question about * in the * with a *'],
-        fn: function* (input) {
-            console.log(input);
-            // Step #1: Use NaiveBayes Classifier to parse
-            // the question.
+        fn: function*(input) {
             var question = {
                     asker: $global.classifiers.players.classify(input),
                     answerer: $global.classifiers.players.classify(
@@ -64,14 +61,9 @@ process.app.controller('main', function ($scope, $global) {
                     person: $global.classifiers.people.classify(input),
                     room: $global.classifiers.rooms.classify(input),
                     weapon: $global.classifiers.weapons.classify(input)
-                },
-                answerer = -1, 
-                asker,
-                i;
-
-
-            try {
-                // create full card list
+                }
+            
+             // create full card list
                 question.cards = [question.person, question.room, question.weapon];
 
                 //Interject if we have to provide an answer
@@ -109,11 +101,29 @@ process.app.controller('main', function ($scope, $global) {
 
                     } else {
                         console.log('Detective Can\'t Answer!')
-                        question.answerer = $global.classifiers.players.classify(
-                            yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
+                        question.answerer = $global.classifiers.players.classify(yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
                     }
-
                 }
+                $global.handleTurn(question);
+                
+        }
+  }, {
+        prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn', 'my turn'],
+        fn: $global.myTurn
+  }]);
+
+
+    $global.handleTurn = function (question) {
+            console.log(question);
+            // Step #1: Use NaiveBayes Classifier to parse
+            // the question.
+            var answerer = -1, 
+                asker,
+                i;
+
+
+            try {
+               
 
                 // Step #2: Remove all three cards from possibles of all people between
                 // who asked and who answered.
@@ -296,11 +306,7 @@ process.app.controller('main', function ($scope, $global) {
                 console.error(String(e));
                 console.error(String(e.stack))
             }
-        }
-  }, {
-        prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn'],
-        fn: $global.myTurn
-  }]);
+        };
 
     // bind alfred's output to angular
     $scope.alout = '';
