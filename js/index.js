@@ -435,7 +435,7 @@ process.app.controller('main', function ($scope, $global) {
 
     // .cardtype(card)
     // get card type
-    $scope.cardtype = function (card) {
+    $global.cardtype = $scope.cardtype = function (card) {
         if ($global.cardset.weapons.indexOf(card) !== -1) return 'weapon';
         if ($global.cardset.people.indexOf(card) !== -1) return 'person';
 
