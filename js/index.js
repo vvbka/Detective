@@ -39,7 +39,8 @@ process.app.controller('main', function ($scope, $global) {
         players: new BayesClassifier(),
         people: BayesClassifier.restore(require('./data/people-classifier.json')),
         rooms: BayesClassifier.restore(require('./data/rooms-classifier.json')),
-        weapons: BayesClassifier.restore(require('./data/weapons-classifier.json'))
+        weapons: BayesClassifier.restore(require('./data/weapons-classifier.json')),
+        cards: BayesClassifier.restore(require('./data/cards-classifier.json'))
     };
 
     // make alfred globally available
@@ -122,11 +123,11 @@ process.app.controller('main', function ($scope, $global) {
         var answerer = -1,
             asker,
             i;
+            
+        // create full card list
+        question.cards = [question.person, question.room, question.weapon];
 
-
-        try {
-
-
+        //try {
             // Step #2: Remove all three cards from possibles of all people between
             // who asked and who answered.
             //1. get the index of the asker
@@ -195,7 +196,7 @@ process.app.controller('main', function ($scope, $global) {
             if (answerer !== -1) {
                 // Step #5: Add remaining cards to a row in Answerer's maybe stack.
                 //but first, let's space them out properly if we need to.
-                if (question.cards.length < 3) {
+                /*if (question.cards.length < 3) {
                     var cardStore = [null, null, null];
                     for (var c of question.cards) {
                         var t = $scope.cardtype(c);
@@ -212,17 +213,14 @@ process.app.controller('main', function ($scope, $global) {
                         };
                     };
                     question.cards = cardStore;
-                }
+                }*/
+                
                 $global.players[answerer].maybe.add(question.cards);
 
                 // Step #6: Check Answerer's maybes for any row with only one item.
                 // Step #7: For each such row:
-                while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().filter(function (n) {
-                        return n
-                    }).length < 2) {
-                    var first = $global.players[answerer].maybe.pop().filter(function (n) {
-                        return n
-                    })[0];
+                while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length === 1) {
+                    var first = $global.players[answerer].maybe.pop()[0];
 
                     // Step #7.1: Add to Answerer's definite.
                     $global.players[answerer].sure.push(first);
@@ -308,10 +306,10 @@ process.app.controller('main', function ($scope, $global) {
             console.log(JSON.stringify(question, null, 2));
             $global.alfred.output.say('Input command ...');
             $scope.$apply();
-        } catch (e) {
-            console.error(String(e));
-            console.error(String(e.stack))
-        }
+        //} catch (e) {
+        //    console.error(String(e));
+        //    console.error(String(e.stack))
+        //}
     };
 
     // bind alfred's output to angular
@@ -394,15 +392,11 @@ process.app.controller('main', function ($scope, $global) {
 
     // this priority queue maintains the possibilities
     // of the murder, and their respective probability
-    $scope.masterGuess = $global.master.Guess = {
+    $scope.master = $global.master;
+    $global.master.Guess = {
         room: priority('prob'),
         person: priority('prob'),
         weapon: priority('prob')
-    };
-    $scope.masterDefinite = $global.master.Definite = {
-        person: '',
-        room: '',
-        weapon: ''
     };
 
     //initiate the master guess
