@@ -9,6 +9,7 @@ process.app.controller('BoardController', function ($scope, $global) {
     var fs = require('fs'),
         path = require('path'),
         util = require('util'),
+        priority = require('./lib/priority'),
         Detective = $global.Detective,
         board = require('./data/board.json'),
         astarmod = require('javascript-astar'),
@@ -64,12 +65,84 @@ process.app.controller('BoardController', function ($scope, $global) {
     });
 
     // question handling
-    this.ask = function (ques) {
-        $global.alfred.input.get(util.format('Ask: "was it %s in the %s with a %s?" Who answered?', ques.person, ques.place, ques.weapon), function (answerer) {
-            $global.handleTurn($.extend({
-                askerer: Detective.name,
-                answerer: $global.classifiers.players.classify(answerer)
-            }, ques));
+    this.ask = function (question) {
+        $global.alfred.input.get(util.format('Ask: "was it %s in the %s with a %s?" Who answered and what did they show you?', question.person, question.place, question.weapon), function (answer) {
+            // create full card list
+            question.cards = [question.person, question.room, question.weapon];
+            
+            // figure out who answered
+            var answerer = $global.classifiers.players.classify(answer), cardtype;
+            
+            // figure out what they showed
+            answer = $global.classifiers.cards.classify(answer);
+            cardtype = $global.cardtype(answer);
+            
+            // remove all question cards from the possibles
+            // of everyone between us and who showed
+            outer: for (var i = 0; i < $global.players.length; i += 1) {
+                if ($global.players[i].detective) {
+                    for (i = (i + 1) === $global.players.length ? 0 : (i + 1);; i += 1) {
+                        if ($global.players.length === i) i = 0;
+                        if ($global.players[i].detective) break outer;
+                        
+                        if ($global.players[i].name !== answerer) {
+                            console.log('ELIMINATE FROM: %s', $global.players[i].name);
+                            $global.players[i].possible = $global.players[i].possible.filter(function (card) {
+                                return !~ question.cards.indexOf(card);
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // remove the card from the possibles of every single
+            // player
+            for (var player of $global.players) {
+                if (!player.detective) {
+                    player.possible = player.possible.filter(function (card) {
+                        return card !== answer;
+                    });
+                }
+            }
+            
+            // remove the card from the master guess
+            $global.master.Guess[cardtype] = $global.master.Guess[cardtype].filter(function (card) {
+                return card.itm !== answer;
+            });
+
+            for (var player of $global.players) {
+                // add the card to the answerer's sure
+                if (player.name === answerer) {
+                    player.sure.push(answer);
+                } else if (!player.detective) {
+                    // edit everyone's maybes
+                    var maybe = priority(player.maybe.key, player.maybe.comp);
+                    
+                    for (var row of player.maybe) {
+                        maybe.add(row.filter(function (card) {
+                            return card !== answer;
+                        }));
+                    }
+                    
+                    player.maybe = maybe;
+                    
+                    // re-evaluate edited maybe queue
+                    while (player.maybe.length > 0 && player.maybe.first().length === 1) {
+                        var first = player.maybe.pop()[0];
+                        
+                        // add to sure
+                        player.sure.push(first);
+                        
+                        // remove from master guess
+                        $global.master.Guess[$global.cardtype(first)] = $global.master.Guess[$global.cardtype(first)].filter(function (card) {
+                            return card.itm !== first;
+                        });
+                    }
+                }
+            }
+            
+            // okay, we're done
+            $global.alfred.output.say('Input command ...');
         });
     };
 
@@ -154,19 +227,25 @@ process.app.controller('BoardController', function ($scope, $global) {
                         },
                         rpath = [],
                         closest = [Infinity, 'none'];
-                    //console.log(util.inspect(Bmap, {
-                    //    colors: true
-                    //}));
 
                     // get distance and path to result.place
-                    for (point of $scope.entries[result.place]) {
-                        var tmp = search(point);
+                    for (var i = 0; i < $scope.entries[result.place].length; i += 1) {
+                        var tmp = search($scope.entries[result.place][i]);
 
                         // since all weights are 1 or 0, the weight
                         // of the path must be the length of the path
                         // plus the door itself
                         if (rpath.length === 0 || rpath.length > tmp.length) {
                             rpath = tmp;
+                            rpath.push({
+                                weight: 1,
+                                visited: true,
+
+                                // swap x and y for consistency with
+                                // rest of the nodes
+                                x: $scope.doors[result.place][i][1],
+                                y: $scope.doors[result.place][i][0]
+                            });
                         }
                     }
 
