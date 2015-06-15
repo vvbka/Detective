@@ -166,6 +166,34 @@ process.app.controller('main', function ($scope, $global) {
                 $scope.$apply();
             } catch (e) {};
         }
+    }, {
+        prompts: ['alias * as *'],
+        fn: function* (input) {
+            input = input.toLowerCase().replace('alias', '');
+            
+            var card = $global.classifiers.cards.classify(input),
+                ctype = $global.cardtype(card),
+                newName = input.substr(input.indexOf('as') + 3).trim().split(/\s+/).map(function (word) {
+                    word = word.replace(/\W+/, '');
+                    return word[0].toUpperCase() + word.substr(1).toLowerCase();
+                }).filter(function (word) {
+                    return word;
+                }).join(' ');
+
+            // confirm
+            if ((yield ('Are you sure you want to alias "' + card + '" with "' + newName + '"?'))[0].toLowerCase() === 'y') {
+                if (ctype === 'person') ctype = 'people';
+                else ctype += 's';
+                
+                $global.classifiers[ctype].addDocument(newName, card);
+                $global.classifiers.cards.addDocument(newName, card);
+                
+                $global.classifiers[ctype].train();
+                $global.classifiers.cards.train();
+            }
+            
+            $global.alfred.output.say('Input command ...');
+        }
     }]);
 
 
