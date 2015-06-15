@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    
+
     <title>Detective</title>
 
     <link href="css/jquery.typeahead.css" rel="stylesheet">
@@ -264,20 +264,23 @@
     </div>
     </div>
 
-<!--Things relating to the game, and board-->
-    
+    <!--Things relating to the game, and board-->
+
     <div ng-controller="BoardController as boardCtl">
         <!--A modal that displays the game board to indicate to the player where to move the game piece-->
         <div class="modal fade" id="modal-board">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">{{activeplayer ? 'Select where '+activeplayer+' moved to:':''}} <button href=" " ng-click="getPositionCancel()" class="btn btn-error" ng-if="activeplayer">Cancel</button> </div>
+                    <div class="modal-header">{{activeplayer ? 'Select where '+activeplayer+' moved to:':''}}
+                        <button href=" " ng-click="getPositionCancel()" class="btn btn-error" ng-if="activeplayer">Cancel</button>
+                    </div>
                     <div class="modal-body">
                         <table class="board">
                             <tbody>
                                 <tr ng-repeat="(rindex,row) in board">
-                                    <td id="board-{{$index}}-{{rindex}}" {{activePlayer ? 'href="#":''}} ng-click="getPosition($index, rindex)" ng-repeat="piece in row track by $index" class="piece-{{piece}}{{isEntry($index, rindex) ? ' entry' : ''}}{{isDetHere($index, rindex) ? ' det-piece' : ''}}{{loc2class($index, rindex)}}{{onPath($index, rindex) ? ' path step-' + stepn($index, rindex) : ''}}" >
-                                        <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
+                                    <td id="board-{{$index}}-{{rindex}}" {{activePlayer ? 'href="#":' '}} ng-click="getPosition($index, rindex)" ng-repeat="piece in row track by $index" class="piece-{{piece}}{{isEntry($index, rindex) ? ' entry ' : ' '}}{{isDetHere($index, rindex) ? ' det-piece
+                                    ' : ' '}}{{loc2class($index, rindex)}}{{onPath($index, rindex) ? ' path step- ' + stepn($index, rindex) : ' '}}" >
+                                        <span ng-if="labels[$index+', '+rindex]" class="room-label"> {{labels[$index+', '+rindex]}} </span>
                                         <span ng-if="isDetHere($index, rindex)" class="glyphicon glyphicon-search"></span>
                                         <span class="footprint-marker"></span>
                                     </td>
@@ -307,7 +310,7 @@
                                         <li>
                                             <a href="#" ng-click="newStrat()">Create new ...</a>
                                         </li>
-                                        <li ng-repeat="(fname,strat) in stratctl.strategies" class="{{ activestrat.fname === fname ? 'active' : '' }}">
+                                        <li ng-repeat="(fname,strat) in stratctl.strategies" class="{{ activestrat.fname === fname ? 'active ' : ' ' }}">
                                             <a href="#" ng-click="loadStrat(fname)">{{strat.name}}</a>
                                         </li>
                                     </ul>
@@ -316,7 +319,7 @@
                                     <p>Some text about what to do.</p>
                                     <input type="text" class="form-control" ng-model="activestrat.name" placeholder="Enter a name for your strategy ...">
                                     <pre id="editor">module.exports = function (destination) {
-  'use strict';
+  'use strict ';
   
   // TODO: ... write some logic ...
 };</pre>
@@ -351,6 +354,23 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modal-help">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Detective | Help</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                 </div>
+                 <div class="modal-body">
+                     <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p>
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                 </div>
+             </div>
+        </div>
+     </div>
 
     <script>
         var $ = jQuery = require('./js/jquery.js')
