@@ -109,7 +109,9 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     $global.locationSet = function () {
         $scope.detloc = Detective.location;
-        $scope.$apply();
+        
+        try { $scope.$apply(); }
+        catch (e) { /**/ }
     };
 
     // alfred binding for turn handling
