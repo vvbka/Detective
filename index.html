@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                    <h1 class="page-header">{{(isMaster ? 'Master' : player.name)}} {{( (!isMaster && player.name!==player.charName ) ? ' ('+player.charName+')':'' )}}</h1>
+                    <h1 class="page-header">{{(isMaster ? 'Master (' + ((master.Guess.person.first().prob * master.Guess.room.first().prob * master.Guess.weapon.first().prob * 100) | double) + '% certain)' : player.name)}} {{( (!isMaster && player.name!==player.charName ) ? ' ('+player.charName+')':'' )}}</h1>
 
                     <!--Master Guess Dsiplay-->
                     <div class="row placeholders" ng-show="isMaster">
@@ -73,7 +73,7 @@
                                 <div>
                                     <img src="{{getImagePath(master.Guess.room.first().itm)}}" class="img" alt="room">
                                     <h4>{{master.Guess.room.first().itm}}</h4>
-                                    <span class="text-muted">{{100 * master.Guess.person.first().prob | double}}%</span>
+                                    <span class="text-muted">{{100 * master.Guess.room.first().prob | double}}%</span>
                                 </div>
                             </div>
                         </div>
@@ -83,7 +83,7 @@
                                 <div>
                                     <img src="{{getImagePath(master.Guess.weapon.first().itm)}}" class="img" alt="weapon">
                                     <h4>{{master.Guess.weapon.first().itm}}</h4>
-                                    <span class="text-muted">{{100 * master.Guess.person.first().prob | double}}%</span>
+                                    <span class="text-muted">{{100 * master.Guess.weapon.first().prob | double}}%</span>
                                 </div>
                             </div>
                         </div>
