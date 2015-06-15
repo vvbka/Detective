@@ -27,6 +27,7 @@ process.app.controller('BoardController', function ($scope, $global) {
     $scope.labels = board.labels;
     $scope.doors = board.doors;
     $scope.entries = board.entries;
+    $scope.passages = board.passages;
     $scope.savable = true;
 
     // is this an entry point
@@ -293,7 +294,7 @@ process.app.controller('BoardController', function ($scope, $global) {
                                     });
                                 }
                             }
-
+                            
                             // use the closest door for the room's weight
                             rooms[room] = min;
 
@@ -312,6 +313,43 @@ process.app.controller('BoardController', function ($scope, $global) {
                     // if they're both the same, then just evaluate path
                     if (result.place === closest[1]) {
                         return $scope.evalPath(rooms[closest[1]], roll);
+                    }
+                    
+                    // if secret passage, prefer it
+                    if ($scope.passages.hasOwnProperty(closest[1])) {
+                        var doors = $scope.doors[$scope.passages[closest[1]]], min = [];
+                        
+                        for (var start of doors) {
+                            for (var door of $scope.doors[result.place]) {
+                                // get path after passage
+                                var after = astar.search(
+                                    B,
+                                    B.grid[start[1]][start[0]],
+                                    B.grid[door[1]][door[0]]
+                                );
+                            
+                                // use minimal path
+                                if (min.length === 0 || min.length > after.length) {
+                                    min = after;
+                                }
+                            }
+                        }
+                        
+                        // is this path worth it?
+                        if (rpath.length > (closest[0] + 1 + min.length)) {
+                            console.log('I AM GOING TO TAKE THE SECRET PASSAGE NOW.');
+                            
+                            // if we are in the room, take the passage
+                            if (Detective.room === closest[0]) return $scope.evalPath([{
+                                visited: true,
+                                weight: 1,
+                                x: min[min.length - 1][1],
+                                y: min[min.length - 1][0]
+                            }], roll);
+                            
+                            // if not, head towards the closest room
+                            return $scope.evalPath(rooms[closest[1]], roll);
+                        }
                     }
 
                     // re-calculate strategies for closest room
