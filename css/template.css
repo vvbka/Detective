@@ -255,6 +255,11 @@ ul.sortable-list > li.disabled {
 .piece-2 {
     background-color: firebrick;
 }
+
+.entry {
+    background-color: aqua;
+}
+
 /**
 * Character name based CSS
 **/
@@ -346,10 +351,6 @@ table.board > tbody > tr > td.cnTL {
 
 .room-label {
     position: absolute;
-}
-
-.board .entry {
-    background-color: aqua;
 }
 
 .board .path .footprint-marker {

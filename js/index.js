@@ -151,13 +151,16 @@ process.app.controller('main', function ($scope, $global) {
         prompts: ['not *'],
         fn: function* (input) {
             var card = $global.classifiers.cards.classify(input);
+            
+            console.log('about to remove from master');
             $global.master.Guess[$global.cardtype(card)] = $global.master.Guess[$global.cardtype(card)].filter(function(crd){return crd.itm !== card});
             for(var p of $global.players){
-                if(!p.dectevite){
+                if(!p.detective){
+                    console.log('removng from: %s', p.name);
                     p.possible = p.possible.filter(function(crd){return crd !== card})
                 }
             }
-            try{$scope.$appy();}catch(e){};
+            try{$scope.$apply();}catch(e){};
         }
     }
     ]);
@@ -193,8 +196,13 @@ process.app.controller('main', function ($scope, $global) {
                 console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
                 break;
             } //end if
+        }
+
+        for (i = asker; i < $global.players.length; i += 1) {
+            if ($global.players[i].name === question.asker) break;
+            
             //console.log(i + ' : ' + $global.players[i].name !== $global.Detective.name && i !== asker);
-            if ($global.players[i].name !== $global.Detective.name && i !== asker) {
+            if (!$global.players[i].detective && i !== asker) {
                 console.log('ELIMINATE FROM: ' + $global.players[i].name);
                 $global.players[i].possible = $global.players[i].possible.filter(function (item) {
                     return !~question.cards.indexOf(item);
