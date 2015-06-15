@@ -394,3 +394,7 @@ table.board > tbody > tr > td.cnTL {
   bottom: 10px;
   position: absolute;
 }
+
+.client-info > * {
+    display: inline-block;
+}
