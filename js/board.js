@@ -165,6 +165,12 @@ process.app.controller('BoardController', function ($scope, $global) {
             // since that is what the dice proclaimed
             return index < roll;
         });
+        
+        // check if path ends at a player location
+        var last = $scope.path[$scope.path.length - 1];
+        if ($scope.loc2class(last[0], last[1])) {
+            $scope.path = $scope.path.slice(0, $scope.path.length - 1);
+        }
 
         // take detective to the last vertex
         Detective.location = $scope.path[$scope.path.length - 1];
@@ -209,8 +215,8 @@ process.app.controller('BoardController', function ($scope, $global) {
                         room,
                         point,
                         door,
-                        Bmap = $scope.board.slice().map(function (row) {
-                            return row.slice().map(function (piece) {
+                        Bmap = $scope.board.slice().map(function (row, y) {
+                            return row.slice().map(function (piece, x) {
                                 // everything that is greater than one,
                                 // we do not want astar to try and traverse
                                 // so we give it an infinite weight to avoid
