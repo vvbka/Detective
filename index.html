@@ -270,7 +270,7 @@
                         <table class="board">
                             <tbody>
                                 <tr ng-repeat="(rindex,row) in board">
-                                    <td id="board-{{$index}}-{{rindex}}" ng-repeat="piece in row track by $index" class="piece-{{piece}}{{isEntry($index, rindex) ? ' entry' : ''}}{{isDetHere($index, rindex) ? ' det-piece' : ''}}{{loc2class($index, rindex)}}{{onPath($index, rindex) ? ' path step-' + stepn($index, rindex) : ''}}">
+                                    <td id="board-{{$index}}-{{rindex}}" {{activePlayer ? 'href="#":''}} ng-click="getPosition($index, rindex)" ng-repeat="piece in row track by $index" class="piece-{{piece}}{{isEntry($index, rindex) ? ' entry' : ''}}{{isDetHere($index, rindex) ? ' det-piece' : ''}}{{loc2class($index, rindex)}}{{onPath($index, rindex) ? ' path step-' + stepn($index, rindex) : ''}}" >
                                         <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
                                         <span ng-if="isDetHere($index, rindex)" class="glyphicon glyphicon-search"></span>
                                         <span class="footprint-marker"></span>

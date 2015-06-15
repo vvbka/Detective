@@ -329,6 +329,21 @@ process.app.controller('BoardController', function ($scope, $global) {
             }
         }.bind(this));
     }.bind(this);
+    
+    this.movePlayer = $global.movePlayer = function(player){
+        $('#modal-board').modal('show');
+        $scope.activeplayer = player;
+    }
+    
+    $scope.activeplayer = null;
+    $scope.getPosition = function (x,y){
+        if ($scope.activeplayer) {
+            $global.players.getByName($scope.activeplayer).location = [x, y];
+            //console.log($scope.activeplayer + ' location updated to: '+x + ' '+y);
+            $scope.activeplayer = null;
+            $('#modal-board').modal('hide');
+        }
+    }
 
     // load strategy for editing
     $scope.loadStrat = function (strat) {

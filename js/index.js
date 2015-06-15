@@ -113,6 +113,12 @@ process.app.controller('main', function ($scope, $global) {
         fn: function* () {
             $global.myTurn();
         }
+    }, {
+        prompts: ['* moved'],
+        fn: function* (input) {
+            var player = $global.classifiers.players.classify(input);
+            $global.movePlayer(player);
+        }
     }]);
 
 
