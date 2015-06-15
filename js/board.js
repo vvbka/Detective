@@ -23,7 +23,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     $scope.stratctl = null;
     $scope.activestrat = null;
-    $scope.board = board.board;
+    $global.board = $scope.board = board.board;
     $scope.labels = board.labels;
     $scope.doors = board.doors;
     $scope.entries = board.entries;
@@ -383,7 +383,7 @@ process.app.controller('BoardController', function ($scope, $global) {
         $('#modal-board').modal('show'); 
     }
     
-    $scope.activeplayer = null;
+    $global.activeplayer = $scope.activeplayer = null;
     $scope.getPosition = function (x,y){
         if ($scope.activeplayer) {
             $global.players.getByName($scope.activeplayer).location = [x, y];

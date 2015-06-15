@@ -1,0 +1,63 @@
+<!doctype html>
+<html ng-app="app">
+
+<head>
+    <meta charset="utf-8">
+    <title>Detective | Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/jquery.typeahead.css">
+    <link rel="stylesheet" href="css/client.css">
+</head>
+
+<body ng-controller="client">
+    <div class="splash"></div>
+    <div class="full-container">
+        <div class="wrapper">
+            <h1 ng-show="movable">Make your move.</h1>
+                <table class="board">
+                            <tbody>
+                                <tr ng-repeat="(rindex,row) in board">
+                                    <td id="board-{{$index}}-{{rindex}}" {{activePlayer ? 'href="#":''}} ng-click="getPosition($index, rindex)" ng-repeat="piece in row track by $index" class="piece-{{piece}}{{isEntry($index, rindex) ? ' entry' : ''}}{{loc2class($index, rindex)}}">
+                                        <span ng-if="labels[$index+','+rindex]" class="room-label"> {{labels[$index+','+rindex]}} </span>
+                                        <span ng-if="isDetHere($index, rindex)" class="glyphicon glyphicon-search"></span>
+                                        <span class="footprint-marker"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="modal-init">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Enter your character name:</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="typeahead-container">
+                        <div class="typeahead-field">
+                            <span class="typeahead-query">
+                                <input class="form-control" type="text" id="name" placeholder="John Smith">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="start()">Start</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/angular.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.typeahead.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/client.js"></script>
+</body>
+
+</html>

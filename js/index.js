@@ -32,7 +32,8 @@ process.app.controller('main', function ($scope, $global) {
     var priority = require('./lib/priority'),
         nextPort = require('next-port'),
         BayesClassifier = require('natural').BayesClassifier,
-        array = Array.prototype.slice.call.bind(Array.prototype.slice);
+        array = Array.prototype.slice.call.bind(Array.prototype.slice),
+        handlers = {};
 
     // load classifiers
     $global.classifiers = {
@@ -124,8 +125,14 @@ process.app.controller('main', function ($scope, $global) {
     }, {
         prompts: ['* moved'],
         fn: function* (input) {
-            var player = $global.classifiers.players.classify(input);
+            var player = $global.classifiers.players.classify(input),
+                cname = $global.players.getByName(player).charName;
+
             $global.movePlayer(player);
+            
+            if (handlers[cname]) {
+                handlers[cname].emit('move');
+            }
         }
     },
     {
@@ -497,4 +504,71 @@ process.app.controller('main', function ($scope, $global) {
     };
 
     $scope.playerdata = {};
+    
+    $scope.host = 'localhost:1024';
+    nextPort(function (err, port) {
+        $scope.host = 'localhost:' + port;
+        $scope.$apply();
+        
+        // start client server
+        var express = require('express'),
+            path = require('path'),
+            app = express(),
+            http = require('http').Server(app),
+            io = require('socket.io')(http),
+            crypto = require('crypto');
+        
+        // static serve
+        app.use(function (req, res) {
+            res.sendFile(path.resolve(__dirname, '.' + (req.path === '/' ? '/client.html' : req.path)));
+        });
+        
+        // io handling
+        io.on('connection', function (sock) {
+            sock.on('init', function (who) {
+                var player = $global.players.getByName(who),
+                    send = true,
+                    prev = null,
+                    update = function () {
+                        if (send) {
+                            var data = {
+                                board: $global.board,
+                                players: $global.players,
+                                labels: require('./data/board.json').labels
+                            }, hash = crypto.createHash('md5');
+                            
+                            hash.update(JSON.stringify(data));
+                            var current = hash.digest('hex');
+                            
+                            if (prev !== current) {
+                                sock.emit('data', data);
+                                prev = current;
+                            }
+                            
+                            setTimeout(update, 100);
+                        }
+                    };
+                
+                handlers[who] = sock;
+                
+                sock.on('moved', function (loc) {
+                    player.location = loc;
+                    $scope.$apply();
+                });
+                
+                sock.on('close', function () {
+                    send = false;
+                });
+                
+                update();
+            });
+            
+            sock.emit('players', $global.players.map(function (player) {
+                return player.charName;
+            }));
+        });
+        
+        // listen up
+        http.listen(port);
+    });
 });
