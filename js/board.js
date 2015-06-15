@@ -374,8 +374,8 @@ process.app.controller('BoardController', function ($scope, $global) {
         }.bind(this));
     }.bind(this);
     
+    //Hand;ting the movement of other players
     this.movePlayer = $global.movePlayer = function(player){
-        
         $scope.activeplayer = player;
         try{
             $scope.$apply()
@@ -392,6 +392,13 @@ process.app.controller('BoardController', function ($scope, $global) {
             $('#modal-board').modal('hide');
         }
     }
+    
+    //a cancel button, if you didn't mean to
+    $scope.getPositionCancel = function(){
+        $scope.activeplayer = null;
+        $('#modal-board').modal('hide');
+    };
+    
 
     // load strategy for editing
     $scope.loadStrat = function (strat) {
