@@ -154,7 +154,6 @@ process.app.controller('BoardController', function ($scope, $global) {
                         },
                         rpath = [],
                         closest = [Infinity, 'none'];
-
                     //console.log(util.inspect(Bmap, {
                     //    colors: true
                     //}));
@@ -222,7 +221,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
                     // ...
                     console.log('%s is the closest room at a distance of %s steps.', closest[1], closest[0]);
-                    console.log('%s was recommended by best strategy.', result.place);
+                    console.log('%s (at a distance of %s steps) was recommended by best strategy.', result.place, rpath.length);
 
                     // if they're both the same, then just evaluate path
                     if (result.place === closest[1]) {
@@ -231,7 +230,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
                     // re-calculate strategies for closest room
                     $scope.stratctl.getBest(closest[1], function (clResult) {
-                        var best = rpath,
+                        var best = rooms[closest[1]],
                             ratios = {
                                 closest: clResult.weight / closest[0],
                                 result: result.weight / rpath.length
@@ -239,8 +238,8 @@ process.app.controller('BoardController', function ($scope, $global) {
 
                         // determine best path based on ratios
                         console.log(ratios);
-                        if (ratios.closest > ratios.result) {
-                            best = rooms[closest[1]];
+                        if (ratios.result > ratios.closest) {
+                            best = rpath;
                         }
 
                         // evaluate path
