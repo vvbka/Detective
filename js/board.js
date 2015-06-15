@@ -196,7 +196,7 @@ process.app.controller('BoardController', function ($scope, $global) {
                     // assume every numeric value given in the answer
                     // is to be summed up; that'll allow us to dynamically
                     // use any number of dice in the game
-                    roll = sum(roll.split(/\s+/g).map(function (n) {
+                    roll = sum(roll.split(/[^0-9]+/g).map(function (n) {
                         return parseInt(n, 10);
                     }).filter(function (n) {
                         return !isNaN(n);
