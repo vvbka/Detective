@@ -27,5 +27,9 @@
     "test": "NODE_ENV=development ./node_modules/.bin/electron ."
   },
   "author": "VBKA",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jsbeautifier": "0.0.8"
+  }
 }
