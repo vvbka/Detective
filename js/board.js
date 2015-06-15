@@ -331,8 +331,12 @@ process.app.controller('BoardController', function ($scope, $global) {
     }.bind(this);
     
     this.movePlayer = $global.movePlayer = function(player){
-        $('#modal-board').modal('show');
+        
         $scope.activeplayer = player;
+        try{
+            $scope.$apply()
+        } catch (e){}
+        $('#modal-board').modal('show'); 
     }
     
     $scope.activeplayer = null;
