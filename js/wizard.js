@@ -20,7 +20,7 @@ process.app.controller('wizard', function ($scope, $global) {
             'Ms. Scarlet': [16, 0],
             'Colonel Mustard': [23, 7],
             'Professor Plum': [0, 5],
-            'Mrs. White': [24, 14],
+            'Mrs. White': [14, 24],
             'Mrs. Peacock': [0, 18]
         },
         getStartingLocation = function (player) {
