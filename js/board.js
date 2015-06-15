@@ -94,7 +94,6 @@ process.app.controller('BoardController', function ($scope, $global) {
 
         // take detective to the last vertex
         Detective.location = $scope.path[$scope.path.length - 1];
-        Detective.location = [Detective.location[1], Detective.location[0]];
 
         // try and apply
         try {
