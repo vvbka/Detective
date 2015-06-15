@@ -111,7 +111,15 @@ process.app.controller('main', function ($scope, $global) {
     }, {
         prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn', 'my turn'],
         fn: function* () {
-            $global.myTurn();
+            if(($global.master.Guess.person.first().prob * $global.master.Guess.room.first().prob * $global.master.Guess.weapon.first().prob) > $global.threshold ) {
+                var ans = 'It was '+ $global.master.Guess.person.first().itm + ' in the ' + $global.master.Guess.room.first().itm + ' with a ' + $global.master.Guess.weapon.first().itm+'?',
+                    resp = yield(ans);
+                    if(~resp.toLowerCase().indexOf('n')) {
+                        window.alert("You LOST!!! :(");
+                    } else {window.alert('You Won!!! YAY!!')}
+            } else {
+                $global.myTurn();
+            }
         }
     }, {
         prompts: ['* moved'],
