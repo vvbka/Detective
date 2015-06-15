@@ -104,14 +104,11 @@ process.app.controller('BoardController', function ($scope, $global) {
     // handle path undos
     $('#modal-board').on('hidden.bs.modal', function () {
         $scope.path = [];
-        $global.locationSet();
+        $scope.$apply($global.locationSet);
     });
 
     $global.locationSet = function () {
         $scope.detloc = Detective.location;
-        
-        try { $scope.$apply(); }
-        catch (e) { /**/ }
     };
 
     // alfred binding for turn handling
