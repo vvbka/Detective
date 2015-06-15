@@ -49,10 +49,14 @@
                             </a>
                         </li>
                     </ul>
-                    <div class="client-info" >
-                        <p>Port for clients: </p>
-                        <input type="number" min="0" class="form-control" style="width: 150px; ">
-                    </div>
+                    <form class="client-info form-horizontal" id="form-port">
+                        <div class="form-group">
+                            <label class="col-xs-2 control-label">Port:</label>
+                            <div class="col-xs-10">
+                                <input type="number" min="1024" class="form-control" ng-model="port" data-toggle="tooltip" title="This is to select what port you want your clients (players) to connect to." data-placement="top">
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

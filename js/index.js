@@ -589,7 +589,43 @@ process.app.controller('main', function ($scope, $global) {
             }));
         });
         
+        // bind ui states to http status
+        http.on('listening', function () {
+            console.log('listening');
+            $('#form-port .form-group')
+                .addClass('has-success')
+                .removeClass('has-error');
+        });
+        
+        http.on('error', function () {
+            console.log('error');
+            $('#form-port .form-group')
+                .removeClass('has-success')
+                .addClass('has-error');
+        });
+        
+        http.on('close', function () {
+            console.log('closed');
+            $('#form-port .form-group')
+                .removeClass('has-success')
+                .removeClass('has-error');
+        });
+        
         // listen up
         http.listen(port);
+        
+        // restarting on different port
+        $scope.$watch('port', function (port) {
+            http.close();
+            
+            if (port !== undefined) {
+                setTimeout(function () {
+                    console.log(':%s', port);
+                    http.listen(port);
+                }, 100);
+            }
+        });
+        
+        $scope.$apply(function () { $scope.port = port; });
     });
 });
