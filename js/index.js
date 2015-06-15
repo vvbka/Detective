@@ -146,6 +146,19 @@ process.app.controller('main', function ($scope, $global) {
             $global.threshold = newThresh;
             console.log('set threshold to be '+$global.threshold)
         }
+    },
+    {
+        prompts: ['not *'],
+        fn: function* (input) {
+            var card = $global.classifiers.cards.classify(input);
+            $global.master.Guess[$global.cardtype(card)] = $global.master.Guess[$global.cardtype(card)].filter(function(crd){return crd.itm !== card});
+            for(var p of $global.players){
+                if(!p.dectevite){
+                    p.possible = p.possible.filter(function(crd){return crd !== card})
+                }
+            }
+            try{$scope.$appy();}catch(e){};
+        }
     }
     ]);
 

@@ -250,6 +250,11 @@ ul.sortable-list > li.disabled {
 .hoverable:not(:hover) .onhover { display: none; }
 .hoverable:hover .default { display: none; }
 
+
+.door,
+.piece-2 {
+    background-color: firebrick;
+}
 /**
 * Character name based CSS
 **/
@@ -337,10 +342,7 @@ table.board > tbody > tr > td.cnTL {
     border-right: none;
 }
 
-table.board td.door,
-.piece-2 {
-    background-color: firebrick;
-}
+
 
 .room-label {
     position: absolute;

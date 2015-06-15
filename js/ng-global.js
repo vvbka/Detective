@@ -15,7 +15,7 @@ process.app.factory('$global', function () {
         },
         cardset: {
             people: ['Ms. Scarlet', 'Colonel Mustard', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'],
-            rooms: ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study'],
+            rooms: ['Ballroom', 'Billards Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study', 'Library'],
             weapons: [ 'Candlestick', 'Knife', 'Pipe',  'Revolver', 'Rope', 'Wrench'],
         },
         Detective: {},
