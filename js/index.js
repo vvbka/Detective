@@ -127,7 +127,20 @@ process.app.controller('main', function ($scope, $global) {
             var player = $global.classifiers.players.classify(input);
             $global.movePlayer(player);
         }
-    }]);
+    },
+    {
+        prompts: ['set threshold *'],
+        fn: function* (input) {
+            var newThresh = input.split(/\s+/g).map(function (n) {
+                        return parseFloat(n);
+                    }).filter(function (n) {
+                        return !isNaN(n);
+                    });
+            $global.threshold = newThresh;
+            console.log('set threshold to be '+$global.threshold)
+        }
+    }
+    ]);
 
 
     $global.handleTurn = function (question) {

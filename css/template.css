@@ -385,3 +385,9 @@ table.board td.door,
     box-shadow: none;
   }
 }
+
+.client-info {
+  text-align: center;
+  bottom: 10px;
+  position: absolute;
+}
