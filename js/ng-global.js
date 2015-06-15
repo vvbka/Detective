@@ -20,6 +20,6 @@ process.app.factory('$global', function () {
         },
         Detective: {},
         players: [],
-        threshold: 0.00001
+        threshold: 0.9
     });
 });
