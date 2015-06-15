@@ -41,8 +41,8 @@ process.app.controller('wizard', function ($scope, $global) {
 
     $scope.addToMyCards = function () {
         $scope.add = $('[ng-model="add"]').val().trim().toLowerCase().split(/\s+/g).map(function (name) {
-          console.log(name);
-          return name[0].toUpperCase() + name.substr(1);
+            console.log(name);
+            return name[0].toUpperCase() + name.substr(1);
         }).join(' ');
 
         if ($scope.add && $scope.myCards.indexOf($scope.add) === -1 && $scope.cards.indexOf($scope.add) !== -1) {
@@ -128,20 +128,29 @@ process.app.controller('wizard', function ($scope, $global) {
         });
 
         //add the corrent probability to the Master Guess, now that we have a proper length for it
-        var newP = 1/($global.master.Guess.person.length + $global.master.Guess.room.length + $global.master.Guess.weapon.length);
-         
-        $global.master.Guess.person.forEach(function(pers){
-            $global.master.Guess.person.update('itm', {prob:newP, itm:pers.itm});
+        var newP = 1 / ($global.master.Guess.person.length + $global.master.Guess.room.length + $global.master.Guess.weapon.length);
+
+        $global.master.Guess.person.forEach(function (pers) {
+            $global.master.Guess.person.update('itm', {
+                prob: newP,
+                itm: pers.itm
+            });
         });
-        
-        $global.master.Guess.room.forEach(function(rm){
-            $global.master.Guess.room.update('itm', {prob:newP, itm:rm.itm});
+
+        $global.master.Guess.room.forEach(function (rm) {
+            $global.master.Guess.room.update('itm', {
+                prob: newP,
+                itm: rm.itm
+            });
         });
-        
-        $global.master.Guess.weapon.forEach(function(wep){
-            $global.master.Guess.weapon.update('itm', {prob:newP, itm:wep.itm});
+
+        $global.master.Guess.weapon.forEach(function (wep) {
+            $global.master.Guess.weapon.update('itm', {
+                prob: newP,
+                itm: wep.itm
+            });
         });
-        
+
         //and 'nobody' as a potetntial answerer
         $global.classifiers.players.addDocument('nobody', 'nobody');
         $global.classifiers.players.addDocument('no one', 'nobody');
