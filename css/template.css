@@ -216,62 +216,7 @@ ul.sortable-list > li.disabled {
     height: 200px;
     width: auto;
 }
-/**
-Board Display CSS
-**/
 
-table.board {
-    border: black solid 1px;
-}
-
-table.board td {
-    height: 20px;
-    width: 20px;
-    border: black solid 1px;
-}
-
-table.board td.roomINT,
-table.board td.outside,
-table.board td.piece-0 {
-    border: none;
-}
-
-table.board td.piece-1 {
-    border: green solid 1px;
-}
-
-table.board td.piece-3 {
-    border: black solid 1px;
-    background-color: gray;
-}
-
-table.board > tbody > tr > td.cnTL {
-    border-top: black solid 1px;
-    border-left: black solid 1px;
-    border-bottom: none;
-    border-right: none;
-}
-
-table.board td.door,
-.piece-2 {
-    background-color: firebrick;
-}
-
-.room-label {
-    position: absolute;
-}
-
-.board .entry {
-    background-color: aqua;
-}
-
-.board .path {
-    background-color: green;
-}
-
-.det-piece {
-    text-align: center;
-}
 /**
  * Modal for Strategies
  **/
@@ -354,6 +299,75 @@ table.board td.door,
 
 .Plum-bg {
     background-color: #82174b;
+}
+
+/**
+Board Display CSS
+**/
+
+table.board {
+    border: black solid 1px;
+}
+
+table.board td {
+    height: 20px;
+    width: 20px;
+    border: black solid 1px;
+}
+
+table.board td.roomINT,
+table.board td.outside,
+table.board td.piece-0 {
+    border: none;
+}
+
+table.board td.piece-1 {
+    border: green solid 1px;
+}
+
+table.board td.piece-3 {
+    border: black solid 1px;
+    background-color: gray;
+}
+
+table.board > tbody > tr > td.cnTL {
+    border-top: black solid 1px;
+    border-left: black solid 1px;
+    border-bottom: none;
+    border-right: none;
+}
+
+table.board td.door,
+.piece-2 {
+    background-color: firebrick;
+}
+
+.room-label {
+    position: absolute;
+}
+
+.board .entry {
+    background-color: aqua;
+}
+
+.board .path .footprint-marker {
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.board .path.step-in .footprint-marker {
+    background-color: green;
+    display: block;
+    height:10px;
+    width: 10px;
+    margin-left: 4px;
+    /*-webkit-transition-delay: 1s;*/
+    -webkit-transition: opacity 2s;
+    opacity: 1;
+}
+
+.det-piece {
+    text-align: center;
 }
 
 @media (max-width: 768px) {

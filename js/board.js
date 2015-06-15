@@ -130,7 +130,8 @@ process.app.controller('BoardController', function ($scope, $global) {
                     }));
 
                     console.log('roll calculated to be %s', roll);
-
+                    $global.alfred.output.say('Input command ...'); //reset Alfred
+                    
                     var rooms = {},
                         room,
                         point,
@@ -344,6 +345,21 @@ process.app.controller('BoardController', function ($scope, $global) {
 
         return -1;
     };
+
+    //setup the path animation
+    $('#modal-board').on('shown.bs.modal', function(){
+        //console.log('shown')
+        var steps = $('.path').length-1;
+        for(var i=0;i<steps;i+=1){
+            //console.log('added: '+i)            
+            $('.path.step-'+i).css('transition-delay', (4+i)+'s').addClass('step-in');
+        }
+    });
+    
+    $('#modal-board').on('hidden.bs.modal', function(){
+        $('.step-in').removeClass('step-in');
+    });
+    
 
     // reset the entire controller
     $scope.reloadStrats = function () {
