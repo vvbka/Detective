@@ -446,6 +446,13 @@ process.app.controller('main', function ($scope, $global) {
         return 'img/' + $scope.cardtype(img) + '/' + img.toLowerCase() + '.png';
     };
 
+    // row type-things so we don't have to use null padding
+    $scope.rowformat = function ($row, $type) {
+        return $row.filter(function ($card) {
+            return $global.cardtype($card) === $type;
+        })[0];
+    };
+
     // we use an array + an object to maintain the list of
     // players and their data so we can maintain and manipulate
     // order

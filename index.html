@@ -101,7 +101,7 @@
                         </div>
                     </div>
 
-                    <h2 class="sub-header">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
+                    <h2 class="sub-header" ng-show="!player.detective">{{(isMaster ? 'Master Guess':'Maybes')}}</h2>
                     <div ng-show="isMaster" class="table-responsive row">
                         <div class="table-responsive col-md-4">
                             <table class="table table-striped">
@@ -149,7 +149,7 @@
                     </div>
 
                     <!--The Player's Display Table-->
-                    <div ng-show="!isMaster" class="table-responsive">
+                    <div ng-show="!isMaster && !player.detective" class="table-responsive">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
@@ -160,9 +160,9 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="row in player.maybe">
-                                    <td>{{ row[0] || '--' }}</td>
-                                    <td>{{ row[1] || '--' }}</td>
-                                    <td>{{ row[2] || '--' }}</td>
+                                    <td>{{ rowformat(row, 'person') || '--' }}</td>
+                                    <td>{{ rowformat(row, 'room') || '--' }}</td>
+                                    <td>{{ rowformat(row, 'weapon') || '--' }}</td>
                                 </tr>
                             </tbody>
                         </table>
