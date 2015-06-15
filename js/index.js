@@ -12,17 +12,17 @@ process.app.controller('main', function ($scope, $global) {
     // for errors
     $scope.error = {};
     $global.tc = require('trashcan');
-    $global.tc.on('error', function (error) {
-        console.log(error);
-        $scope.$apply(function () {
-            $scope.error = {
-                title: String(error),
-                stack: String(error.stack || 'No available stacktrace.')
-            };
-
-            $('#modal-err').modal('show');
-        });
-    });
+//     $global.tc.on('error', function (error) {
+//         console.log(error);
+//         $scope.$apply(function () {
+//             $scope.error = {
+//                 title: String(error),
+//                 stack: String(error.stack || 'No available stacktrace.')
+//             };
+// 
+//             $('#modal-err').modal('show');
+//         });
+//     });
 
     // for the ACE editor
     $global.editor = ace.edit("editor");
