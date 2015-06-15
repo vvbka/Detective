@@ -2,7 +2,7 @@
  * js/wizard.js - detective
  * all things binding and setup for the wizard.
  *
- * Licensed under GPLv3.
+ * Licensed under MIT.
  * Copyright (C) 2015 VBKA.
  **/
 
@@ -10,23 +10,21 @@
 
 process.app.controller('wizard', function ($scope, $global) {
     var priority = require('./lib/priority'),
-        format = require('util').format,
+        capitalize = function (str) {
+            return str.toLowerCase().split(/\s+/g).map(function (word) {
+                return word[0].toUpperCase() + word.substr(1);
+            }).join(' ');
+        },
+        locations = {
+            'Mr. Green': [9, 24],
+            'Ms. Scarlet': [16, 0],
+            'Colonel Mustard': [23, 7],
+            'Professor Plum': [0, 5],
+            'Mrs. White': [24, 14],
+            'Mrs. Peacock': [0, 18]
+        },
         getStartingLocation = function (player) {
-            switch (player) {
-            case 'Mr. Green':
-                return [9, 24];
-            case 'Ms. Scarlet':
-                return [16, 0];
-            case 'Colonel Mustard':
-                return [23, 7];
-            case 'Professor Plum':
-                return [0, 5];
-            case 'Mrs. White':
-                return [24, 14];
-            case 'Mrs. Peacock':
-                return [0, 18];
-
-            }
+            return locations[player];
         };
 
     $scope.players = $global.players;
@@ -80,7 +78,7 @@ process.app.controller('wizard', function ($scope, $global) {
         // initiate the Detective player
         $global.Detective.sure = $scope.myCards;
         $global.Detective.charName = $scope.chars[detindex];
-        $global.Detective.name = $scope.plnames[detindex] || 'Detective';
+        $global.Detective.name = capitalize($scope.plnames[detindex]);
         $global.Detective.turn = $('#playersSort li').index($('#playersSort').find('input:checked').parent());
         $global.Detective.detective = true;
         $global.Detective.location = getStartingLocation($scope.chars[detindex]);
@@ -91,8 +89,8 @@ process.app.controller('wizard', function ($scope, $global) {
             if ($(this).find('input:checked').length != 1) {
                 var cn = $(this).text().trim(),
                     newPlayer = {
-                        name: $(this).find('input[type=text]').val().trim() || cn,
-                        charName: cn,
+                        name: capitalize($(this).find('input[type=text]').val().trim() || cn),
+                        charName: capitalize(cn),
                         maybe: priority('length', function (a, b) {
                             return (a - b) < 0;
                         }),
