@@ -271,7 +271,8 @@
         <div class="modal fade" id="modal-board">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">{{activeplayer ? 'Select where '+activeplayer+' moved to:':''}} <button href=" " ng-click="getPositionCancel()" class="btn btn-error" ng-if="activeplayer">Cancel</button> </div>
+                    <div class="modal-header" ng-if="activeplayer">{{activeplayer ? 'Select where '+activeplayer+' moved to:':''}} <button href=" " ng-click="getPositionCancel()" class="btn btn-error">Cancel</button> </div>
+                    <div class="modal-header" ng-if="questionwaiting">There's a question to be asked waiting for you.</div>
                     <div class="modal-body">
                         <table class="board">
                             <tbody>

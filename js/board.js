@@ -150,7 +150,8 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     // path handling
     $scope.path = [];
-    $scope.evalPath = function (path, roll) {
+    $scope.questionwaiting = true;
+    $scope.evalPath = function (path, roll, question) {
         // show the board
         if (!$('#modal-board').is('.in')) {
             $('.modal.in').modal('hide');
@@ -158,6 +159,7 @@ process.app.controller('BoardController', function ($scope, $global) {
         }
 
         // fix the path (astar reverses x and y)
+        var len = path.length;
         $scope.path = path.map(function (vertex) {
             return [vertex.y, vertex.x];
         }).filter(function (elm, index) {
@@ -176,15 +178,22 @@ process.app.controller('BoardController', function ($scope, $global) {
         // take detective to the last vertex
         Detective.location = $scope.path[$scope.path.length - 1];
 
+        // see if we can ask a question
+        if (question && $scope.path.length === len) {
+            $scope.questionwaiting = true;
+            this.ask(question);
+        }
+
         // try and apply
         try {
             $scope.$apply()
         } catch (e) { /* ignore if angular is upset at double $apply */ }
-    };
+    }.bind(this);
 
     // handle path undos
     $('#modal-board').on('hidden.bs.modal', function () {
         $scope.path = [];
+        $scope.questionwaiting = false;
         $scope.$apply($global.locationSet);
     });
 
@@ -260,7 +269,7 @@ process.app.controller('BoardController', function ($scope, $global) {
                     // if we can reach that room on this turn, we
                     // should immediately aim for that
                     if (rpath.length <= roll) {
-                        return $scope.evalPath(rpath, roll);
+                        return $scope.evalPath(rpath, roll, result);
                     }
 
                     // calculate distance to every door
@@ -363,6 +372,7 @@ process.app.controller('BoardController', function ($scope, $global) {
                     // re-calculate strategies for closest room
                     $scope.stratctl.getBest(closest[1], function (clResult) {
                         var best = rooms[closest[1]],
+                            ques = clResult,
                             ratios = {
                                 closest: clResult.weight / closest[0],
                                 result: result.weight / rpath.length
@@ -372,10 +382,11 @@ process.app.controller('BoardController', function ($scope, $global) {
                         console.log(ratios);
                         if (ratios.result > ratios.closest) {
                             best = rpath;
+                            ques = result;
                         }
 
                         // evaluate path
-                        $scope.evalPath(best, roll);
+                        $scope.evalPath(best, roll, ques);
                     });
                 });
             }
