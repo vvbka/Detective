@@ -43,26 +43,29 @@ process.app.controller('main', function ($scope, $global) {
         weapons: BayesClassifier.restore(require('./data/weapons-classifier.json')),
         cards: BayesClassifier.restore(require('./data/cards-classifier.json'))
     };
-
-    // make alfred globally available
-    $global.alfred = require('alfred');
-    $global.alfred.init([{
+    
+    // alfred commands
+    $scope.alcmds = [{
         prompts: ['help'],
+        desc: 'Show this help message.',
         fn: function* () {
             $('#modal-help').modal('show');
         }
     }, {
         prompts: ['modal dismiss'],
+        desc: 'Dismiss all active modals.',
         fn: function* () {
             $('.modal.in').modal('hide');
         }
     }, {
         prompts: ['show game board'],
+        desc: 'Open up the game board.',
         fn: function* () {
             $('#modal-board').modal('show');
         }
     }, {
         prompts: ['* asked a question about * in the * with a *'],
+        desc: 'Inform Detective that a question was asked.',
         fn: function* (input) {
             var question = {
                 // Step #1: Use NaiveBayes Classifier to parse
@@ -121,6 +124,7 @@ process.app.controller('main', function ($scope, $global) {
         }
     }, {
         prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn', 'my turn'],
+        desc: 'Tell Detective that it is now your turn.',
         fn: function* () {
             if (($global.master.Guess.person.first().prob * $global.master.Guess.room.first().prob * $global.master.Guess.weapon.first().prob) > $global.threshold) {
                 var ans = 'It was ' + $global.master.Guess.person.first().itm + ' in the ' + $global.master.Guess.room.first().itm + ' with a ' + $global.master.Guess.weapon.first().itm + '?',
@@ -135,7 +139,8 @@ process.app.controller('main', function ($scope, $global) {
             }
         }
     }, {
-        prompts: ['* moved'],
+        prompts: ['* moved', '* wants to move'],
+        desc: 'Trigger the movement of a player',
         fn: function* (input) {
             var player = $global.classifiers.players.classify(input),
                 cname = $global.players.getByName(player).charName;
@@ -148,6 +153,7 @@ process.app.controller('main', function ($scope, $global) {
         }
     }, {
         prompts: ['set threshold *'],
+        desc: 'Adjust the minimal certainty threshold.',
         fn: function* (input) {
             var newThresh = input.split(/\s+/g).map(function (n) {
                 return parseFloat(n);
@@ -159,6 +165,7 @@ process.app.controller('main', function ($scope, $global) {
         }
     }, {
         prompts: ['not *'],
+        desc: 'Exempt a card from the cardset (that you do not wish to play with).',
         fn: function* (input) {
             var card = $global.classifiers.cards.classify(input);
 
@@ -180,6 +187,7 @@ process.app.controller('main', function ($scope, $global) {
         }
     }, {
         prompts: ['alias * as *'],
+        desc: 'Alias a certain card as another. (alias ballroom as bedroom)',
         fn: function* (input) {
             input = input.toLowerCase().replace('alias', '');
             
@@ -206,7 +214,11 @@ process.app.controller('main', function ($scope, $global) {
             
             $global.alfred.output.say('Input command ...');
         }
-    }]);
+    }];
+
+    // make alfred globally available
+    $global.alfred = require('alfred');
+    $global.alfred.init($scope.alcmds);
 
 
     $global.handleTurn = function (question) {
