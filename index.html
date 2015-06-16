@@ -22,8 +22,8 @@
                     <!--<p class="navbar-text navbar-right" id="turnCounter">Current Turn: {{currentTurn}}</p>-->
                     <div class="pull-right">
                         <button type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#modal-board">Game Board</button>
-                        <button type="button" class="btn" data-toggle="modal" data-target="#modal-strats"><span class="glyphicon glyphicon-cog"></span>
-                        </button>
+                        <button type="button" class="btn" data-toggle="modal" data-target="#modal-strats"><span class="glyphicon glyphicon-cog"></span></button>
+                        <button type="button" data-toggle="modal" data-target="#modal-help" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-question-sign"></span></button>
                     </div>
                     <form class="navbar-form" style="text-align:center; max-width:700px;" ng-submit="exec(alinput)">
                         <div class="typeahead-container">
@@ -360,10 +360,17 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                  </div>
                  <div class="modal-body">
+                     <h3>Commands:</h3>
+                     <ul class="det-cmd-lst">
+                         <li>help - Show this help</li>
+                         <li>my turn - Tell Detective to play it's turn</li>
+                         <li>* moved - Trigger the movement of a player</li>
+                         <li>* asked a question about * in the * with a * - Inform Detective that a question was asked</li>
+                     </ul>
                      <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p>
                  </div>
                  <div class="modal-footer">
-                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                     <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
                  </div>
              </div>
         </div>
