@@ -29,7 +29,8 @@ process.app.controller('main', function ($scope, $global) {
     $global.editor.setTheme("ace/theme/monokai");
     $global.editor.getSession().setMode("ace/mode/javascript");
 
-    var priority = require('./lib/priority'),
+    var os = require('os'),
+        priority = require('./lib/priority'),
         nextPort = require('next-port'),
         BayesClassifier = require('natural').BayesClassifier,
         array = Array.prototype.slice.call.bind(Array.prototype.slice),
@@ -50,6 +51,55 @@ process.app.controller('main', function ($scope, $global) {
         desc: 'Show this help message.',
         fn: function* () {
             $('#modal-help').modal('show');
+        }
+    }, {
+        prompts: ['set port *'],
+        desc: 'Set the client port number.',
+        fn: function* (input) {
+            input = input.split(/[^0-9]+/g).map(function (word) {
+                return parseInt(word, 10);
+            }).filter(function (num) {
+                return !isNaN(num);
+            })[0];
+            
+            $scope.port = input;
+            try { $scope.$apply(); }
+            catch (e) { /* ignore angular's spazzes */ }
+        }
+    }, {
+        prompts: ['get my ip'],
+        desc: 'Fetch your local IP address.',
+        fn: function* () {
+            var ifaces = os.networkInterfaces(), ip = '127.0.0.1';
+            
+            Object.keys(ifaces).forEach(function (ifname) {
+                var alias = 0;
+                
+                for (var iface of ifaces[ifname]) {
+                    if ('IPv4' !== iface.family || iface.internal !== false) {
+                        // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+                        return;
+                    }
+                    
+                    //
+                    ip = iface.address;
+                    break;
+                 }
+            });
+            
+            $global.alfred.output.say('Your IP address is: %s', ip);
+            setTimeout(function () {
+                $global.alfred.output.say('Input command ...');
+            }, 3000);
+        }
+    }, {
+        prompts: ['toggle possibles'],
+        desc: 'Toggle the visibility of the possibles array.',
+        fn: function* () {
+            $scope.possiblesVisible = !$scope.possiblesVisible;
+            
+            try { $scope.$apply(); }
+            catch (e) { /* ignore potential angular spazzes */ }
         }
     }, {
         prompts: ['modal dismiss'],
