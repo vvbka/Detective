@@ -57,6 +57,8 @@ process.app.controller('main', function ($scope, $global) {
         prompts: ['* asked a question about * in the * with a *'],
         fn: function* (input) {
             var question = {
+                // Step #1: Use NaiveBayes Classifier to parse
+                // the question.
                 asker: $global.classifiers.players.classify(input),
                 answerer: $global.classifiers.players.classify(
                     yield 'Who answered?'),
@@ -168,8 +170,7 @@ process.app.controller('main', function ($scope, $global) {
 
     $global.handleTurn = function (question) {
         console.log(question);
-        // Step #1: Use NaiveBayes Classifier to parse
-        // the question.
+        
         var answerer = -1,
             asker,
             i;
@@ -189,13 +190,15 @@ process.app.controller('main', function ($scope, $global) {
         }
 
         for (i = asker; i < $global.players.length; i += 1) {
-            //console.log('INDEX: '+ i);
+            console.log('INDEX: '+ i);
+            //if ($global.players[i].name === question.asker){break;}
             if ($global.players[i].name === question.answerer) {
                 answerer = i;
                 i = $global.players.length;
                 console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
                 break;
             } //end if
+            if(i === $global.players.length-1){i=0}
         }
 
         for (i = asker; i < $global.players.length; i += 1) {
@@ -247,7 +250,7 @@ process.app.controller('main', function ($scope, $global) {
         question.cards = [question.person, question.room, question.weapon].filter(function (card) {
             return card;
         });
-
+        console.log('ANS: '+answerer);
         if (answerer !== -1) {
             // Step #5: Add remaining cards to a row in Answerer's maybe stack.
             //but first, let's space them out properly if we need to.
@@ -271,7 +274,7 @@ process.app.controller('main', function ($scope, $global) {
             }*/
 
             $global.players[answerer].maybe.add(question.cards);
-
+            console.log('added '+question.cards + ' to '+answerer);
             // Step #6: Check Answerer's maybes for any row with only one item.
             // Step #7: For each such row:
             while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length === 1) {
