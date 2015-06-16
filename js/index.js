@@ -52,6 +52,16 @@ process.app.controller('main', function ($scope, $global) {
             $('#modal-help').modal('show');
         }
     }, {
+        prompts: ['modal dismiss'],
+        fn: function* () {
+            $('.modal.in').modal('hide');
+        }
+    }, {
+        prompts: ['show game board'],
+        fn: function* () {
+            $('#modal-board').modal('show');
+        }
+    }, {
         prompts: ['* asked a question about * in the * with a *'],
         fn: function* (input) {
             var question = {
