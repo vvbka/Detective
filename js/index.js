@@ -49,9 +49,7 @@ process.app.controller('main', function ($scope, $global) {
     $global.alfred.init([{
         prompts: ['help'],
         fn: function* () {
-            $('<div class="modal fade" data-keyboard="true"> <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> <h4 class="modal-title">Detective | Help</h4> </div><div class="modal-body"> <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p></div><div class="modal-footer"> <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> </div></div></div></div>').appendTo(document.body).modal('show').on('bs.modal.hidden', function () {
-                $(this).remove();
-            });
+            $('#modal-help').modal('show');
         }
     }, {
         prompts: ['* asked a question about * in the * with a *'],
@@ -114,12 +112,14 @@ process.app.controller('main', function ($scope, $global) {
     }, {
         prompts: ['it is my turn', 'it\'s my turn', 'gimme a question to ask', 'handle my turn', 'my turn'],
         fn: function* () {
-            if(($global.master.Guess.person.first().prob * $global.master.Guess.room.first().prob * $global.master.Guess.weapon.first().prob) > $global.threshold ) {
-                var ans = 'It was '+ $global.master.Guess.person.first().itm + ' in the ' + $global.master.Guess.room.first().itm + ' with a ' + $global.master.Guess.weapon.first().itm+'?',
+            if (($global.master.Guess.person.first().prob * $global.master.Guess.room.first().prob * $global.master.Guess.weapon.first().prob) > $global.threshold) {
+                var ans = 'It was ' + $global.master.Guess.person.first().itm + ' in the ' + $global.master.Guess.room.first().itm + ' with a ' + $global.master.Guess.weapon.first().itm + '?',
                     resp = yield(ans);
-                    if(~resp.toLowerCase().indexOf('n')) {
-                        window.alert("You LOST!!! :(");
-                    } else {window.alert('You Won!!! YAY!!')}
+                if (~resp.toLowerCase().indexOf('n')) {
+                    window.alert("You LOST!!! :(");
+                } else {
+                    window.alert('You Won!!! YAY!!')
+                }
             } else {
                 $global.myTurn();
             }
@@ -131,41 +131,72 @@ process.app.controller('main', function ($scope, $global) {
                 cname = $global.players.getByName(player).charName;
 
             $global.movePlayer(player);
-            
+
             if (handlers[cname]) {
                 handlers[cname].emit('move');
             }
         }
-    },
-    {
+    }, {
         prompts: ['set threshold *'],
         fn: function* (input) {
             var newThresh = input.split(/\s+/g).map(function (n) {
-                        return parseFloat(n);
-                    }).filter(function (n) {
-                        return !isNaN(n);
-                    });
+                return parseFloat(n);
+            }).filter(function (n) {
+                return !isNaN(n);
+            });
             $global.threshold = newThresh;
-            console.log('set threshold to be '+$global.threshold)
+            console.log('set threshold to be ' + $global.threshold)
         }
-    },
-    {
+    }, {
         prompts: ['not *'],
         fn: function* (input) {
             var card = $global.classifiers.cards.classify(input);
-            
+
             console.log('about to remove from master');
-            $global.master.Guess[$global.cardtype(card)] = $global.master.Guess[$global.cardtype(card)].filter(function(crd){return crd.itm !== card});
-            for(var p of $global.players){
-                if(!p.detective){
+            $global.master.Guess[$global.cardtype(card)] = $global.master.Guess[$global.cardtype(card)].filter(function (crd) {
+                return crd.itm !== card
+            });
+            for (var p of $global.players) {
+                if (!p.detective) {
                     console.log('removng from: %s', p.name);
-                    p.possible = p.possible.filter(function(crd){return crd !== card})
+                    p.possible = p.possible.filter(function (crd) {
+                        return crd !== card
+                    })
                 }
             }
-            try{$scope.$apply();}catch(e){};
+            try {
+                $scope.$apply();
+            } catch (e) {};
         }
-    }
-    ]);
+    }, {
+        prompts: ['alias * as *'],
+        fn: function* (input) {
+            input = input.toLowerCase().replace('alias', '');
+            
+            var card = $global.classifiers.cards.classify(input),
+                ctype = $global.cardtype(card),
+                newName = input.substr(input.indexOf('as') + 3).trim().split(/\s+/).map(function (word) {
+                    word = word.replace(/\W+/, '');
+                    return word[0].toUpperCase() + word.substr(1).toLowerCase();
+                }).filter(function (word) {
+                    return word;
+                }).join(' ');
+
+            // confirm
+            if ((yield ('Are you sure you want to alias "' + card + '" with "' + newName + '"?'))[0].toLowerCase() === 'y') {
+                if (ctype === 'person') ctype = 'people';
+                else ctype += 's';
+                
+                $global.classifiers[ctype].addDocument(newName, card);
+                $global.classifiers.cards.addDocument(newName, card);
+                
+                $global.classifiers[ctype].train();
+                $global.classifiers.cards.train();
+            }
+            
+            $global.alfred.output.say('Input command ...');
+        }
+    }]);
 
 
     $global.handleTurn = function (question) {
@@ -203,7 +234,7 @@ process.app.controller('main', function ($scope, $global) {
 
         for (i = asker; i < $global.players.length; i += 1) {
             if ($global.players[i].name === question.asker) break;
-            
+
             //console.log(i + ' : ' + $global.players[i].name !== $global.Detective.name && i !== asker);
             if (!$global.players[i].detective && i !== asker) {
                 console.log('ELIMINATE FROM: ' + $global.players[i].name);
@@ -528,12 +559,12 @@ process.app.controller('main', function ($scope, $global) {
     };
 
     $scope.playerdata = {};
-    
+
     $scope.host = 'localhost:1024';
     nextPort(function (err, port) {
         $scope.host = 'localhost:' + port;
         $scope.$apply();
-        
+
         // start client server
         var express = require('express'),
             path = require('path'),
@@ -541,12 +572,12 @@ process.app.controller('main', function ($scope, $global) {
             http = require('http').Server(app),
             io = require('socket.io')(http),
             crypto = require('crypto');
-        
+
         // static serve
         app.use(function (req, res) {
             res.sendFile(path.resolve(__dirname, '.' + (req.path === '/' ? '/client.html' : req.path)));
         });
-        
+
         // io handling
         io.on('connection', function (sock) {
             sock.on('init', function (who) {
@@ -556,43 +587,82 @@ process.app.controller('main', function ($scope, $global) {
                     update = function () {
                         if (send) {
                             var data = {
-                                board: $global.board,
-                                players: $global.players,
-                                labels: require('./data/board.json').labels
-                            }, hash = crypto.createHash('md5');
-                            
+                                    board: $global.board,
+                                    players: $global.players,
+                                    labels: require('./data/board.json').labels
+                                },
+                                hash = crypto.createHash('md5');
+
                             hash.update(JSON.stringify(data));
                             var current = hash.digest('hex');
-                            
+
                             if (prev !== current) {
                                 sock.emit('data', data);
                                 prev = current;
                             }
-                            
+
                             setTimeout(update, 100);
                         }
                     };
-                
+
                 handlers[who] = sock;
-                
+
                 sock.on('moved', function (loc) {
                     player.location = loc;
                     $scope.$apply();
                 });
-                
+
                 sock.on('close', function () {
                     send = false;
                 });
-                
+
                 update();
             });
-            
+
             sock.emit('players', $global.players.map(function (player) {
                 return player.charName;
             }));
         });
-        
+
+        // bind ui states to http status
+        http.on('listening', function () {
+            console.log('listening');
+            $('#form-port .form-group')
+                .addClass('has-success')
+                .removeClass('has-error');
+        });
+
+        http.on('error', function () {
+            console.log('error');
+            $('#form-port .form-group')
+                .removeClass('has-success')
+                .addClass('has-error');
+        });
+
+        http.on('close', function () {
+            console.log('closed');
+            $('#form-port .form-group')
+                .removeClass('has-success')
+                .removeClass('has-error');
+        });
+
         // listen up
         http.listen(port);
+
+        // restarting on different port
+        $scope.$watch('port', function (port) {
+            http.close();
+
+            if (port !== undefined) {
+                setTimeout(function () {
+                    console.log(':%s', port);
+                    http.listen(port);
+                }, 100);
+            }
+        });
+
+        $scope.$apply(function () {
+            $scope.port = port;
+        });
     });
 });

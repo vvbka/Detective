@@ -166,7 +166,7 @@ process.app.controller('BoardController', function ($scope, $global) {
             // since that is what the dice proclaimed
             return index < roll;
         });
-        
+
         // check if path ends at a player location
         var last = $scope.path[$scope.path.length - 1];
         if ($scope.loc2class(last[0], last[1])) {
@@ -294,7 +294,7 @@ process.app.controller('BoardController', function ($scope, $global) {
                                     });
                                 }
                             }
-                            
+
                             // use the closest door for the room's weight
                             rooms[room] = min;
 
@@ -314,11 +314,13 @@ process.app.controller('BoardController', function ($scope, $global) {
                     if (result.place === closest[1]) {
                         return $scope.evalPath(rooms[closest[1]], roll);
                     }
-                    
+
                     // if secret passage, prefer it
                     if ($scope.passages.hasOwnProperty(closest[1])) {
-                        var doors = $scope.doors[$scope.passages[closest[1]]], min = [];
-                        
+                        var doors = $scope.doors[$scope.passages[closest[1]]],
+                            min = [],
+                            mstart = [];
+
                         for (var start of doors) {
                             for (var door of $scope.doors[result.place]) {
                                 // get path after passage
@@ -327,26 +329,32 @@ process.app.controller('BoardController', function ($scope, $global) {
                                     B.grid[start[1]][start[0]],
                                     B.grid[door[1]][door[0]]
                                 );
-                            
+
+                                //console.log('from [%s] of %s', start.join(','), closest[1]);
+                                //console.log('to [%s] of %s', door.join(','), result.place);
+                                //console.log(after);
+
                                 // use minimal path
                                 if (min.length === 0 || min.length > after.length) {
                                     min = after;
+                                    mstart = start;
                                 }
                             }
                         }
-                        
+
                         // is this path worth it?
                         if (rpath.length > (closest[0] + 1 + min.length)) {
                             console.log('I AM GOING TO TAKE THE SECRET PASSAGE NOW.');
-                            
+
                             // if we are in the room, take the passage
-                            if (Detective.room === closest[0]) return $scope.evalPath([{
+                            console.log('compare "%s" with "%s"', Detective.room, closest[1].toLowerCase());
+                            if (Detective.room === closest[1].toLowerCase()) return $scope.evalPath([{
                                 visited: true,
                                 weight: 1,
-                                x: min[min.length - 1][1],
-                                y: min[min.length - 1][0]
+                                x: mstart[1],
+                                y: mstart[0]
                             }], roll);
-                            
+
                             // if not, head towards the closest room
                             return $scope.evalPath(rooms[closest[1]], roll);
                         }
@@ -373,18 +381,18 @@ process.app.controller('BoardController', function ($scope, $global) {
             }
         }.bind(this));
     }.bind(this);
-    
+
     //Hand;ting the movement of other players
-    this.movePlayer = $global.movePlayer = function(player){
+    this.movePlayer = $global.movePlayer = function (player) {
         $scope.activeplayer = player;
-        try{
+        try {
             $scope.$apply()
-        } catch (e){}
-        $('#modal-board').modal('show'); 
+        } catch (e) {}
+        $('#modal-board').modal('show');
     }
-    
+
     $global.activeplayer = $scope.activeplayer = null;
-    $scope.getPosition = function (x,y){
+    $scope.getPosition = function (x, y) {
         if ($scope.activeplayer) {
             $global.players.getByName($scope.activeplayer).location = [x, y];
             //console.log($scope.activeplayer + ' location updated to: '+x + ' '+y);
@@ -392,13 +400,13 @@ process.app.controller('BoardController', function ($scope, $global) {
             $('#modal-board').modal('hide');
         }
     }
-    
+
     //a cancel button, if you didn't mean to
-    $scope.getPositionCancel = function(){
+    $scope.getPositionCancel = function () {
         $scope.activeplayer = null;
         $('#modal-board').modal('hide');
     };
-    
+
 
     // load strategy for editing
     $scope.loadStrat = function (strat) {

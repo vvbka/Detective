@@ -393,6 +393,8 @@ table.board > tbody > tr > td.cnTL {
   text-align: center;
   bottom: 10px;
   position: absolute;
+  width: 95%;
+  left: 2.5%;
 }
 
 .client-info > * {
