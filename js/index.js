@@ -329,15 +329,16 @@ process.app.controller('main', function ($scope, $global) {
         //handle case where no one answeres, those cards must therefore be in either our hand, their hand, or the answer
         if (question.answerer === 'nobody') {
             console.log('nobody answered')
+            console.log(question)
             for (var c of question.cards) {
                 console.log('update ' + c)
-                if (!~$.inArray(c, $global.players[$global.players.getByName(question.asker)].possible)) {
+                if (!~$.inArray(c, $global.players.getByName(question.asker).possible)) {
                     $global.master.Guess[$scope.cardtype(c)].update('itm', {
                         prob: 1,
                         itm: c
                     });
                 } else {
-                    $global.players[$global.players.getByName(question.asker)].maybe.add(question.cards);
+                    $global.players.getByName(question.asker).maybe.add(question.cards);
                     $global.master.Guess[$scope.cardtype(c)].update('itm', {
                         prob: 0.5,
                         itm: c
