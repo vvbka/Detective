@@ -229,7 +229,10 @@ process.app.controller('main', function ($scope, $global) {
                 console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
                 break;
             } //end if
-            if(i === $global.players.length-1){i=0}
+            
+            if (i === asker) break;
+            
+            if(i === $global.players.length-1){i=-1}
         }
 
         for (i = asker; i < $global.players.length; i += 1) {
