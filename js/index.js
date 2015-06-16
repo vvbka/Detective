@@ -330,15 +330,18 @@ process.app.controller('main', function ($scope, $global) {
         if (question.answerer === 'nobody') {
             console.log('nobody answered')
             console.log(question)
+            
+            $global.players.getByName(question.asker).maybe.add(question.cards);
             for (var c of question.cards) {
                 console.log('update ' + c)
+                
                 if (!~$.inArray(c, $global.players.getByName(question.asker).possible)) {
                     $global.master.Guess[$scope.cardtype(c)].update('itm', {
                         prob: 1,
                         itm: c
                     });
                 } else {
-                    $global.players.getByName(question.asker).maybe.add(question.cards);
+                    
                     $global.master.Guess[$scope.cardtype(c)].update('itm', {
                         prob: 0.5,
                         itm: c
