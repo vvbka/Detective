@@ -318,7 +318,8 @@ process.app.controller('BoardController', function ($scope, $global) {
                     // if secret passage, prefer it
                     if ($scope.passages.hasOwnProperty(closest[1])) {
                         var doors = $scope.doors[$scope.passages[closest[1]]],
-                            min = [];
+                            min = [],
+                            mstart = [];
 
                         for (var start of doors) {
                             for (var door of $scope.doors[result.place]) {
@@ -329,9 +330,14 @@ process.app.controller('BoardController', function ($scope, $global) {
                                     B.grid[door[1]][door[0]]
                                 );
 
+                                //console.log('from [%s] of %s', start.join(','), closest[1]);
+                                //console.log('to [%s] of %s', door.join(','), result.place);
+                                //console.log(after);
+
                                 // use minimal path
                                 if (min.length === 0 || min.length > after.length) {
                                     min = after;
+                                    mstart = start;
                                 }
                             }
                         }
@@ -341,11 +347,12 @@ process.app.controller('BoardController', function ($scope, $global) {
                             console.log('I AM GOING TO TAKE THE SECRET PASSAGE NOW.');
 
                             // if we are in the room, take the passage
-                            if (Detective.room === closest[0]) return $scope.evalPath([{
+                            console.log('compare "%s" with "%s"', Detective.room, closest[1].toLowerCase());
+                            if (Detective.room === closest[1].toLowerCase()) return $scope.evalPath([{
                                 visited: true,
                                 weight: 1,
-                                x: min[min.length - 1][1],
-                                y: min[min.length - 1][0]
+                                x: mstart[1],
+                                y: mstart[0]
                             }], roll);
 
                             // if not, head towards the closest room
