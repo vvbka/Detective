@@ -39,11 +39,22 @@ process.app.controller('main', function ($scope, $global) {
     // load classifiers
     $global.classifiers = {
         players: new BayesClassifier(),
-        people: BayesClassifier.restore(require('./data/people-classifier.json')),
-        rooms: BayesClassifier.restore(require('./data/rooms-classifier.json')),
-        weapons: BayesClassifier.restore(require('./data/weapons-classifier.json')),
-        cards: BayesClassifier.restore(require('./data/cards-classifier.json'))
+        people: new BayesClassifier(), // BayesClassifier.restore(require('./data/people-classifier.json')),
+        rooms: new BayesClassifier(), // BayesClassifier.restore(require('./data/rooms-classifier.json')),
+        weapons: new BayesClassifier(), // BayesClassifier.restore(require('./data/weapons-classifier.json')),
+        cards: new BayesClassifier() // BayesClassifier.restore(require('./data/cards-classifier.json'))
     };
+
+    // train classifiers
+    for (var person of $global.cardset.people) { $global.classifiers.people.addDocument(person, person); $global.classifiers.cards.addDocument(person, person); }
+    for (var room of $global.cardset.rooms) { $global.classifiers.rooms.addDocument(room, room); $global.classifiers.cards.addDocument(room, room); }
+    for (var weapon of $global.cardset.weapons) { $global.classifiers.weapons.addDocument(weapon, weapon); $global.classifiers.cards.addDocument(weapon, weapon); }
+
+    for (var ctype in $global.classifiers) {
+      if ($global.classifiers.hasOwnProperty(ctype)) {
+        setTimeout($global.classifiers[ctype].train.bind($global.classifiers[ctype]), 1);
+      }
+    }
     
     // alfred commands
     $scope.alcmds = [{
@@ -290,20 +301,16 @@ process.app.controller('main', function ($scope, $global) {
                 asker = i;
                 console.log("asker %s found at %d", $global.players[i].name, asker);
             }
+
+            if ($global.players[i].name === question.answerer) {
+                answerer = i;
+                console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
+            }
         }
 
         for (i = asker; i < $global.players.length; i += 1) {
             console.log('INDEX: '+ i);
-            //if ($global.players[i].name === question.asker){break;}
-            if ($global.players[i].name === question.answerer) {
-                answerer = i;
-                i = $global.players.length;
-                console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
-                break;
-            } //end if
-            
             if (i === asker) break;
-            
             if(i === $global.players.length-1){i=-1}
         }
 
