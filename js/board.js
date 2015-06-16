@@ -150,7 +150,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
     // path handling
     $scope.path = [];
-    $scope.questionwaiting = true;
+    $scope.questionwaiting = false;
     $scope.evalPath = function (path, roll, question) {
         // show the board
         if (!$('#modal-board').is('.in')) {
