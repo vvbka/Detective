@@ -362,15 +362,20 @@
                  </div>
                  <div class="modal-body">
                      <h3>Commands:</h3>
-                     <ul class="det-cmd-lst">
-                         <li>help - Show this help</li>
-                         <li>my turn - Tell Detective to play it's turn</li>
-                         <li>* moved - Trigger the movement of a player</li>
-                         <li>* asked a question about * in the * with a * - Inform Detective that a question was asked</li>
-                         <li>alias * as * - Add an alias to a card, in case your version of the came uses different names</li>
-                         <li>show board - Shows the game board</li>
-                         <li>modal dismiss - Dismisses all active modals</li>
-                     </ul>
+                     <table class="table table-hover">
+                         <thead>
+                             <tr>
+                                 <th>Command</th>
+                                 <th>Description</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                             <tr ng-repeat="cmd in alcmds">
+                                 <td>{{cmd.prompts.join(', ')}}</td>
+                                 <td>{{cmd.desc}}</td>
+                             </tr>
+                         </tbody>
+                     </table>
                      <p>You can find our documentation over <a href="http://bitbucket.org/vbka/detective/wiki/Home">here</a></p>
                  </div>
                  <div class="modal-footer">
