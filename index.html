@@ -165,7 +165,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="row in player.maybe">
+                                <tr ng-repeat="row in player.maybe track by $index">
                                     <td>{{ rowformat(row, 'person') || '--' }}</td>
                                     <td>{{ rowformat(row, 'room') || '--' }}</td>
                                     <td>{{ rowformat(row, 'weapon') || '--' }}</td>
