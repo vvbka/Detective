@@ -149,7 +149,43 @@ process.app.controller('wizard', function ($scope, $global) {
             });
         });
 
+        
+        var observe = function (obj, key, fn) {
+            var val = obj[key];
+            if (val instanceof Array) Array.observe(val, fn);
+            
+            Object.defineProperty(obj, key, {
+                get: function () {
+                    return val;
+                },
 
+                set: function (value) {
+                    val = value;
+                    if (val instanceof Array) Array.observe(val, fn);
+                    fn();
+                }
+            });
+        }, possibleUpdater = function (player) {
+            return function () {
+                // filter maybes to fit possibles
+                player.maybe = player.maybe.map(function (maybe) {
+                    return maybe.filter(function (card) {
+                        return ~ player.possible.indexOf(card);
+                    });
+                });
+                
+                // update scope
+                try { $scope.$apply(); }
+                catch (e) { /* ignore angular */ }
+            };
+        };
+
+        // add auto-updating for maybes
+        for (var player of $global.players) {
+            if (!player.detective) {
+                observe(player, 'possible', possibleUpdater(player));
+            }
+        }
 
         //and 'nobody' as a potetntial answerer
         $global.classifiers.players.addDocument('nobody', 'nobody');
