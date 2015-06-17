@@ -327,7 +327,7 @@ process.app.controller('main', function ($scope, $global) {
                 asker = i;
                 console.log("asker %s found at %d", $global.players[i].name, asker);
             }
-
+            //get the index of the answerer
             if ($global.players[i].name === question.answerer) {
                 answerer = i;
                 console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
@@ -335,7 +335,7 @@ process.app.controller('main', function ($scope, $global) {
         }
 
         for (i = asker + 1; i < $global.players.length; i += 1) {
-            if (i === answerer) break;
+            if (i === answerer || i==asker) break;
             
             if (!$global.players[i].detective) {
                 console.log('ELIMINATE FROM: ' + $global.players[i].name);
@@ -384,26 +384,8 @@ process.app.controller('main', function ($scope, $global) {
         console.log('ANS: '+answerer);
         if (answerer !== -1) {
             // Step #5: Add remaining cards to a row in Answerer's maybe stack.
-            //but first, let's space them out properly if we need to.
-            /*if (question.cards.length < 3) {
-                var cardStore = [null, null, null];
-                for (var c of question.cards) {
-                    var t = $scope.cardtype(c);
-                    switch (t) {
-                    case ('person'):
-                        cardStore[0] = c;
-                        break;
-                    case ('room'):
-                        cardStore[1] = c;
-                        break;
-                    case ('weapon'):
-                        cardStore[2] = c;
-                        break;
-                    };
-                };
-                question.cards = cardStore;
-            }*/
-
+            
+            
             $global.players[answerer].maybe.add(question.cards);
             console.log('added '+question.cards + ' to '+answerer);
             // Step #6: Check Answerer's maybes for any row with only one item.
