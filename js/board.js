@@ -71,6 +71,11 @@ process.app.controller('BoardController', function ($scope, $global) {
             // create full card list
             question.cards = [question.person, question.room, question.weapon];
 
+            //filter out the cards that are in our hand
+            question.cards = question.cards.filter(function(crd) {
+                return ($.inArray(crd, $global.Detective.sure)===-1);
+            })
+
             // figure out who answered
             var answerer = $global.classifiers.players.classify(answer),
                 cardtype;
@@ -98,47 +103,55 @@ process.app.controller('BoardController', function ($scope, $global) {
             }
 
             // remove the card from the possibles of every single
-            // player
+            // player other than the answerer
             for (var player of $global.players) {
-                if (!player.detective) {
+                if (!player.detective && player.name !== question.answerer) {
                     player.possible = player.possible.filter(function (card) {
                         return card !== answer;
                     });
                 }
             }
 
-            // remove the card from the master guess
-            $global.master.Guess[cardtype] = $global.master.Guess[cardtype].filter(function (card) {
-                return card.itm !== answer;
-            });
-
-            for (var player of $global.players) {
-                // add the card to the answerer's sure
-                if (player.name === answerer) {
-                    player.sure.push(answer);
-                } else if (!player.detective) {
-                    // edit everyone's maybes
-                    var maybe = priority(player.maybe.key, player.maybe.comp);
-
-                    for (var row of player.maybe) {
-                        maybe.add(row.filter(function (card) {
-                            return card !== answer;
-                        }));
-                    }
-
-                    player.maybe = maybe;
-
-                    // re-evaluate edited maybe queue
-                    while (player.maybe.length > 0 && player.maybe.first().length === 1) {
-                        var first = player.maybe.pop()[0];
-
-                        // add to sure
-                        player.sure.push(first);
-
-                        // remove from master guess
-                        $global.master.Guess[$global.cardtype(first)] = $global.master.Guess[$global.cardtype(first)].filter(function (card) {
-                            return card.itm !== first;
-                        });
+            //did nobody answer?
+            if(answerer === 'nobody'){
+                //if the cards array is only 1 long, and no one answered, then that card has to be 100%.
+                if(question.cards.length===1){
+                       $global.master.Guess[$global.cardtype(question.cards[0])].update('itm', {prob:1,itm:question.cards[0]})
+                }
+            } else {
+                // remove the card from the master guess
+                $global.master.Guess[cardtype] = $global.master.Guess[cardtype].filter(function (card) {
+                    return card.itm !== answer;
+                });
+            
+                for (var player of $global.players) {
+                    // add the card to the answerer's sure
+                    if (player.name === answerer) {
+                        player.sure.push(answer);
+                    } else if (!player.detective) {
+                        // edit everyone's maybes
+                        var maybe = priority(player.maybe.key, player.maybe.comp);
+                    
+                        for (var row of player.maybe) {
+                            maybe.add(row.filter(function (card) {
+                                return card !== answer;
+                            }));
+                        }
+                    
+                        player.maybe = maybe;
+                    
+                        // re-evaluate edited maybe queue
+                        while (player.maybe.length > 0 && player.maybe.first().length === 1) {
+                            var first = player.maybe.pop()[0];
+                        
+                            // add to sure
+                            player.sure.push(first);
+                        
+                            // remove from master guess
+                            $global.master.Guess[$global.cardtype(first)] = $global.master.Guess[$global.cardtype(first)].filter(function (card) {
+                                return card.itm !== first;
+                            });
+                        }
                     }
                 }
             }
