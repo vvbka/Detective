@@ -74,7 +74,7 @@ process.app.controller('BoardController', function ($scope, $global) {
             //filter out the cards that are in our hand
             question.cards = question.cards.filter(function(crd) {
                 return ($.inArray(crd, $global.Detective.sure)===-1);
-            })
+            }).filter(function(n){return n;});
 
             // figure out who answered
             var answerer = $global.classifiers.players.classify(answer),
@@ -113,10 +113,14 @@ process.app.controller('BoardController', function ($scope, $global) {
             }
 
             //did nobody answer?
+            console.log('In response to my question '+answerer+' answered.');
             if(answerer === 'nobody'){
-                //if the cards array is only 1 long, and no one answered, then that card has to be 100%.
-                if(question.cards.length===1){
-                       $global.master.Guess[$global.cardtype(question.cards[0])].update('itm', {prob:1,itm:question.cards[0]})
+                //if no one answered, then the remaining cards have to be 100%.
+                //console.log("setting " +question.cards+' to 100%');
+                
+                for(var crd of question.cards){
+                        console.log("setting "+ crd +' to 100%');
+                       $global.master.Guess[$global.cardtype(crd)].update('itm', {prob:1,itm:crd})
                 }
             } else {
                 // remove the card from the master guess
