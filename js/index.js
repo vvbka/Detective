@@ -37,16 +37,16 @@ process.app.controller('main', function ($scope, $global) {
         handlers = {};
 
     $scope.aliases = {};
+    $global.classifiers = {
+        players: new BayesClassifier()
+    };
 
     $scope.trainClassifiers = function () {
         // load classifiers
-        $global.classifiers = {
-            players: new BayesClassifier(),
-            people: new BayesClassifier(), // BayesClassifier.restore(require('./data/people-classifier.json')),
-            rooms: new BayesClassifier(), // BayesClassifier.restore(require('./data/rooms-classifier.json')),
-            weapons: new BayesClassifier(), // BayesClassifier.restore(require('./data/weapons-classifier.json')),
-            cards: new BayesClassifier() // BayesClassifier.restore(require('./data/cards-classifier.json'))
-        };
+            $global.classifiers.people= new BayesClassifier();
+            $global.classifiers.rooms= new BayesClassifier();
+            $global.classifiers.weapons= new BayesClassifier();
+            $global.classifiers.cards= new BayesClassifier();
         
         // add cardset
         for (var person of $global.cardset.people) { $global.classifiers.people.addDocument(person, person); $global.classifiers.cards.addDocument(person, person); }
