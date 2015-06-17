@@ -149,29 +149,7 @@ process.app.controller('wizard', function ($scope, $global) {
             });
         });
 
-        var observe = function (obj, key, fn) {
-          var val = obj[key];
-         if (typeof val === 'object') Object.observe(val,fn);
-          Object.defineProperty(obj, key, {
-            get: function () {
-              return val
-            },
-            set: function (value) {
-              val = value;
-              if (typeof val === 'object') Object.observe(val,fn);
-              fn();
-            }
-          });
-        }
 
-        // add auto-updating for maybes
-        for (var player of $global.players) {
-          if (!player.detective) {
-            observe(player, 'possible', function () {
-              console.log('possibles updated');
-            });
-          }
-        }
 
         //and 'nobody' as a potetntial answerer
         $global.classifiers.players.addDocument('nobody', 'nobody');
