@@ -318,7 +318,7 @@ process.app.controller('main', function ($scope, $global) {
         // create full card list
         question.cards = [question.person, question.room, question.weapon];
 
-        //try {
+        try {
         // Step #2: Remove all three cards from possibles of all people between
         // who asked and who answered.
         //1. get the index of the asker
@@ -334,17 +334,28 @@ process.app.controller('main', function ($scope, $global) {
             }
         }
 
-        for (i = asker + 1; i < $global.players.length; i += 1) {
-            if (i === answerer || i==asker) break;
-            
-            if (!$global.players[i].detective) {
-                console.log('ELIMINATE FROM: ' + $global.players[i].name);
-                $global.players[i].possible = $global.players[i].possible.filter(function (item) {
-                    return !~ question.cards.indexOf(item);
-                });
+        if (answerer === -1) {
+            for (var player of $global.players) {
+                if (!player.detective) {
+                    console.log('ELIMINATE FROM: ' + player.name);
+                    player.possible = player.possible.filter(function (card) {
+                        return !~ question.cards.indexOf(card);
+                    });
+                }
             }
+        } else {
+            for (i = asker + 1; i < $global.players.length; i += 1) {
+                if (i === answerer) break;
             
-            if (i === $global.players.length - 1) i = -1;
+                if (!$global.players[i].detective) {
+                    console.log('ELIMINATE FROM: ' + $global.players[i].name);
+                    $global.players[i].possible = $global.players[i].possible.filter(function (item) {
+                        return !~ question.cards.indexOf(item);
+                    });
+                }
+            
+                if (i === $global.players.length - 1) i = -1;
+            }
         }
 
         // Step #3: Eliminate cards from the question which are NOT present
@@ -410,24 +421,34 @@ process.app.controller('main', function ($scope, $global) {
             console.log('nobody answered')
             console.log(question)
             
-            $global.players.getByName(question.asker).maybe.add(question.cards);
-            for (var c of question.cards) {
-                console.log('update ' + c)
+            var planswerer = $global.players.getByName(question.asker);
+            
+            if (planswerer.detective) {
+                for (var c of question.cards) {
+                    console.log('update ' + c)
+                    $global.master.Guess[$scope.cardtype(c)].update('itm', {
+                      prob: 1,
+                      itm: c
+                    });
+                } //end for
+            } else {
+                planswerer.maybe.add(question.cards);
+                for (var c of question.cards) {
+                    console.log('update ' + c)
                 
-                if (!~$.inArray(c, $global.players.getByName(question.asker).possible)) {
-                    $global.master.Guess[$scope.cardtype(c)].update('itm', {
-                        prob: 1,
-                        itm: c
-                    });
-                } else {
-                    
-                    $global.master.Guess[$scope.cardtype(c)].update('itm', {
-                        prob: 0.5,
-                        itm: c
-                    });
-                }
-
-            } //end for
+                    if (!~$.inArray(c, $global.players.getByName(question.asker).possible)) {
+                        $global.master.Guess[$scope.cardtype(c)].update('itm', {
+                            prob: 1,
+                            itm: c
+                        });
+                    } else {
+                        $global.master.Guess[$scope.cardtype(c)].update('itm', {
+                            prob: 0.5,
+                            itm: c
+                        });
+                    }
+                } //end for
+            }
         } //endif nobody 
 
 
@@ -481,10 +502,10 @@ process.app.controller('main', function ($scope, $global) {
         console.log(JSON.stringify(question, null, 2));
         $global.alfred.output.say('Input command ...');
         $scope.$apply();
-        //} catch (e) {
-        //    console.error(String(e));
-        //    console.error(String(e.stack))
-        //}
+        } catch (e) {
+            console.error(String(e));
+            console.error(String(e.stack))
+        }
     };
 
     // bind alfred's output to angular
