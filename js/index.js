@@ -247,7 +247,8 @@ process.app.controller('main', function ($scope, $global) {
         desc: 'Exempt a card from the cardset (that you do not wish to play with).',
         fn: function* (input) {
             var card = $global.classifiers.cards.classify(input),
-                ctype = $global.cardtype(card);
+                ctype = $global.cardtype(card),
+                cardset = ctype === 'person' ? 'people' : (ctype + 's');
 
             // remove from master
             $global.master.Guess[ctype] = $global.master.Guess[ctype].filter(function (crd) {
