@@ -336,7 +336,7 @@ process.app.controller('main', function ($scope, $global) {
 
         if (answerer === -1) {
             for (var player of $global.players) {
-                if (!player.detective) {
+                if (!player.detective && player.name !== question.asker) {
                     console.log('ELIMINATE FROM: ' + player.name);
                     player.possible = player.possible.filter(function (card) {
                         return !~ question.cards.indexOf(card);
