@@ -149,49 +149,51 @@ process.app.controller('wizard', function ($scope, $global) {
             });
         });
 
-        
+
         var observe = function (obj, key, fn) {
-            var val = obj[key];
-            if (val instanceof Array) Array.observe(val, fn);
-            
-            Object.defineProperty(obj, key, {
-                get: function () {
-                    return val;
-                },
+                var val = obj[key];
+                if (val instanceof Array) Array.observe(val, fn);
 
-                set: function (value) {
-                    val = value;
-                    if (val instanceof Array) Array.observe(val, fn);
-                    fn();
-                }
-            });
-        }, possibleUpdater = function (player) {
-            return function () {
-                // filter maybes to fit possibles
-                player.maybe = player.maybe.map(function (maybe) {
-                    return maybe.filter(function (card) {
-                        return ~ player.possible.indexOf(card);
-                    });
+                Object.defineProperty(obj, key, {
+                    get: function () {
+                        return val;
+                    },
+
+                    set: function (value) {
+                        val = value;
+                        if (val instanceof Array) Array.observe(val, fn);
+                        fn();
+                    }
                 });
-                
-                // update single row maybes
-                while (player.maybe.length > 0 && player.maybe.first().length === 1) {
-                    var first = player.maybe.pop()[0];
-
-                    // Step #7.1: Add to Answerer's definite.
-                    player.sure.push(first);
-
-                    // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
-                    $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
-                        return card.itm !== first;
+            },
+            possibleUpdater = function (player) {
+                return function () {
+                    // filter maybes to fit possibles
+                    player.maybe = player.maybe.map(function (maybe) {
+                        return maybe.filter(function (card) {
+                            return ~player.possible.indexOf(card);
+                        });
                     });
-                }
-                
-                // update scope
-                try { $scope.$apply(); }
-                catch (e) { /* ignore angular */ }
+
+                    // update single row maybes
+                    while (player.maybe.length > 0 && player.maybe.first().length === 1) {
+                        var first = player.maybe.pop()[0];
+
+                        // Step #7.1: Add to Answerer's definite.
+                        player.sure.push(first);
+
+                        // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+                        $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
+                            return card.itm !== first;
+                        });
+                    }
+
+                    // update scope
+                    try {
+                        $scope.$apply();
+                    } catch (e) { /* ignore angular */ }
+                };
             };
-        };
 
         // add auto-updating for maybes
         for (var player of $global.players) {

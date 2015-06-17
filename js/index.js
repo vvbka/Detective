@@ -43,22 +43,31 @@ process.app.controller('main', function ($scope, $global) {
 
     $scope.trainClassifiers = function () {
         // load classifiers
-            $global.classifiers.people= new BayesClassifier();
-            $global.classifiers.rooms= new BayesClassifier();
-            $global.classifiers.weapons= new BayesClassifier();
-            $global.classifiers.cards= new BayesClassifier();
-        
+        $global.classifiers.people = new BayesClassifier();
+        $global.classifiers.rooms = new BayesClassifier();
+        $global.classifiers.weapons = new BayesClassifier();
+        $global.classifiers.cards = new BayesClassifier();
+
         // add cardset
-        for (var person of $global.cardset.people) { $global.classifiers.people.addDocument(person, person); $global.classifiers.cards.addDocument(person, person); }
-        for (var room of $global.cardset.rooms) { $global.classifiers.rooms.addDocument(room, room); $global.classifiers.cards.addDocument(room, room); }
-        for (var weapon of $global.cardset.weapons) { $global.classifiers.weapons.addDocument(weapon, weapon); $global.classifiers.cards.addDocument(weapon, weapon); }
+        for (var person of $global.cardset.people) {
+            $global.classifiers.people.addDocument(person, person);
+            $global.classifiers.cards.addDocument(person, person);
+        }
+        for (var room of $global.cardset.rooms) {
+            $global.classifiers.rooms.addDocument(room, room);
+            $global.classifiers.cards.addDocument(room, room);
+        }
+        for (var weapon of $global.cardset.weapons) {
+            $global.classifiers.weapons.addDocument(weapon, weapon);
+            $global.classifiers.cards.addDocument(weapon, weapon);
+        }
 
         // add aliases
         for (var alias in $scope.aliases) {
             if ($scope.aliases.hasOwnProperty(alias)) {
                 var ctype = $global.cardtype($scope.aliases[alias]);
                 ctype = ctype === 'person' ? 'people' : (ctype + 's');
-                
+
                 $global.classifiers[ctype].addDocument(alias, $scope.aliases[alias]);
                 $global.classifiers.cards.addDocument(alias, $scope.aliases[alias]);
             }
@@ -70,10 +79,10 @@ process.app.controller('main', function ($scope, $global) {
             }
         }
     };
-    
+
     // train initially
     $scope.trainClassifiers();
-    
+
     // alfred commands
     $scope.alcmds = [{
         prompts: ['help'],
@@ -90,32 +99,34 @@ process.app.controller('main', function ($scope, $global) {
             }).filter(function (num) {
                 return !isNaN(num);
             })[0];
-            
+
             $scope.port = input;
-            try { $scope.$apply(); }
-            catch (e) { /* ignore angular's spazzes */ }
+            try {
+                $scope.$apply();
+            } catch (e) { /* ignore angular's spazzes */ }
         }
     }, {
         prompts: ['get my ip'],
         desc: 'Fetch your local IP address.',
         fn: function* () {
-            var ifaces = os.networkInterfaces(), ip = '127.0.0.1';
-            
+            var ifaces = os.networkInterfaces(),
+                ip = '127.0.0.1';
+
             Object.keys(ifaces).forEach(function (ifname) {
                 var alias = 0;
-                
+
                 for (var iface of ifaces[ifname]) {
                     if ('IPv4' !== iface.family || iface.internal !== false) {
                         // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
                         return;
                     }
-                    
+
                     //
                     ip = iface.address;
                     break;
-                 }
+                }
             });
-            
+
             $global.alfred.output.say('Your IP address is: %s', ip);
             setTimeout(function () {
                 $global.alfred.output.say('Input command ...');
@@ -126,9 +137,10 @@ process.app.controller('main', function ($scope, $global) {
         desc: 'Toggle the visibility of the possibles array.',
         fn: function* () {
             $scope.possiblesVisible = !$scope.possiblesVisible;
-            
-            try { $scope.$apply(); }
-            catch (e) { /* ignore potential angular spazzes */ }
+
+            try {
+                $scope.$apply();
+            } catch (e) { /* ignore potential angular spazzes */ }
         }
     }, {
         prompts: ['modal dismiss'],
@@ -254,7 +266,7 @@ process.app.controller('main', function ($scope, $global) {
             $global.master.Guess[ctype] = $global.master.Guess[ctype].filter(function (crd) {
                 return crd.itm !== card;
             });
-            
+
             // remove from players
             for (var p of $global.players) {
                 if (!p.detective) {
@@ -264,15 +276,15 @@ process.app.controller('main', function ($scope, $global) {
                     });
                 }
             }
-            
+
             // remove from cardset
             $global.cardset[cardset] = $global.cardset[cardset].filter(function (crd) {
                 return crd !== card;
             });
-            
+
             // re-train classifiers
             $scope.trainClassifiers();
-            
+
             try {
                 $scope.$apply();
             } catch (e) {};
@@ -282,7 +294,7 @@ process.app.controller('main', function ($scope, $global) {
         desc: 'Alias a certain card as another. (alias ballroom as bedroom)',
         fn: function* (input) {
             input = input.toLowerCase().replace('alias', '');
-            
+
             var card = $global.classifiers.cards.classify(input),
                 ctype = $global.cardtype(card),
                 newName = input.substr(input.indexOf('as') + 3).trim().split(/\s+/).map(function (word) {
@@ -293,14 +305,14 @@ process.app.controller('main', function ($scope, $global) {
                 }).join(' ');
 
             // confirm
-            if ((yield ('Are you sure you want to alias "' + card + '" with "' + newName + '"?'))[0].toLowerCase() === 'y') {
+            if ((yield('Are you sure you want to alias "' + card + '" with "' + newName + '"?'))[0].toLowerCase() === 'y') {
                 if (ctype === 'person') ctype = 'people';
                 else ctype += 's';
-                
+
                 $scope.aliases[newName] = card;
                 $scope.trainClassifiers();
             }
-            
+
             $global.alfred.output.say('Input command ...');
         }
     }];
@@ -311,7 +323,7 @@ process.app.controller('main', function ($scope, $global) {
 
     $global.handleTurn = function (question) {
         console.log(question);
-        
+
         var answerer = -1,
             asker,
             i;
@@ -320,189 +332,189 @@ process.app.controller('main', function ($scope, $global) {
         question.cards = [question.person, question.room, question.weapon];
 
         try {
-        // Step #2: Remove all three cards from possibles of all people between
-        // who asked and who answered.
-        //1. get the index of the asker
-        for (i = 0; i < $global.players.length; i += 1) {
-            if ($global.players[i].name === question.asker) {
-                asker = i;
-                console.log("asker %s found at %d", $global.players[i].name, asker);
-            }
-            //get the index of the answerer
-            if ($global.players[i].name === question.answerer) {
-                answerer = i;
-                console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
-            }
-        }
-
-        if (answerer === -1) {
-            for (var player of $global.players) {
-                if (!player.detective && player.name !== question.asker) {
-                    console.log('ELIMINATE FROM: ' + player.name);
-                    player.possible = player.possible.filter(function (card) {
-                        return !~ question.cards.indexOf(card);
-                    });
+            // Step #2: Remove all three cards from possibles of all people between
+            // who asked and who answered.
+            //1. get the index of the asker
+            for (i = 0; i < $global.players.length; i += 1) {
+                if ($global.players[i].name === question.asker) {
+                    asker = i;
+                    console.log("asker %s found at %d", $global.players[i].name, asker);
+                }
+                //get the index of the answerer
+                if ($global.players[i].name === question.answerer) {
+                    answerer = i;
+                    console.log('found answerer ' + $global.players[answerer].name + ' at ' + answerer);
                 }
             }
-        } else {
-            for (i = asker + 1; i < $global.players.length; i += 1) {
-                if (i === answerer) break;
-            
-                if (!$global.players[i].detective) {
-                    console.log('ELIMINATE FROM: ' + $global.players[i].name);
-                    $global.players[i].possible = $global.players[i].possible.filter(function (item) {
-                        return !~ question.cards.indexOf(item);
-                    });
+
+            if (answerer === -1) {
+                for (var player of $global.players) {
+                    if (!player.detective && player.name !== question.asker) {
+                        console.log('ELIMINATE FROM: ' + player.name);
+                        player.possible = player.possible.filter(function (card) {
+                            return !~question.cards.indexOf(card);
+                        });
+                    }
                 }
-            
-                if (i === $global.players.length - 1) i = -1;
+            } else {
+                for (i = asker + 1; i < $global.players.length; i += 1) {
+                    if (i === answerer) break;
+
+                    if (!$global.players[i].detective) {
+                        console.log('ELIMINATE FROM: ' + $global.players[i].name);
+                        $global.players[i].possible = $global.players[i].possible.filter(function (item) {
+                            return !~question.cards.indexOf(item);
+                        });
+                    }
+
+                    if (i === $global.players.length - 1) i = -1;
+                }
             }
-        }
 
-        // Step #3: Eliminate cards from the question which are NOT present
-        // in the master guess.
-        question.person = $global.master.Guess.person.filter(function (prsn) {
-            return prsn.itm === question.person;
-        }).length > 0 ? question.person : null;
-
-        question.room = $global.master.Guess.room.filter(function (rm) {
-            return rm.itm === question.room;
-        }).length > 0 ? question.room : null;
-
-        question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
-            return wpn.itm === question.weapon;
-        }).length > 0 ? question.weapon : null;
-
-        // Step #4: Eliminate cards remaining in the question which are NOT
-        // in the Answerer's possibles.
-        if (answerer !== -1) {
-            question.person = $global.players[answerer].possible.filter(function (prsn) {
-                return prsn === question.person;
+            // Step #3: Eliminate cards from the question which are NOT present
+            // in the master guess.
+            question.person = $global.master.Guess.person.filter(function (prsn) {
+                return prsn.itm === question.person;
             }).length > 0 ? question.person : null;
 
-            question.room = $global.players[answerer].possible.filter(function (rm) {
-                return rm === question.room;
+            question.room = $global.master.Guess.room.filter(function (rm) {
+                return rm.itm === question.room;
             }).length > 0 ? question.room : null;
 
-            question.weapon = $global.players[answerer].possible.filter(function (wpn) {
-                return wpn === question.weapon;
+            question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
+                return wpn.itm === question.weapon;
             }).length > 0 ? question.weapon : null;
-        }
 
-        // create clean stack
-        question.cards = [question.person, question.room, question.weapon].filter(function (card) {
-            return card;
-        });
-        console.log('ANS: '+answerer);
-        if (answerer !== -1) {
-            // Step #5: Add remaining cards to a row in Answerer's maybe stack.
-            
-            
-            $global.players[answerer].maybe.add(question.cards);
-            console.log('added '+question.cards + ' to '+answerer);
-            // Step #6: Check Answerer's maybes for any row with only one item.
-            // Step #7: For each such row:
-            while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length === 1) {
-                var first = $global.players[answerer].maybe.pop()[0];
+            // Step #4: Eliminate cards remaining in the question which are NOT
+            // in the Answerer's possibles.
+            if (answerer !== -1) {
+                question.person = $global.players[answerer].possible.filter(function (prsn) {
+                    return prsn === question.person;
+                }).length > 0 ? question.person : null;
 
-                // Step #7.1: Add to Answerer's definite.
-                $global.players[answerer].sure.push(first);
+                question.room = $global.players[answerer].possible.filter(function (rm) {
+                    return rm === question.room;
+                }).length > 0 ? question.room : null;
 
-                // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
-                $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
-                    return card.itm !== first;
-                });
+                question.weapon = $global.players[answerer].possible.filter(function (wpn) {
+                    return wpn === question.weapon;
+                }).length > 0 ? question.weapon : null;
+            }
 
-            } //while...
+            // create clean stack
+            question.cards = [question.person, question.room, question.weapon].filter(function (card) {
+                return card;
+            });
+            console.log('ANS: ' + answerer);
+            if (answerer !== -1) {
+                // Step #5: Add remaining cards to a row in Answerer's maybe stack.
 
-        } //if...
 
-        //handle case where no one answeres, those cards must therefore be in either our hand, their hand, or the answer
-        if (question.answerer === 'nobody') {
-            console.log('nobody answered')
-            console.log(question)
-            
-            var planswerer = $global.players.getByName(question.asker);
-            
-            if (planswerer.detective) {
-                for (var c of question.cards) {
-                    console.log('update ' + c)
-                    $global.master.Guess[$scope.cardtype(c)].update('itm', {
-                      prob: 1,
-                      itm: c
+                $global.players[answerer].maybe.add(question.cards);
+                console.log('added ' + question.cards + ' to ' + answerer);
+                // Step #6: Check Answerer's maybes for any row with only one item.
+                // Step #7: For each such row:
+                while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length === 1) {
+                    var first = $global.players[answerer].maybe.pop()[0];
+
+                    // Step #7.1: Add to Answerer's definite.
+                    $global.players[answerer].sure.push(first);
+
+                    // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+                    $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
+                        return card.itm !== first;
                     });
-                } //end for
-            } else {
-                planswerer.maybe.add(question.cards);
-                for (var c of question.cards) {
-                    console.log('update ' + c)
-                
-                    if (!~$.inArray(c, $global.players.getByName(question.asker).possible)) {
+
+                } //while...
+
+            } //if...
+
+            //handle case where no one answeres, those cards must therefore be in either our hand, their hand, or the answer
+            if (question.answerer === 'nobody') {
+                console.log('nobody answered')
+                console.log(question)
+
+                var planswerer = $global.players.getByName(question.asker);
+
+                if (planswerer.detective) {
+                    for (var c of question.cards) {
+                        console.log('update ' + c)
                         $global.master.Guess[$scope.cardtype(c)].update('itm', {
                             prob: 1,
                             itm: c
                         });
-                    } else {
-                        $global.master.Guess[$scope.cardtype(c)].update('itm', {
-                            prob: 0.5,
-                            itm: c
-                        });
-                    }
-                } //end for
-            }
-        } //endif nobody 
+                    } //end for
+                } else {
+                    planswerer.maybe.add(question.cards);
+                    for (var c of question.cards) {
+                        console.log('update ' + c)
+
+                        if (!~$.inArray(c, $global.players.getByName(question.asker).possible)) {
+                            $global.master.Guess[$scope.cardtype(c)].update('itm', {
+                                prob: 1,
+                                itm: c
+                            });
+                        } else {
+                            $global.master.Guess[$scope.cardtype(c)].update('itm', {
+                                prob: 0.5,
+                                itm: c
+                            });
+                        }
+                    } //end for
+                }
+            } //endif nobody 
 
 
-        // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
-        // card in the master guess, do:
-        var guess = array($global.master.Guess.person).concat(array($global.master.Guess.room), array($global.master.Guess.weapon)).map(function (card) {
-            return card.itm;
-        });
+            // Step #8: If the Asker is on our right, create an empty array of probabilities then for each
+            // card in the master guess, do:
+            var guess = array($global.master.Guess.person).concat(array($global.master.Guess.room), array($global.master.Guess.weapon)).map(function (card) {
+                return card.itm;
+            });
 
-        // update probabilities of all guesses
-        for (var card of guess) {
-            var updated = false,
-                probabilities = [];
+            // update probabilities of all guesses
+            for (var card of guess) {
+                var updated = false,
+                    probabilities = [];
 
-            // Step #8.1: For each player in players do:
-            for (var player of $global.players) {
-                if (!player.detective) {
-                    // Step #8.1.1: For each row in player's maybes do:
-                    for (var row of player.maybe) {
-                        // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
-                        if (row.indexOf(card) !== -1) {
-                            probabilities.push(1 / row.length);
-                            updated = true;
+                // Step #8.1: For each player in players do:
+                for (var player of $global.players) {
+                    if (!player.detective) {
+                        // Step #8.1.1: For each row in player's maybes do:
+                        for (var row of player.maybe) {
+                            // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
+                            if (row.indexOf(card) !== -1) {
+                                probabilities.push(1 / row.length);
+                                updated = true;
+                            }
                         }
                     }
                 }
-            }
 
-            // Step #8.1.2: Multiply every element in the array by 1 / array.length.
-            probabilities = probabilities.map(function (p) {
-                return p * (1 / probabilities.length);
-            });
-
-            // Step #8.1.3: Sum all elements in the array, and set the probability of
-            // card in the master guess to 1 - sum.
-            var sum = 0;
-            probabilities.forEach(function (p) {
-                sum += p;
-            });
-
-            if (updated) {
-                $global.master.Guess[$scope.cardtype(card)].update('itm', {
-                    prob: 1 - sum,
-                    itm: card
+                // Step #8.1.2: Multiply every element in the array by 1 / array.length.
+                probabilities = probabilities.map(function (p) {
+                    return p * (1 / probabilities.length);
                 });
-            }
-        }
-        //} //<
 
-        // ..
-        console.log(JSON.stringify(question, null, 2));
-        $global.alfred.output.say('Input command ...');
-        $scope.$apply();
+                // Step #8.1.3: Sum all elements in the array, and set the probability of
+                // card in the master guess to 1 - sum.
+                var sum = 0;
+                probabilities.forEach(function (p) {
+                    sum += p;
+                });
+
+                if (updated) {
+                    $global.master.Guess[$scope.cardtype(card)].update('itm', {
+                        prob: 1 - sum,
+                        itm: card
+                    });
+                }
+            }
+            //} //<
+
+            // ..
+            console.log(JSON.stringify(question, null, 2));
+            $global.alfred.output.say('Input command ...');
+            $scope.$apply();
         } catch (e) {
             console.error(String(e));
             console.error(String(e.stack))
