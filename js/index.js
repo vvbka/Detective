@@ -36,25 +36,43 @@ process.app.controller('main', function ($scope, $global) {
         array = Array.prototype.slice.call.bind(Array.prototype.slice),
         handlers = {};
 
-    // load classifiers
-    $global.classifiers = {
-        players: new BayesClassifier(),
-        people: new BayesClassifier(), // BayesClassifier.restore(require('./data/people-classifier.json')),
-        rooms: new BayesClassifier(), // BayesClassifier.restore(require('./data/rooms-classifier.json')),
-        weapons: new BayesClassifier(), // BayesClassifier.restore(require('./data/weapons-classifier.json')),
-        cards: new BayesClassifier() // BayesClassifier.restore(require('./data/cards-classifier.json'))
+    $scope.aliases = {};
+
+    $scope.trainClassifiers = function () {
+        // load classifiers
+        $global.classifiers = {
+            players: new BayesClassifier(),
+            people: new BayesClassifier(), // BayesClassifier.restore(require('./data/people-classifier.json')),
+            rooms: new BayesClassifier(), // BayesClassifier.restore(require('./data/rooms-classifier.json')),
+            weapons: new BayesClassifier(), // BayesClassifier.restore(require('./data/weapons-classifier.json')),
+            cards: new BayesClassifier() // BayesClassifier.restore(require('./data/cards-classifier.json'))
+        };
+        
+        // add cardset
+        for (var person of $global.cardset.people) { $global.classifiers.people.addDocument(person, person); $global.classifiers.cards.addDocument(person, person); }
+        for (var room of $global.cardset.rooms) { $global.classifiers.rooms.addDocument(room, room); $global.classifiers.cards.addDocument(room, room); }
+        for (var weapon of $global.cardset.weapons) { $global.classifiers.weapons.addDocument(weapon, weapon); $global.classifiers.cards.addDocument(weapon, weapon); }
+
+        // add aliases
+        for (var alias in $scope.aliases) {
+            if ($scope.aliases.hasOwnProperty(alias)) {
+                var ctype = $global.cardtype($scope.aliases[alias]);
+                ctype = ctype === 'person' ? 'people' : (ctype + 's');
+                
+                $global.classifiers[ctype].addDocument(alias, $scope.aliases[alias]);
+                $global.classifiers.cards.addDocument(alias, $scope.aliases[alias]);
+            }
+        }
+
+        for (var ctype in $global.classifiers) {
+            if ($global.classifiers.hasOwnProperty(ctype)) {
+                setTimeout($global.classifiers[ctype].train.bind($global.classifiers[ctype]), 1);
+            }
+        }
     };
-
-    // train classifiers
-    for (var person of $global.cardset.people) { $global.classifiers.people.addDocument(person, person); $global.classifiers.cards.addDocument(person, person); }
-    for (var room of $global.cardset.rooms) { $global.classifiers.rooms.addDocument(room, room); $global.classifiers.cards.addDocument(room, room); }
-    for (var weapon of $global.cardset.weapons) { $global.classifiers.weapons.addDocument(weapon, weapon); $global.classifiers.cards.addDocument(weapon, weapon); }
-
-    for (var ctype in $global.classifiers) {
-      if ($global.classifiers.hasOwnProperty(ctype)) {
-        setTimeout($global.classifiers[ctype].train.bind($global.classifiers[ctype]), 1);
-      }
-    }
+    
+    // train initially
+    $scope.trainClassifiers();
     
     // alfred commands
     $scope.alcmds = [{
@@ -228,20 +246,32 @@ process.app.controller('main', function ($scope, $global) {
         prompts: ['not *'],
         desc: 'Exempt a card from the cardset (that you do not wish to play with).',
         fn: function* (input) {
-            var card = $global.classifiers.cards.classify(input);
+            var card = $global.classifiers.cards.classify(input),
+                ctype = $global.cardtype(card);
 
-            console.log('about to remove from master');
-            $global.master.Guess[$global.cardtype(card)] = $global.master.Guess[$global.cardtype(card)].filter(function (crd) {
-                return crd.itm !== card
+            // remove from master
+            $global.master.Guess[ctype] = $global.master.Guess[ctype].filter(function (crd) {
+                return crd.itm !== card;
             });
+            
+            // remove from players
             for (var p of $global.players) {
                 if (!p.detective) {
                     console.log('removng from: %s', p.name);
                     p.possible = p.possible.filter(function (crd) {
-                        return crd !== card
-                    })
+                        return crd !== card;
+                    });
                 }
             }
+            
+            // remove from cardset
+            $global.cardset[cardset] = $global.cardset[cardset].filter(function (crd) {
+                return crd !== card;
+            });
+            
+            // re-train classifiers
+            $scope.trainClassifiers();
+            
             try {
                 $scope.$apply();
             } catch (e) {};
@@ -266,11 +296,8 @@ process.app.controller('main', function ($scope, $global) {
                 if (ctype === 'person') ctype = 'people';
                 else ctype += 's';
                 
-                $global.classifiers[ctype].addDocument(newName, card);
-                $global.classifiers.cards.addDocument(newName, card);
-                
-                $global.classifiers[ctype].train();
-                $global.classifiers.cards.train();
+                $scope.aliases[newName] = card;
+                $scope.trainClassifiers();
             }
             
             $global.alfred.output.say('Input command ...');
@@ -280,7 +307,6 @@ process.app.controller('main', function ($scope, $global) {
     // make alfred globally available
     $global.alfred = require('alfred');
     $global.alfred.init($scope.alcmds);
-
 
     $global.handleTurn = function (question) {
         console.log(question);
