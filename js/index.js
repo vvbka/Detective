@@ -385,6 +385,13 @@ process.app.controller('main', function ($scope, $global) {
                 return wpn.itm === question.weapon;
             }).length > 0 ? question.weapon : null;
 
+            // add the question cards to the asker
+            if (!$global.players[asker].detective) {
+                $global.players[asker].maybe.add(question.cards.filter(function (card) {
+                    return $global.players[asker].possible.indexOf(card) !== -1;
+                }));
+            }
+
             // Step #4: Eliminate cards remaining in the question which are NOT
             // in the Answerer's possibles.
             if (answerer !== -1) {
@@ -409,11 +416,11 @@ process.app.controller('main', function ($scope, $global) {
             if (answerer !== -1) {
                 // Step #5: Add remaining cards to a row in Answerer's maybe stack.
 
-
                 $global.players[answerer].maybe.add(question.cards);
+                
                 console.log('added ' + question.cards + ' to ' + answerer);
                 // Step #6: Check Answerer's maybes for any row with only one item.
-                // Step #7: For each such row:
+  /*              // Step #7: For each such row:
                 while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length === 1) {
                     var first = $global.players[answerer].maybe.pop()[0];
 
@@ -426,7 +433,7 @@ process.app.controller('main', function ($scope, $global) {
                     });
 
                 } //while...
-
+*/
             } //if...
 
             //handle case where no one answeres, those cards must therefore be in either our hand, their hand, or the answer

@@ -180,14 +180,32 @@ process.app.controller('wizard', function ($scope, $global) {
                     // update single row maybes
                     while (player.maybe.length > 0 && player.maybe.first().length === 1) {
                         var first = player.maybe.pop()[0];
+                        
+                        // only assume we know the card if no one else
+                        // has it in their maybes
+                        var existsElsewhere = false;
+outer:                  for (var ply of $global.players) {
+                            if (!ply.detective && ply.name !== player.name) {
+                                for (var row of ply.maybe) {
+                                    if (row.indexOf(first) !== -1) {
+                                        existsElsewhere = true;
+                                        break outer;
+                                    }
+                                }
+                            }
+                        }
 
-                        // Step #7.1: Add to Answerer's definite.
-                        player.sure.push(first);
+                        if (existsElsewhere) {
+                            player.maybe.add([first]);
+                        } else {
+                            // Step #7.1: Add to Answerer's definite.
+                            player.sure.push(first);
 
-                        // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
-                        $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
-                            return card.itm !== first;
-                        });
+                            // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
+                            $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
+                                return card.itm !== first;
+                            });
+                        }
                     }
                     
                     // update every card
