@@ -119,9 +119,16 @@ process.app.controller('BoardController', function ($scope, $global) {
                 //console.log("setting " +question.cards+' to 100%');
                 
                 for(var crd of question.cards){
-                        console.log("setting "+ crd +' to 100%');
-                       $global.master.Guess[$global.cardtype(crd)].update('itm', {prob:1,itm:crd})
+                    console.log("setting "+ crd +' to 100%');
+                    $global.master.Guess[$global.cardtype(crd)].update('itm', {prob:1,itm:crd})
+                    
+                    //also, everything else in that same type should be filtered from the master guess list
+                    $global.master.Guess[$global.cardtype(crd)] = $global.master.Guess[$global.cardtype(crd)].filter(function (card) {
+                    return card.itm === crd;
+                });
                 }
+                
+                
             } else {
                 // remove the card from the master guess
                 $global.master.Guess[cardtype] = $global.master.Guess[cardtype].filter(function (card) {
