@@ -93,8 +93,9 @@ process.app.controller('BoardController', function ($scope, $global) {
                         if ($global.players[i].detective) break outer;
 
                         if ($global.players[i].name !== answerer) {
-                            console.log('ELIMINATE FROM: %s', $global.players[i].name);
+                            //console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
                             $global.players[i].possible = $global.players[i].possible.filter(function (card) {
+                                if(~question.cards.indexOf(card)) console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
                                 return !~question.cards.indexOf(card);
                             });
                         }

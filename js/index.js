@@ -200,17 +200,19 @@ process.app.controller('main', function ($scope, $global) {
                     $global.alfred.output.say('Show Card: ' + ret);
                     $scope.$apply();
                     setTimeout(function () {
-                        $global.alfred.output.say('Input Command...');
-                        $scope.$apply();
+                        $global.handleTurn(question);
+                        //$global.alfred.output.say('Input Command...');
+                        //$scope.$apply();
                     }, 3000)
-                    return ret
+                    return ret;
 
                 } else {
                     console.log('Detective Can\'t Answer!')
                     question.answerer = $global.classifiers.players.classify(yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
+                    $global.handleTurn(question);
                 }
             }
-            $global.handleTurn(question);
+            
 
         }
     }, {
@@ -386,7 +388,7 @@ process.app.controller('main', function ($scope, $global) {
             }).length > 0 ? question.weapon : null;
 
             // add the question cards to the asker
-            if (!$global.players[asker].detective) {
+            if (!$global.players[asker].detective && answerer !== -1) {
                 $global.players[asker].maybe.add(question.cards.filter(function (card) {
                     return $global.players[asker].possible.indexOf(card) !== -1;
                 }));
@@ -394,7 +396,7 @@ process.app.controller('main', function ($scope, $global) {
 
             // Step #4: Eliminate cards remaining in the question which are NOT
             // in the Answerer's possibles.
-            if (answerer !== -1) {
+            if (answerer !== -1 && !$global.players[answerer].detective) {
                 question.person = $global.players[answerer].possible.filter(function (prsn) {
                     return prsn === question.person;
                 }).length > 0 ? question.person : null;
@@ -413,7 +415,7 @@ process.app.controller('main', function ($scope, $global) {
                 return card;
             });
             console.log('ANS: ' + answerer);
-            if (answerer !== -1) {
+            if (answerer !== -1 && !$global.players[answerer].detective) {
                 // Step #5: Add remaining cards to a row in Answerer's maybe stack.
 
                 $global.players[answerer].maybe.add(question.cards);
