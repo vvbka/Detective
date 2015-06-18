@@ -472,7 +472,7 @@ process.app.controller('main', function ($scope, $global) {
             });
 
             // update probabilities of all guesses
-            for (var card of guess) {
+            /*for (var card of guess) {
                 var updated = false,
                     probabilities = [];
 
@@ -508,7 +508,7 @@ process.app.controller('main', function ($scope, $global) {
                         itm: card
                     });
                 }
-            }
+            }*/
             //} //<
 
             // ..

@@ -189,6 +189,31 @@ process.app.controller('wizard', function ($scope, $global) {
                             return card.itm !== first;
                         });
                     }
+                    
+                    // update every card
+                    for (var stack in $global.master.Guess) {
+                        if ($global.master.Guess.hasOwnProperty(stack)) {
+                            for (var card of $global.master.Guess[stack]) {
+                                var nT = 0;
+                                
+                                for (var ply of $global.players) {
+                                    if (!ply.detective && ply.possible.indexOf(card.itm) !== -1) {
+                                        // assume that the cards have been evenly distributed
+                                        // such that the number of cards in Detective's hand are
+                                        // equal to the number of cards in any given player's hand
+                                        // ... and so we are summing up the unknowns in every
+                                        // player's hand
+                                        nT += $global.Detective.sure.length - ply.sure.length;
+                                    }
+                                }
+                                
+                                $global.master.Guess[stack].update('itm', {
+                                    itm: card.itm,
+                                    prob: 1 / nT
+                                });
+                            }
+                        }
+                    }
 
                     // update scope
                     try {
