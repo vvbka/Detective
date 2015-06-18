@@ -212,7 +212,7 @@ outer:                  for (var ply of $global.players) {
                     for (var stack in $global.master.Guess) {
                         if ($global.master.Guess.hasOwnProperty(stack)) {
                             for (var card of $global.master.Guess[stack]) {
-                                var nT = 0;
+                                var nT = 1;
                                 
                                 for (var ply of $global.players) {
                                     if (!ply.detective && ply.possible.indexOf(card.itm) !== -1) {
