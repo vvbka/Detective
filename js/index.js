@@ -377,19 +377,19 @@ process.app.controller('main', function ($scope, $global) {
 
             // Step #3: Eliminate cards from the question which are NOT present
             // in the master guess.
-            question.person = $global.master.Guess.person.filter(function (prsn) {
-                return prsn.itm === question.person;
-            }).length > 0 ? question.person : null;
-
-            question.room = $global.master.Guess.room.filter(function (rm) {
-                return rm.itm === question.room;
-            }).length > 0 ? question.room : null;
-
-            question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
-                return wpn.itm === question.weapon;
-            }).length > 0 ? question.weapon : null;
-
-            // add the question cards to the asker
+//             question.person = $global.master.Guess.person.filter(function (prsn) {
+//                 return prsn.itm === question.person;
+//             }).length > 0 ? question.person : null;
+// 
+//             question.room = $global.master.Guess.room.filter(function (rm) {
+//                 return rm.itm === question.room;
+//             }).length > 0 ? question.room : null;
+// 
+//             question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
+//                 return wpn.itm === question.weapon;
+//             }).length > 0 ? question.weapon : null;
+// 
+//             // add the question cards to the asker
             if (!$global.players[asker].detective && answerer !== -1) {
                 $global.players[asker].maybe.add(question.cards.filter(function (card) {
                     return $global.players[asker].possible.indexOf(card) !== -1;
@@ -399,7 +399,9 @@ process.app.controller('main', function ($scope, $global) {
             // Step #4: Eliminate cards remaining in the question which are NOT
             // in the Answerer's possibles.
             if (answerer !== -1 && !$global.players[answerer].detective) {
+                
                 question.person = $global.players[answerer].possible.filter(function (prsn) {
+                    console.log(prsn + '===' + question.person);
                     return prsn === question.person;
                 }).length > 0 ? question.person : null;
 

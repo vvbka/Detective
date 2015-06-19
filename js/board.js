@@ -98,11 +98,11 @@ process.app.controller('BoardController', function ($scope, $global) {
                         if ($global.players[i].name !== answerer) {
                             //console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
                             $global.players[i].possible = $global.players[i].possible.filter(function (card) {
-                                if(~question.cards.indexOf(card)) console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
+                                if(!~question.cards.indexOf(card)) console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
                                 return !~question.cards.indexOf(card);
                             });
                         }
-                    }
+                    }   
                 }
             }
 
@@ -120,7 +120,7 @@ process.app.controller('BoardController', function ($scope, $global) {
             console.log('In response to my question '+answerer+' answered.');
             if(answerer === 'nobody'){
                 //if no one answered, then the remaining cards have to be 100%.
-                //console.log("setting " +question.cards+' to 100%');
+                console.log("setting " +question.cards+' to 100%');
                 
                 for(var crd of question.cards){
                     console.log("setting "+ crd +' to 100%');
