@@ -82,6 +82,7 @@ process.app.controller('wizard', function ($scope, $global) {
         $global.Detective.turn = $('#playersSort li').index($('#playersSort').find('input:checked').parent());
         $global.Detective.detective = true;
         $global.Detective.location = getStartingLocation($scope.chars[detindex]);
+        $global.Detective.seen = [];
         $global.locationSet();
 
         //initiate each new player
