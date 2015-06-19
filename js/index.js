@@ -211,6 +211,8 @@ process.app.controller('main', function ($scope, $global) {
                     question.answerer = $global.classifiers.players.classify(yield 'I\'m Sorry, I can\'t Answer.  Who was able to?')
                     $global.handleTurn(question);
                 }
+            } else {
+                $global.handleTurn(question);
             }
             
 
