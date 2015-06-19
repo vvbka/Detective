@@ -83,6 +83,9 @@ process.app.controller('BoardController', function ($scope, $global) {
             // figure out what they showed
             answer = $global.classifiers.cards.classify(answer);
             cardtype = $global.cardtype(answer);
+            
+            //mark that we've seen this card
+            $global.Detective.seen.push(answer);
 
             // remove all question cards from the possibles
             // of everyone between us and who showed
