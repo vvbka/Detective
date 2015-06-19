@@ -69,7 +69,7 @@ process.app.controller('BoardController', function ($scope, $global) {
     this.ask = function (question) {
         $global.alfred.input.get(util.format('Ask: "was it %s in the %s with a %s?" Who answered and what did they show you?', question.person, question.place, question.weapon), function (answer) {
             // create full card list
-            question.cards = [question.person, question.room, question.weapon];
+            question.cards = [question.person, question.room || question.place, question.weapon];
 
             //filter out the cards that are in our hand
             question.cards = question.cards.filter(function(crd) {
@@ -85,7 +85,7 @@ process.app.controller('BoardController', function ($scope, $global) {
             cardtype = $global.cardtype(answer);
             
             //mark that we've seen this card
-            $global.Detective.seen.push(answer);
+            if (answerer !== 'nobody') $global.Detective.seen.push(answer);
 
             // remove all question cards from the possibles
             // of everyone between us and who showed
@@ -98,8 +98,8 @@ process.app.controller('BoardController', function ($scope, $global) {
                         if ($global.players[i].name !== answerer) {
                             //console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
                             $global.players[i].possible = $global.players[i].possible.filter(function (card) {
-                                if(!~question.cards.indexOf(card)) console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
-                                return !~question.cards.indexOf(card);
+                                if(~question.cards.indexOf(card)) console.log('ELIMINATE %s FROM: %s', card, $global.players[i].name);
+                                return !~ question.cards.indexOf(card);
                             });
                         }
                     }   
@@ -108,11 +108,21 @@ process.app.controller('BoardController', function ($scope, $global) {
 
             // remove the card from the possibles of every single
             // player other than the answerer
-            for (var player of $global.players) {
-                if (!player.detective && player.name !== question.answerer) {
-                    player.possible = player.possible.filter(function (card) {
-                        return card !== answer;
-                    });
+            if (answerer !== 'nobody') {
+                for (var player of $global.players) {
+                    if (!player.detective && player.name !== question.answerer) {
+                        player.possible = player.possible.filter(function (card) {
+                            return card !== answer;
+                        });
+                    }
+                }
+            } else {
+                for (var player of $global.players) {
+                    if (!player.detective && player.name !== question.answerer) {
+                        player.possible = player.possible.filter(function (card) {
+                            return card.toLowerCase() !== question.cards[0].toLowerCase();
+                        });
+                    }
                 }
             }
 
@@ -123,13 +133,15 @@ process.app.controller('BoardController', function ($scope, $global) {
                 console.log("setting " +question.cards+' to 100%');
                 
                 for(var crd of question.cards){
-                    console.log("setting "+ crd +' to 100%');
-                    $global.master.Guess[$global.cardtype(crd)].update('itm', {prob:1,itm:crd})
+                    if (crd) {
+                        console.log("setting "+ crd +' to 100%');
+                        $global.master.Guess[$global.cardtype(crd)].update('itm', {prob:1,itm:crd})
                     
-                    //also, everything else in that same type should be filtered from the master guess list
-                    $global.master.Guess[$global.cardtype(crd)] = $global.master.Guess[$global.cardtype(crd)].filter(function (card) {
-                    return card.itm === crd;
-                });
+                        //also, everything else in that same type should be filtered from the master guess list
+                        $global.master.Guess[$global.cardtype(crd)] = $global.master.Guess[$global.cardtype(crd)].filter(function (card) {
+                            return card.itm.toLowerCase() === crd;
+                        });
+                    }
                 }
                 
                 
@@ -173,6 +185,7 @@ process.app.controller('BoardController', function ($scope, $global) {
 
             // okay, we're done
             $global.alfred.output.say('Input command ...');
+            $global.updateProbs();
         });
     };
 

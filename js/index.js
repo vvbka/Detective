@@ -696,7 +696,8 @@ process.app.controller('main', function ($scope, $global) {
     $scope.host = 'localhost:1024';
     nextPort(function (err, port) {
         $scope.host = 'localhost:' + port;
-        $scope.$apply();
+        //try { $scope.$apply(); }
+        //catch (e) { /* ignore */ }
 
         // start client server
         var express = require('express'),
@@ -794,8 +795,6 @@ process.app.controller('main', function ($scope, $global) {
             }
         });
 
-        $scope.$apply(function () {
-            $scope.port = port;
-        });
+        $scope.port = port;
     });
 });
