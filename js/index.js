@@ -220,7 +220,7 @@ process.app.controller('main', function ($scope, $global) {
         desc: 'Tell Detective that it is now your turn.',
         fn: function* () {
             if (($global.master.Guess.person.first().prob * $global.master.Guess.room.first().prob * $global.master.Guess.weapon.first().prob) > $global.threshold) {
-                var ans = 'It was ' + $global.master.Guess.person.first().itm + ' in the ' + $global.master.Guess.room.first().itm + ' with a ' + $global.master.Guess.weapon.first().itm + '?',
+                var ans = 'It was ' + $global.master.Guess.person.first().itm + ' in the ' + $global.master.Guess.room.first().itm + ' with a ' + $global.master.Guess.weapon.first().itm + '!',
                     resp = yield(ans);
                 if (~resp.toLowerCase().indexOf('n')) {
                     window.alert("You LOST!!! :(");
