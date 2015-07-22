@@ -11,7 +11,10 @@ process.app.controller('main', function ($scope, $global) {
 
     // for errors
     $scope.error = {};
-    $global.tc = require('trashcan');
+    
+    //If you want to use trashcan for fancy modal errors, uncomment this
+    
+    //$global.tc = require('trashcan');
     //     $global.tc.on('error', function (error) {
     //         console.log(error);
     //         $scope.$apply(function () {
@@ -377,19 +380,8 @@ process.app.controller('main', function ($scope, $global) {
 
             // Step #3: Eliminate cards from the question which are NOT present
             // in the master guess.
-//             question.person = $global.master.Guess.person.filter(function (prsn) {
-//                 return prsn.itm === question.person;
-//             }).length > 0 ? question.person : null;
-// 
-//             question.room = $global.master.Guess.room.filter(function (rm) {
-//                 return rm.itm === question.room;
-//             }).length > 0 ? question.room : null;
-// 
-//             question.weapon = $global.master.Guess.weapon.filter(function (wpn) {
-//                 return wpn.itm === question.weapon;
-//             }).length > 0 ? question.weapon : null;
-// 
-//             // add the question cards to the asker
+           
+            // add the question cards to the asker
             if (!$global.players[asker].detective && answerer !== -1) {
                 $global.players[asker].maybe.add(question.cards.filter(function (card) {
                     return $global.players[asker].possible.indexOf(card) !== -1;
@@ -426,20 +418,7 @@ process.app.controller('main', function ($scope, $global) {
                 
                 console.log('added ' + question.cards + ' to ' + answerer);
                 // Step #6: Check Answerer's maybes for any row with only one item.
-  /*              // Step #7: For each such row:
-                while ($global.players[answerer].maybe.length > 0 && $global.players[answerer].maybe.first().length === 1) {
-                    var first = $global.players[answerer].maybe.pop()[0];
-
-                    // Step #7.1: Add to Answerer's definite.
-                    $global.players[answerer].sure.push(first);
-
-                    // Step #7.2: Remove from master guess, definite, and from all players, possible and maybes.
-                    $global.master.Guess[$scope.cardtype(first)] = $global.master.Guess[$scope.cardtype(first)].filter(function (card) {
-                        return card.itm !== first;
-                    });
-
-                } //while...
-*/
+                
             } //if...
 
             //handle case where no one answeres, those cards must therefore be in either our hand, their hand, or the answer
@@ -484,47 +463,9 @@ process.app.controller('main', function ($scope, $global) {
                 return card.itm;
             });
 
-            // update probabilities of all guesses
-            /*for (var card of guess) {
-                var updated = false,
-                    probabilities = [];
+           
 
-                // Step #8.1: For each player in players do:
-                for (var player of $global.players) {
-                    if (!player.detective) {
-                        // Step #8.1.1: For each row in player's maybes do:
-                        for (var row of player.maybe) {
-                            // Step #8.1.1.1: If row contains card, push 1 / row.length to array of probabilities.
-                            if (row.indexOf(card) !== -1) {
-                                probabilities.push(1 / row.length);
-                                updated = true;
-                            }
-                        }
-                    }
-                }
-
-                // Step #8.1.2: Multiply every element in the array by 1 / array.length.
-                probabilities = probabilities.map(function (p) {
-                    return p * (1 / probabilities.length);
-                });
-
-                // Step #8.1.3: Sum all elements in the array, and set the probability of
-                // card in the master guess to 1 - sum.
-                var sum = 0;
-                probabilities.forEach(function (p) {
-                    sum += p;
-                });
-
-                if (updated) {
-                    $global.master.Guess[$scope.cardtype(card)].update('itm', {
-                        prob: 1 - sum,
-                        itm: card
-                    });
-                }
-            }*/
-            //} //<
-
-            // ..
+            //And we're done, so clean up
             console.log(JSON.stringify(question, null, 2));
             $global.alfred.output.say('Input command ...');
             $scope.$apply();
@@ -696,6 +637,8 @@ process.app.controller('main', function ($scope, $global) {
     $scope.host = 'localhost:1024';
     nextPort(function (err, port) {
         $scope.host = 'localhost:' + port;
+        
+        //uncomment if a scope apply force is needed
         //try { $scope.$apply(); }
         //catch (e) { /* ignore */ }
 

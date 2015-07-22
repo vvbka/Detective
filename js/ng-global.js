@@ -13,6 +13,7 @@ process.app.factory('$global', function () {
             Guess: {},
             Definite: {}
         },
+        //update Cardset to reflect actual avaiable playing cards at outset (using 'not' command will have an impact on the probabilities)
         cardset: {
             people: ['Ms. Scarlet', 'Colonel Mustard', 'Professor Plum', 'Mr. Green', 'Mrs. White', 'Mrs. Peacock'],
             rooms: ['Ballroom', 'Billiard Room', 'Conservatory', 'Dining Room', 'Hall', 'Kitchen', 'Lounge', 'Study', 'Library'],
