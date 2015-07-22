@@ -1,8 +1,8 @@
 /**
- * js/main.js - detective
- * Licensed under MIT.
- * Copyright (C) 2015 VBKA.
- **/
+ * js/index.js - Detective
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
 
 process.app.controller('main', function ($scope, $global) {
     'use strict';

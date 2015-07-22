@@ -1,3 +1,9 @@
+/**
+ * js/client.js - Detective
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
+
 angular.module('app', []).controller('client', function ($scope) {
     'use strict';
 

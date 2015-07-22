@@ -1,6 +1,9 @@
 /**
- * Board Display CSS
- **/
+ * css/board.js - Detective
+ * CSS for the game board display
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
 
 .board td {
     height: 20px;

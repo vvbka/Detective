@@ -1,9 +1,9 @@
 /**
- * js/ng-global.js - detective
- * safely define globals without globalling them.
- * Licensed under MIT.
- * Copyright (C) 2015 VBKA.
- **/
+ * js/ng-global.js - Detective
+ * Safely define globals without globalling them.
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
 
 'use strict';
 

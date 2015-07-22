@@ -1,8 +1,9 @@
 /**
- * js/board.js - detective
- * Copyright (C) 2015 VBKA.
- **/
-
+ * 
+ * js/board.js - Detective
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
 process.app.controller('BoardController', function ($scope, $global) {
     'use strict';
 

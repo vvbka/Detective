@@ -1,10 +1,9 @@
 /**
- * js/wizard.js - detective
- * all things binding and setup for the wizard.
- *
- * Licensed under MIT.
- * Copyright (C) 2015 VBKA.
- **/
+ * js/wizzard.js - Detective
+ * All things binding and setup for the game configuration wizard.
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
 
 'use strict';
 

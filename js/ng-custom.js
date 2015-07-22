@@ -1,9 +1,9 @@
 /**
- * js/ng-custom.js - detective
- * custom Angular directives, filters, etc...
- * Licensed under MIT.
- * Copyright (C) 2015 VBKA.
- **/
+ * js/ng-custom.js - Detective
+ * Custom Angular bindings for Detective
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
+**/
 
 $('[data-toggle=tooltip]').tooltip();
 
