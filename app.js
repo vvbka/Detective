@@ -1,7 +1,7 @@
 /**
- * app.js - detective
- * Licensed under MIT.
- * Copyright (C) 2015 VBKA.
+ * app.js - Detective
+ * Licensed under GPLv2.
+ * Copyright (C) 2015 VVBKA.
  **/
 
 'use strict';
